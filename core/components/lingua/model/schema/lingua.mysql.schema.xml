@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model package="lingua" baseClass="xPDOObject" platform="mysql" defaultEngine="MyISAM" version="1.1">
+	<object class="Langs" table="langs" extends="xPDOSimpleObject">
+		<field key="active" dbtype="tinyint" precision="3" attributes="unsigned" phptype="integer" null="false" default="0" />
+		<field key="local_name" dbtype="varchar" precision="255" phptype="string" null="true" />
+		<field key="lang_code" dbtype="char" precision="2" phptype="string" null="false" index="index" />
+		<field key="lcid_string" dbtype="char" precision="10" phptype="string" null="true" />
+		<field key="lcid_dec" dbtype="int" precision="6" attributes="unsigned" phptype="integer" null="true" />
+		<field key="date_format_lite" dbtype="char" precision="32" phptype="string" null="true" default="Y-m-d" />
+		<field key="date_format_full" dbtype="char" precision="32" phptype="string" null="true" default="Y-m-d H:i:s" />
+		<field key="is_rtl" dbtype="tinyint" precision="1" attributes="unsigned" phptype="integer" null="false" default="0" />
+		<field key="flag" dbtype="varchar" precision="255" phptype="string" null="true" />
+
+		<index alias="lang_code" name="lang_code" primary="false" unique="false" type="BTREE" >
+			<column key="lang_code" length="" collation="A" null="false" />
+		</index>
+	</object>
+</model>

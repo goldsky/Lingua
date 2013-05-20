@@ -1,0 +1,1 @@
+[{"name":"lingua.get.key","desc":"prop_lingua.get.key_desc","xtype":"textfield","options":[],"value":"lang","lexicon":"lingua:property","overridden":false,"desc_trans":"Request key.","area":"URL","area_trans":"URL","menu":null}]
