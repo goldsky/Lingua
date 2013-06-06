@@ -20,30 +20,32 @@
  * Suite 330, Boston, MA 02111-1307 USA
  *
  * @package lingua
- * @subpackage lingua_processor
+ * @subpackage lingua_getfield
  */
 
-class LangsGetListProcessor extends modObjectGetListProcessor {
-
-    public $classKey = 'Langs';
-    public $languageTopics = array('lingua:cmp');
-    public $defaultSortField = 'id';
-    public $defaultSortDirection = 'ASC';
-    public $objectType = 'lingua.LangsGetList';
-
-    public function prepareQueryBeforeCount(xPDOQuery $c) {
-        $query = $this->getProperty('query');
-        if (!empty($query)) {
-            $c->where(array(
-                'local_name:LIKE' => '%' . $query . '%',
-                'OR:lang_code:LIKE' => '%' . $query . '%',
-                'OR:lcid_string:LIKE' => '%' . $query . '%',
-                'OR:lcid_dec:LIKE' => '%' . $query . '%',
-            ));
-        }
-        return $c;
-    }
-
+$field = $modx->getOption('field', $scriptProperties);
+if (empty($field)) {
+    return;
 }
 
-return 'LangsGetListProcessor';
+$langCodeField = $modx->getOption('codeField', $scriptProperties, $modx->getOption('lingua.code.field', null, 'lang_code'));
+$cultureKey = $modx->cultureKey;
+$defaultLinguaCorePath = $modx->getOption('core_path') . 'components/lingua/';
+$linguaCorePath = $modx->getOption('lingua.core_path', null, $defaultLinguaCorePath);
+$lingua = $modx->getService('lingua', 'Lingua', $linguaCorePath . 'model/', $scriptProperties);
+
+if (!($lingua instanceof Lingua)) {
+    return;
+}
+
+$langObj = $modx->getObject('Langs', array(
+    $langCodeField => $cultureKey
+));
+if (!$langObj) {
+    return;
+}
+$output = $langObj->get($field);
+if (!$output) {
+    return;
+}
+return $output;

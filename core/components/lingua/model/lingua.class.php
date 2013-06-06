@@ -1,10 +1,33 @@
 <?php
 
+/**
+ * Lingua
+ *
+ * Copyright 2013 by goldsky <goldsky@virtudraft.com>
+ *
+ * This file is part of Lingua, a MODX's Lexicon switcher for front-end interface
+ *
+ * Lingua is free software; you can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software
+ * Foundation version 3.
+ *
+ * Lingua is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * Lingua; if not, write to the Free Software Foundation, Inc., 59 Temple Place,
+ * Suite 330, Boston, MA 02111-1307 USA
+ *
+ * @package lingua
+ * @subpackage lingua
+ */
 class Lingua {
+
+    const version = '1.0.0.pl';
 
     public $modx;
     public $config = array();
-    public $option = array();
 
     /**
      * constructor
@@ -17,6 +40,7 @@ class Lingua {
         $basePath = $this->modx->getOption('lingua.core_path', $config, $this->modx->getOption('core_path') . 'components/lingua/');
         $assetsUrl = $this->modx->getOption('lingua.assets_url', $config, $this->modx->getOption('assets_url') . 'components/lingua/');
         $this->config = array_merge(array(
+            'version' => self::version,
             'basePath' => $basePath,
             'corePath' => $basePath,
             'modelPath' => $basePath . 'model/',
@@ -48,41 +72,6 @@ class Lingua {
      */
     public function setConfig($key, $val) {
         $this->config[$key] = $val;
-    }
-
-    /**
-     * Set options
-     * @param   array   $option     options
-     */
-    public function setOptions(array $option= array()) {
-        $this->option = array_merge($this->option, $option);
-    }
-
-    /**
-     * Get options
-     * @param   string  $key    array's key
-     * @param   string  $val    array's value
-     */
-    public function getOptions() {
-        return $this->option;
-    }
-
-    /**
-     * Define individual option
-     * @param   string  $key    array's key
-     * @param   string  $val    array's value
-     */
-    public function setOption($key, $val) {
-        $this->option[$key] = $val;
-    }
-
-    /**
-     * Define individual option
-     * @param   string  $key    array's key
-     * @param   string  $val    array's value
-     */
-    public function getOption($key) {
-        return $this->option[$key];
     }
 
     /**
@@ -130,9 +119,17 @@ class Lingua {
                     return 'Chunk: ' . $tplChunk . ' is not found, neither the file ' . $output;
                 }
             } else {
-                $output = $this->modx->getChunk($tpl, $phs);
+//                $output = $this->modx->getChunk($tpl, $phs);
+                /**
+                 * @link    http://forums.modx.com/thread/74071/help-with-getchunk-and-modx-speed-please?page=4#dis-post-464137
+                 */
+                $chunk = $this->modx->getParser()->getElement('modChunk', $tpl);
+                $chunk->setCacheable(false);
+                $chunk->_processed = false;
+                $output = $chunk->process($phs);
             }
         }
+        $output = $this->processElementTags($output);
 
         return $output;
     }
@@ -148,6 +145,7 @@ class Lingua {
         $chunk->setContent($code);
         $chunk->setCacheable(false);
         $phs = $this->replacePropPhs($phs);
+        $chunk->_processed = false;
         return $chunk->process($phs);
     }
 
@@ -173,6 +171,7 @@ class Lingua {
 
         $chunk->setCacheable(false);
         $chunk->setContent($o);
+        $chunk->_processed = false;
         $output = $chunk->process($phs);
 
         return $output;
@@ -235,5 +234,4 @@ class Lingua {
             return preg_replace($pattern, $replacement, $subject);
         }
     }
-
 }

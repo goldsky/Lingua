@@ -19,7 +19,7 @@
  * Lingua; if not, write to the Free Software Foundation, Inc., 59 Temple Place,
  * Suite 330, Boston, MA 02111-1307 USA
  *
- * Resolve creating db tables
+ * Validates before action.
  *
  * @package lingua
  * @subpackage build
@@ -27,20 +27,29 @@
 if ($modx = & $object->xpdo) {
     switch ($options[xPDOTransport::PACKAGE_ACTION]) {
         case xPDOTransport::ACTION_INSTALL:
-            $modelPath = $modx->getOption('core_path') . 'components/lingua/model/';
-            $modx->addPackage('lingua', $modelPath, 'modx_lingua_');
-            $manager = $modx->getManager();
-            if ($manager->createObjectContainer('Langs')) {
-                $defaults = include $modx->getOption('core_path') . 'components/lingua/defaults/default.langs.php';
-                foreach ($defaults as $default) {
-                    $default->save();
+            if ($modx->getDebug()) {
+                $modx->log(modX::LOG_LEVEL_WARN, 'validator xPDOTransport::ACTION_INSTALL');
+                $modelPath = $modx->getOption('core_path') . 'components/lingua/model/';
+                if ($modx->addPackage('lingua', $modelPath, 'modx_lingua_')) {
+                    $modx->log(modX::LOG_LEVEL_WARN, '[Lingua] package was added in validator xPDOTransport::ACTION_INSTALL');
                 }
             }
             break;
         case xPDOTransport::ACTION_UPGRADE:
+            break;
         case xPDOTransport::ACTION_UNINSTALL:
+            if ($modx->getDebug()) {
+                $modx->log(modX::LOG_LEVEL_WARN, 'validator xPDOTransport::ACTION_UNINSTALL');
+            }
+            $modelPath = $modx->getOption('core_path') . 'components/lingua/model/';
+            if ($modx->addPackage('lingua', $modelPath, 'modx_lingua_')) {
+                if ($modx->getDebug()) {
+                    $modx->log(modX::LOG_LEVEL_WARN, '[Lingua] package was added in validator xPDOTransport::ACTION_UNINSTALL');
+                }
+                $manager = $modx->getManager();
+                $manager->removeObjectContainer('Langs');
+            }
             break;
     }
 }
-
 return true;

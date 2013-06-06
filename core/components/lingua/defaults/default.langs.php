@@ -19,37 +19,34 @@
  * Lingua; if not, write to the Free Software Foundation, Inc., 59 Temple Place,
  * Suite 330, Boston, MA 02111-1307 USA
  *
- * Lingua build script
+ * Filling up db tables
  *
  * @package lingua
  * @subpackage build
  */
-
-if (!function_exists("fixJson")) {
-
-    function fixJson(array $array) {
-        $fixed = array();
-        foreach ($array as $k => $v) {
-            $fixed[] = array(
-                'name' => $v['name'],
-                'desc' => $v['desc'],
-                'type' => $v['xtype'],
-                'options' => empty($v['options']) ? '' : $v['options'],
-                'value' => $v['value'],
-                'lexicon' => $v['lexicon'],
-            );
-        }
-        return $fixed;
+$collection = array();
+$langs = include dirname(__FILE__) . '/modx_lingua_langs.php';
+foreach ($langs as $lang) {
+    $oldLang = $modx->getObject('Langs', array(
+		'lang_code' => $lang['lang_code'],
+		'lcid_string' => $lang['lcid_string'],
+		'lcid_dec' => $lang['lcid_dec'],
+    ));
+    if ($oldLang) {
+        continue;
     }
-
+	$newLang = $modx->newObject('Langs');
+	$newLang->fromArray(array(
+		'active' => $lang['lang_code'] === 'en' ? 1 : 0,
+		'local_name' => $lang['local_name'],
+		'lang_code' => $lang['lang_code'],
+		'lcid_string' => $lang['lcid_string'],
+		'lcid_dec' => $lang['lcid_dec'],
+		'date_format_lite' => $lang['date_format_lite'],
+		'date_format_full' => $lang['date_format_full'],
+		'is_rtl' => $lang['is_rtl'],
+		'flag' => $lang['flag'],
+			), '', true, true);
+	$collection[] = $newLang;
 }
-
-ob_start();
-include dirname(__FILE__) . '/default.lingua.plugin.properties.js';
-$json = ob_get_contents();
-ob_end_clean();
-
-$properties = $modx->fromJSON($json);
-$properties = fixJson($properties);
-
-return $properties;
+return $collection;

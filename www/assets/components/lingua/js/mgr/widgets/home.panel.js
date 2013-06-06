@@ -5,7 +5,7 @@ Lingua.panel.Home = function(config) {
         baseCls: 'modx-formpanel',
         cls: 'container',
         items: [{
-                html: '<h2>' + _('lingua') + '</h2>',
+                html: '<b>' + _('lingua') + '</b> ' + Lingua.config.version,
                 border: false,
                 cls: 'modx-page-header'
             }, {
@@ -42,11 +42,11 @@ Lingua.panel.Home = function(config) {
                 listeners: {
                     afterrender: function() {
                         Ext.get('lingua_about').on('click', function() {
-                            var msg = '&copy; 2012, ';
+                            var msg = '&copy; 2013, ';
                             msg += '<a href="http://www.virtudraft.com" target="_blank">';
                             msg += 'www.virtudraft.com';
                             msg += '</a><br/>';
-                            msg += 'License GPL v2';
+                            msg += 'License GPL v3';
                             Ext.MessageBox.alert('Lingua', msg);
                         });
                     }

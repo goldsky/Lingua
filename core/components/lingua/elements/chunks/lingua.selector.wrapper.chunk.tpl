@@ -1,4 +1,4 @@
-<div class="container" style="height: 500px;">
+<div class="container">
 	<div class="btn-group">
 		<button
 			class="btn btn-link btn-mini dropdown-toggle"

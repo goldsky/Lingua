@@ -1,3 +1,7 @@
+Lingua 1.0.0-pl (June 6, 2013)
+=================================
+- initial public launch
+
 Lingua 1.0.0-dev.2
 =================================
 - refactored
