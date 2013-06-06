@@ -1,6 +1,7 @@
-Always uncache your lexicon tags, and then add new placeholder
-([[+lingua.cultureKey]]) to get the language selection:
-[[!%foo.bar? &namespace=`sky` &language=`[[+lingua.cultureKey]]`]]
+Always uncache your lexicon tags, and then add snippet ([[!lingua.cultureKey]])
+to get the current language:
+
+[[!%foo.bar? &namespace=`sky` &language=`[[!lingua.cultureKey]]`]]
 
 After installation, please make sure the Lingua's plugin has "OnHandleRequest"
 checked.
