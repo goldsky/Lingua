@@ -29,7 +29,6 @@ if (empty($field)) {
 }
 
 $langCodeField = $modx->getOption('codeField', $scriptProperties, $modx->getOption('lingua.code.field', null, 'lang_code'));
-$cultureKey = $modx->cultureKey;
 $defaultLinguaCorePath = $modx->getOption('core_path') . 'components/lingua/';
 $linguaCorePath = $modx->getOption('lingua.core_path', null, $defaultLinguaCorePath);
 $lingua = $modx->getService('lingua', 'Lingua', $linguaCorePath . 'model/', $scriptProperties);
@@ -38,8 +37,8 @@ if (!($lingua instanceof Lingua)) {
     return;
 }
 
-$langObj = $modx->getObject('Langs', array(
-    $langCodeField => $cultureKey
+$langObj = $modx->getObject('linguaLangs', array(
+    $langCodeField => $modx->cultureKey
 ));
 if (!$langObj) {
     return;

@@ -25,7 +25,7 @@
 
 class LangsUpdateProcessor extends modObjectUpdateProcessor {
 
-	public $classKey = 'Langs';
+	public $classKey = 'linguaLangs';
 	public $languageTopics = array('lingua:cmp');
 	public $objectType = 'lingua.LangsUpdate';
 

@@ -1,5 +1,5 @@
 <?php
-$xpdo_meta_map['Langs']= array (
+$xpdo_meta_map['linguaLangs']= array (
   'package' => 'lingua',
   'version' => '1.1',
   'table' => 'langs',
@@ -107,6 +107,17 @@ $xpdo_meta_map['Langs']= array (
           'null' => false,
         ),
       ),
+    ),
+  ),
+  'composites' => 
+  array (
+    'SiteContent' => 
+    array (
+      'class' => 'linguaSiteContent',
+      'local' => 'id',
+      'foreign' => 'lang_id',
+      'cardinality' => 'many',
+      'owner' => 'local',
     ),
   ),
 );

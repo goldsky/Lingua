@@ -25,7 +25,7 @@
 
 class LangsGetListProcessor extends modObjectGetListProcessor {
 
-    public $classKey = 'Langs';
+    public $classKey = 'linguaLangs';
     public $languageTopics = array('lingua:cmp');
     public $defaultSortField = 'id';
     public $defaultSortDirection = 'ASC';

@@ -24,10 +24,39 @@
  */
 class Lingua {
 
-    const version = '1.0.0.pl';
+    const VERSION = '2.0.0';
+    const RELEASE = 'pl';
 
+    /**
+     * modX object
+     * @var object
+     */
     public $modx;
-    public $config = array();
+
+    /**
+     * $scriptProperties
+     * @var array
+     */
+    public $config;
+
+    /**
+     * To hold error message
+     * @var string
+     */
+    private $_error = '';
+
+    /**
+     * To hold output message
+     * @var string
+     */
+    private $_output = '';
+
+    /**
+     * To hold placeholder array, flatten array with prefixable
+     * @var array
+     */
+    private $_placeholders = array();
+
 
     /**
      * constructor
@@ -40,7 +69,7 @@ class Lingua {
         $basePath = $this->modx->getOption('lingua.core_path', $config, $this->modx->getOption('core_path') . 'components/lingua/');
         $assetsUrl = $this->modx->getOption('lingua.assets_url', $config, $this->modx->getOption('assets_url') . 'components/lingua/');
         $this->config = array_merge(array(
-            'version' => self::version,
+            'version' => self::VERSION . '-' . self::RELEASE,
             'basePath' => $basePath,
             'corePath' => $basePath,
             'modelPath' => $basePath . 'model/',
@@ -54,7 +83,8 @@ class Lingua {
                 ), $config);
 
         $this->modx->lexicon->load('lingua:default');
-        $this->modx->addPackage('lingua', $this->config['modelPath'], 'modx_lingua_');
+        $tablePrefix = $this->modx->getOption('lingua.table_prefix', null, $this->modx->config[modX::OPT_TABLE_PREFIX] . 'lingua_');
+        $this->modx->addPackage('lingua', $this->config['modelPath'], $tablePrefix);
     }
 
     /**
@@ -75,6 +105,147 @@ class Lingua {
     }
 
     /**
+     * Set string error for boolean returned methods
+     * @return  void
+     */
+    public function setError($msg) {
+        $this->_error = $msg;
+    }
+
+    /**
+     * Get string error for boolean returned methods
+     * @return  string  output
+     */
+    public function getError() {
+        return $this->_error;
+    }
+
+    /**
+     * Set string output for boolean returned methods
+     * @return  void
+     */
+    public function setOutput($msg) {
+        $this->_output = $msg;
+    }
+
+    /**
+     * Get string output for boolean returned methods
+     * @return  string  output
+     */
+    public function getOutput() {
+        return $this->_output;
+    }
+
+    /**
+     * Set internal placeholder
+     * @param   string  $key    key
+     * @param   string  $value  value
+     * @param   string  $prefix add prefix if it's required
+     */
+    public function setPlaceholder($key, $value, $prefix = '') {
+        $prefix = !empty($prefix) ? $prefix : (isset($this->config['phsPrefix']) ? $this->config['phsPrefix'] : '');
+        $this->_placeholders[$prefix . $key] = $this->trimString($value);
+    }
+
+    /**
+     * Get an internal placeholder
+     * @param   string  $key    key
+     * @return  string  value
+     */
+    public function getPlaceholder($key) {
+        return $this->_placeholders[$key];
+    }
+
+    /**
+     * Set internal placeholders
+     * @param   array   $placeholders   placeholders in an associative array
+     * @param   string  $prefix         add prefix if it's required
+     * @param   boolean $merge          define whether the output will be merge to global properties or not
+     * @param   string  $delimiter      define placeholder's delimiter
+     * @return  mixed   boolean|array of placeholders
+     */
+    public function setPlaceholders($placeholders, $prefix = '', $merge = true, $delimiter = '.') {
+        if (empty($placeholders)) {
+            return FALSE;
+        }
+        $prefix = !empty($prefix) ? $prefix : (isset($this->config['phsPrefix']) ? $this->config['phsPrefix'] : '');
+        $placeholders = $this->trimArray($placeholders);
+        $placeholders = $this->implodePhs($placeholders, rtrim($prefix, $delimiter));
+        // enclosed private scope
+        if ($merge) {
+            $this->_placeholders = array_merge($this->_placeholders, $placeholders);
+        }
+        // return only for this scope
+        return $placeholders;
+    }
+
+    /**
+     * Get internal placeholders in an associative array
+     * @return array
+     */
+    public function getPlaceholders() {
+        return $this->_placeholders;
+    }
+
+    /**
+     * Merge multi dimensional associative arrays with separator
+     * @param   array   $array      raw associative array
+     * @param   string  $keyName    parent key of this array
+     * @param   string  $separator  separator between the merged keys
+     * @param   array   $holder     to hold temporary array results
+     * @return  array   one level array
+     */
+    public function implodePhs(array $array, $keyName = null, $separator = '.', array $holder = array()) {
+        $phs = !empty($holder) ? $holder : array();
+        foreach ($array as $k => $v) {
+            $key = !empty($keyName) ? $keyName . $separator . $k : $k;
+            if (is_array($v)) {
+                $phs = $this->implodePhs($v, $key, $separator, $phs);
+            } else {
+                $phs[$key] = $v;
+            }
+        }
+        return $phs;
+    }
+
+    /**
+     * Trim string value
+     * @param   string  $string     source text
+     * @param   string  $charlist   defined characters to be trimmed
+     * @link http://php.net/manual/en/function.trim.php
+     * @return  string  trimmed text
+     */
+    public function trimString($string, $charlist = null) {
+        if (empty($string) && !is_numeric($string)) {
+            return '';
+        }
+        $string = htmlentities($string);
+        // blame TinyMCE!
+        $string = preg_replace('/(&Acirc;|&nbsp;)+/i', '', $string);
+        $string = trim($string, $charlist);
+        $string = trim(preg_replace('/\s+^(\r|\n|\r\n)/', ' ', $string));
+        $string = html_entity_decode($string);
+        return $string;
+    }
+
+    /**
+     * Trim array values
+     * @param   array   $array          array contents
+     * @param   string  $charlist       [default: null] defined characters to be trimmed
+     * @link http://php.net/manual/en/function.trim.php
+     * @return  array   trimmed array
+     */
+    public function trimArray($input, $charlist = null) {
+        if (is_array($input)) {
+            $output = array_map(array($this, 'trimArray'), $input);
+        } else {
+            $output = $this->trimString($input, $charlist);
+        }
+
+        return $output;
+    }
+
+    /**
      * Parsing template
      * @param   string  $tpl    @BINDINGs options
      * @param   array   $phs    placeholders
@@ -83,11 +254,17 @@ class Lingua {
      */
     public function parseTpl($tpl, array $phs = array()) {
         $output = '';
+
+        if (isset($this->_chunks[$tpl]) && !empty($this->_chunks[$tpl])) {
+            return $this->parseTplCode($this->_chunks[$tpl], $phs);
+        }
+
         if (preg_match('/^(@CODE|@INLINE)/i', $tpl)) {
             $tplString = preg_replace('/^(@CODE|@INLINE)/i', '', $tpl);
             // tricks @CODE: / @INLINE:
             $tplString = ltrim($tplString, ':');
             $tplString = trim($tplString);
+            $this->_chunks[$tpl] = $tplString;
             $output = $this->parseTplCode($tplString, $phs);
         } elseif (preg_match('/^@FILE/i', $tpl)) {
             $tplFile = preg_replace('/^@FILE/i', '', $tpl);
@@ -119,17 +296,17 @@ class Lingua {
                     return 'Chunk: ' . $tplChunk . ' is not found, neither the file ' . $output;
                 }
             } else {
-//                $output = $this->modx->getChunk($tpl, $phs);
+//                $output = $this->modx->getChunk($tplChunk, $phs);
                 /**
                  * @link    http://forums.modx.com/thread/74071/help-with-getchunk-and-modx-speed-please?page=4#dis-post-464137
                  */
-                $chunk = $this->modx->getParser()->getElement('modChunk', $tpl);
+                $chunk = $this->modx->getParser()->getElement('modChunk', $tplChunk);
+                $this->_chunks[$tpl] = $chunk->get('content');
                 $chunk->setCacheable(false);
                 $chunk->_processed = false;
                 $output = $chunk->process($phs);
             }
         }
-        $output = $this->processElementTags($output);
 
         return $output;
     }
@@ -161,6 +338,7 @@ class Lingua {
             throw new Exception('File: ' . $file . ' is not found.');
         }
         $o = file_get_contents($file);
+        $this->_chunks[$file] = $o;
         $chunk = $this->modx->newObject('modChunk');
 
         // just to create a name for the modChunk object.
@@ -194,6 +372,9 @@ class Lingua {
      */
     public function processElementTags($content, array $options = array()) {
         $maxIterations = intval($this->modx->getOption('parser_max_iterations', $options, 10));
+        if (!$this->modx->parser) {
+            $this->modx->getParser();
+        }
         $this->modx->parser->processElementTags('', $content, true, false, '[[', ']]', array(), $maxIterations);
         $this->modx->parser->processElementTags('', $content, true, true, '[[', ']]', array(), $maxIterations);
         return $content;
@@ -234,4 +415,87 @@ class Lingua {
             return preg_replace($pattern, $replacement, $subject);
         }
     }
+
+    /**
+     * Replacing MODX's getCount(), because it has bug on counting SQL with function.<br>
+     * Retrieves a count of xPDOObjects by the specified xPDOCriteria.
+     *
+     * @param string $className Class of xPDOObject to count instances of.
+     * @param mixed $criteria Any valid xPDOCriteria object or expression.
+     * @return integer The number of instances found by the criteria.
+     * @see xPDO::getCount()
+     * @link http://forums.modx.com/thread/88619/getcount-fails-if-the-query-has-aggregate-leaving-having-039-s-field-undefined The discussion for this
+     */
+    public function getQueryCount($className, $criteria= null) {
+        $count= 0;
+        if ($query= $this->modx->newQuery($className, $criteria)) {
+            $expr= '*';
+            if ($pk= $this->modx->getPK($className)) {
+                if (!is_array($pk)) {
+                    $pk= array ($pk);
+                }
+                $expr= $this->modx->getSelectColumns($className, 'alias', '', $pk);
+            }
+            $query->prepare();
+            $sql = $query->toSQL();
+            $stmt= $this->modx->query("SELECT COUNT($expr) FROM ($sql) alias");
+            if ($stmt) {
+                $tstart = microtime(true);
+                if ($stmt->execute()) {
+                    $this->modx->queryTime += microtime(true) - $tstart;
+                    $this->modx->executedQueries++;
+                    if ($results= $stmt->fetchAll(PDO::FETCH_COLUMN)) {
+                        $count= reset($results);
+                        $count= intval($count);
+                    }
+                } else {
+                    $this->modx->queryTime += microtime(true) - $tstart;
+                    $this->modx->executedQueries++;
+                    $this->modx->log(modX::LOG_LEVEL_ERROR, "[" . __CLASS__ . "] Error " . $stmt->errorCode() . " executing statement: \n" . print_r($stmt->errorInfo(), true), '', __METHOD__, __FILE__, __LINE__);
+                }
+            }
+        }
+        return $count;
+    }
+
+    /**
+     * Returns select statement for easy reading
+     *
+     * @access public
+     * @param xPDOQuery $query The query to print
+     * @return string The select statement
+     * @author Coroico <coroico@wangba.fr>
+     */
+    public function niceQuery(xPDOQuery $query = null) {
+        $searched = array("SELECT", "GROUP_CONCAT", "LEFT JOIN", "INNER JOIN", "EXISTS", "LIMIT", "FROM",
+            "WHERE", "GROUP BY", "HAVING", "ORDER BY", "OR", "AND", "IFNULL", "ON", "MATCH", "AGAINST",
+            "COUNT");
+        $replace = array(" \r\nSELECT", " \r\nGROUP_CONCAT", " \r\nLEFT JOIN", " \r\nINNER JOIN", " \r\nEXISTS", " \r\nLIMIT", " \r\nFROM",
+            " \r\nWHERE", " \r\nGROUP BY", " \r\nHAVING", " ORDER BY", " \r\nOR", " \r\nAND", " \r\nIFNULL", " \r\nON", " \r\nMATCH", " \r\nAGAINST",
+            " \r\nCOUNT");
+        $output = '';
+        if (isset($query)) {
+            $query->prepare();
+            $output = str_replace($searched, $replace, " " . $query->toSQL());
+        }
+        return $output;
+    }
+    
+    public function getLanguages($activeOnly = 1) {
+        $languages = array();
+        $c = $this->modx->newQuery('linguaLangs');
+        if ($activeOnly) {
+            $c->where(array(
+                'active' => 1
+            ));
+        }
+        $collection = $this->modx->getCollection('linguaLangs', $c);
+        if ($collection) {
+            foreach ($collection as $item) {
+                $languages[$item->get('lang_code')] = $item->toArray();
+            }
+        }
+        return $languages;
+    }
+    
 }

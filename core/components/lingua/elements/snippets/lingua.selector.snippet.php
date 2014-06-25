@@ -22,7 +22,6 @@
  * @package lingua
  * @subpackage lingua_selector
  */
-
 $tplWrapper = $modx->getOption('tplWrapper', $scriptProperties, 'lingua.selector.wrapper');
 $tplItem = $modx->getOption('tplItem', $scriptProperties, 'lingua.selector.item');
 $langKey = $modx->getOption('getKey', $scriptProperties, $modx->getOption('lingua.get.key', null, 'lang'));
@@ -39,10 +38,10 @@ if (!($lingua instanceof Lingua)) {
     return;
 }
 
-$c = $modx->newQuery('Langs');
+$c = $modx->newQuery('linguaLangs');
 $c->where('active=1');
 $c->sortby($sortby, $sortdir);
-$collection = $modx->getCollection('Langs', $c);
+$collection = $modx->getCollection('linguaLangs', $c);
 $output = '';
 if ($collection) {
     $pageURL = 'http';
@@ -73,16 +72,16 @@ if ($collection) {
             define('HTTP_URL_STRIP_FRAGMENT', 512);     // Strip any fragments (#identifier)
             define('HTTP_URL_STRIP_ALL', 1024);         // Strip anything but scheme and host
 
-			/**
-			 * Build an URL<br>
-			 * The parts of the second URL will be merged into the first according to the flags argument.<br><br>
-			 *
-			 * @param	mixed	$url	(Part(s) of) an URL in form of a string or associative array like parse_url() returns
-			 * @param	mixed	$parts	Same as the first argument
-			 * @param	int		$flags	A bitmask of binary or'ed HTTP_URL constants (Optional)HTTP_URL_REPLACE is the default
-			 * @param	array	$newUrl	If set, it will be filled with the parts of the composed url like parse_url() would return
-			 * @return	string			Built URL
-			 */
+            /**
+             * Build an URL<br>
+             * The parts of the second URL will be merged into the first according to the flags argument.<br><br>
+             *
+             * @param	mixed	$url	(Part(s) of) an URL in form of a string or associative array like parse_url() returns
+             * @param	mixed	$parts	Same as the first argument
+             * @param	int		$flags	A bitmask of binary or'ed HTTP_URL constants (Optional)HTTP_URL_REPLACE is the default
+             * @param	array	$newUrl	If set, it will be filled with the parts of the composed url like parse_url() would return
+             * @return	string			Built URL
+             */
             function http_build_url($url, $parts = array(), $flags = HTTP_URL_REPLACE, &$newUrl = false) {
                 $keys = array('user', 'pass', 'port', 'path', 'query', 'fragment');
 
@@ -163,10 +162,11 @@ if ($collection) {
         $pageURL = http_build_url($pageURL, $parseUrl);
         $pageURL = urldecode($pageURL);
         // replace: &queryarray[0]=foo&queryarray[1]=bar
-		// to:		&queryarray[]=foo&queryarray[]=bar
+        // to:		&queryarray[]=foo&queryarray[]=bar
         $pageURL = preg_replace('/\[+(\d)+\]+/', '[]', $pageURL);
     }
 
+    $pageURL = rtrim($pageURL, '?');
     $hasQuery = strstr($pageURL, '?');
 
     $languages = array();
