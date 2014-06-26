@@ -5,7 +5,7 @@ require_once MODX_CORE_PATH . 'config/' . MODX_CONFIG_KEY . '.inc.php';
 require_once MODX_CONNECTORS_PATH . 'index.php';
 
 $corePath = $modx->getOption('lingua.core_path', null, $modx->getOption('core_path') . 'components/lingua/');
-require_once $corePath . 'model/lingua.class.php';
+require_once $corePath . 'model/lingua/lingua.class.php';
 $modx->lingua = new Lingua($modx);
 
 $modx->lexicon->load('lingua:cmp');

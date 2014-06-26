@@ -8,3 +8,6 @@ $_lang['prop_tplItem_desc'] = 'Item template';
 $_lang['prop_sortby_desc'] = 'Sort the list by';
 $_lang['prop_sortdir_desc'] = 'Sort direction';
 $_lang['prop_phsPrefix_desc'] = 'Additional prefix for templates';
+$_lang['prop_lingua.contexts_desc'] = 'Comma separated contexts where this plugin should run';
+$_lang['prop_lingua.parents_desc'] = 'Comma separated parents where this plugin should run';
+$_lang['prop_lingua.ids_desc'] = 'Comma separated resources\' IDs where this plugin should run';

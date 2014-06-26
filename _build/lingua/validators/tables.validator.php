@@ -30,7 +30,8 @@ if ($modx = & $object->xpdo) {
             if ($modx->getDebug()) {
                 $modx->log(modX::LOG_LEVEL_WARN, 'validator xPDOTransport::ACTION_INSTALL');
                 $modelPath = $modx->getOption('core_path') . 'components/lingua/model/';
-                if ($modx->addPackage('lingua', $modelPath, 'modx_lingua_')) {
+                $tablePrefix = $modx->getOption('lingua.table_prefix', null, $modx->config[modX::OPT_TABLE_PREFIX] . 'lingua_');
+                if ($modx->addPackage('lingua', $modelPath, $tablePrefix)) {
                     $modx->log(modX::LOG_LEVEL_WARN, '[Lingua] package was added in validator xPDOTransport::ACTION_INSTALL');
                 }
             }
@@ -42,12 +43,16 @@ if ($modx = & $object->xpdo) {
                 $modx->log(modX::LOG_LEVEL_WARN, 'validator xPDOTransport::ACTION_UNINSTALL');
             }
             $modelPath = $modx->getOption('core_path') . 'components/lingua/model/';
-            if ($modx->addPackage('lingua', $modelPath, 'modx_lingua_')) {
+            $tablePrefix = $modx->getOption('lingua.table_prefix', null, $modx->config[modX::OPT_TABLE_PREFIX] . 'lingua_');
+            if ($modx->addPackage('lingua', $modelPath, $tablePrefix)) {
                 if ($modx->getDebug()) {
                     $modx->log(modX::LOG_LEVEL_WARN, '[Lingua] package was added in validator xPDOTransport::ACTION_UNINSTALL');
                 }
-                $manager = $modx->getManager();
-                $manager->removeObjectContainer('Langs');
+//                $manager = $modx->getManager();
+//                $manager->removeObjectContainer('linguaLangs');
+//                $manager->removeObjectContainer('linguaSiteContent');
+//                $manager->removeObjectContainer('linguaSiteTmplvarContentvalues');
+//                $manager->removeObjectContainer('linguaSiteTmplvars');
             }
             break;
     }

@@ -99,23 +99,24 @@ Lingua.prototype.createHiddenFields = function(lang) {
         MODx.triggerRTEOnChange = function() {
             triggerDirtyField(Ext.getCmp('ta-' + lang));
         };
-        
-    }
 
-    if (MODx.config.use_editor && MODx.loadRTE) {
-        var f = modxPanelResource.getForm().findField('richtext');
-        modxPanelResource.rteLoaded = false;
-        if (f && f.getValue() == 1 && !modxPanelResource.rteLoaded) {
-            MODx.loadRTE('ta-' + lang);
-            modxPanelResource.rteLoaded = true;
-        } else if (f && f.getValue() == 0 && modxPanelResource.rteLoaded) {
-            if (MODx.unloadRTE) {
-                MODx.unloadRTE('ta-' + lang);
-            }
-            modxPanelResource.rteLoaded = false;
+        if (MODx.config.use_editor && MODx.loadRTE) {
+            hiddenCmp.on('afterrender', function(){
+                var f = modxPanelResource.getForm().findField('richtext');
+                modxPanelResource.rteLoaded = false;
+                if (f && f.getValue() == 1 && !modxPanelResource.rteLoaded) {
+                    MODx.loadRTE(this.getId());
+                    modxPanelResource.rteLoaded = true;
+                } else if (f && f.getValue() == 0 && modxPanelResource.rteLoaded) {
+                    if (MODx.unloadRTE) {
+                        MODx.unloadRTE(this.getId());
+                    }
+                    modxPanelResource.rteLoaded = false;
+                }
+            });
         }
     }
-    
+
     // hidden  content
     var content = Ext.getCmp('content');
     if (content) {
@@ -247,6 +248,7 @@ Lingua.prototype.switchLanguage = function(selectedLang) {
     Ext.each(els, function(item, idx) {
         Ext.getCmp(item.id).hide();
     });
+    
     var pagetitle = Ext.getCmp('modx-resource-pagetitle');
     if (pagetitle) {
         if (selectedLang !== this.config.defaultLang) {

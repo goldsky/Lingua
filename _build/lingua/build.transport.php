@@ -24,7 +24,6 @@
  * @package lingua
  * @subpackage build
  */
-
 $mtime = microtime();
 $mtime = explode(" ", $mtime);
 $mtime = $mtime[1] + $mtime[0];
@@ -34,8 +33,8 @@ set_time_limit(0);
 /* define version */
 define('PKG_NAME', 'Lingua');
 define('PKG_NAME_LOWER', 'lingua');
-define('PKG_VERSION', '1.0.0');
-define('PKG_RELEASE', 'pl');
+define('PKG_VERSION', '2.0.0');
+define('PKG_RELEASE', 'dev');
 
 /* override with your own defines here (see build.config.sample.php) */
 require_once dirname(__FILE__) . '/build.config.php';
@@ -44,16 +43,16 @@ require_once realpath(MODX_CORE_PATH) . '/model/modx/modx.class.php';
 /* define sources */
 $root = dirname(dirname(dirname(__FILE__))) . DIRECTORY_SEPARATOR;
 $sources = array(
-	'root' => $root,
-	'build' => BUILD_PATH,
-	'resolvers' => BUILD_PATH . 'resolvers' . DIRECTORY_SEPARATOR,
+    'root' => $root,
+    'build' => BUILD_PATH,
+    'resolvers' => BUILD_PATH . 'resolvers' . DIRECTORY_SEPARATOR,
     'validators' => realpath(BUILD_PATH . 'validators/') . DIRECTORY_SEPARATOR,
-	'data' => BUILD_PATH . 'data' . DIRECTORY_SEPARATOR,
-	'properties' => realpath(BUILD_PATH . 'data/properties/') . DIRECTORY_SEPARATOR,
-	'source_core' => realpath(MODX_CORE_PATH . 'components') . DIRECTORY_SEPARATOR . PKG_NAME_LOWER,
-	'source_assets' => realpath(MODX_ASSETS_PATH . 'components') . DIRECTORY_SEPARATOR . PKG_NAME_LOWER,
-	'docs' => realpath(MODX_CORE_PATH . 'components/' . PKG_NAME_LOWER . '/docs/') . DIRECTORY_SEPARATOR,
-	'lexicon' => realpath(MODX_CORE_PATH . 'components/' . PKG_NAME_LOWER . '/lexicon/') . DIRECTORY_SEPARATOR,
+    'data' => BUILD_PATH . 'data' . DIRECTORY_SEPARATOR,
+    'properties' => realpath(BUILD_PATH . 'data/properties/') . DIRECTORY_SEPARATOR,
+    'source_core' => realpath(MODX_CORE_PATH . 'components') . DIRECTORY_SEPARATOR . PKG_NAME_LOWER,
+    'source_assets' => realpath(MODX_ASSETS_PATH . 'components') . DIRECTORY_SEPARATOR . PKG_NAME_LOWER,
+    'docs' => realpath(MODX_CORE_PATH . 'components/' . PKG_NAME_LOWER . '/docs/') . DIRECTORY_SEPARATOR,
+    'lexicon' => realpath(MODX_CORE_PATH . 'components/' . PKG_NAME_LOWER . '/lexicon/') . DIRECTORY_SEPARATOR,
 );
 unset($root);
 
@@ -128,10 +127,10 @@ $category->set('category', 'Lingua');
 $modx->log(modX::LOG_LEVEL_INFO, 'Adding in snippets.');
 $snippets = include $sources['data'] . 'transport.snippets.php';
 if (is_array($snippets)) {
-	$category->addMany($snippets);
+    $category->addMany($snippets);
     $modx->log(modX::LOG_LEVEL_INFO, 'Adding in ' . count($snippets) . ' snippets done.');
 } else {
-	$modx->log(modX::LOG_LEVEL_FATAL, 'Adding snippets failed.');
+    $modx->log(modX::LOG_LEVEL_FATAL, 'Adding snippets failed.');
 }
 
 
@@ -141,42 +140,42 @@ if (is_array($snippets)) {
 $modx->log(modX::LOG_LEVEL_INFO, 'Adding in plugins.');
 $plugins = include $sources['data'] . 'transport.plugins.php';
 if (is_array($plugins)) {
-	$category->addMany($plugins);
+    $category->addMany($plugins);
     $modx->log(modX::LOG_LEVEL_INFO, 'Adding in ' . count($plugins) . ' plugins done.');
 } else {
-	$modx->log(modX::LOG_LEVEL_FATAL, 'Adding plugins failed.');
+    $modx->log(modX::LOG_LEVEL_FATAL, 'Adding plugins failed.');
 }
 
 /**
  * Apply category to the elements
  */
 $elementsAttribute = array(
-	xPDOTransport::UNIQUE_KEY => 'category',
-	xPDOTransport::PRESERVE_KEYS => false,
-	xPDOTransport::UPDATE_OBJECT => true,
-	xPDOTransport::RELATED_OBJECTS => true,
-	xPDOTransport::RELATED_OBJECT_ATTRIBUTES => array(
-		'Snippets' => array(
-			xPDOTransport::PRESERVE_KEYS => false,
-			xPDOTransport::UPDATE_OBJECT => true,
-			xPDOTransport::UNIQUE_KEY => 'name',
-		),
-		'Chunks' => array(
-			xPDOTransport::PRESERVE_KEYS => false,
-			xPDOTransport::UPDATE_OBJECT => true,
-			xPDOTransport::UNIQUE_KEY => 'name',
-		),
-		'Plugins' => array(
-			xPDOTransport::PRESERVE_KEYS => false,
-			xPDOTransport::UPDATE_OBJECT => true,
-			xPDOTransport::UNIQUE_KEY => 'name',
-		),
-		'PluginEvents' => array(
-			xPDOTransport::PRESERVE_KEYS => true,
-			xPDOTransport::UPDATE_OBJECT => false,
-			xPDOTransport::UNIQUE_KEY => array('pluginid', 'event'),
-		),
-	)
+    xPDOTransport::UNIQUE_KEY => 'category',
+    xPDOTransport::PRESERVE_KEYS => false,
+    xPDOTransport::UPDATE_OBJECT => true,
+    xPDOTransport::RELATED_OBJECTS => true,
+    xPDOTransport::RELATED_OBJECT_ATTRIBUTES => array(
+        'Snippets' => array(
+            xPDOTransport::PRESERVE_KEYS => false,
+            xPDOTransport::UPDATE_OBJECT => true,
+            xPDOTransport::UNIQUE_KEY => 'name',
+        ),
+        'Chunks' => array(
+            xPDOTransport::PRESERVE_KEYS => false,
+            xPDOTransport::UPDATE_OBJECT => true,
+            xPDOTransport::UNIQUE_KEY => 'name',
+        ),
+        'Plugins' => array(
+            xPDOTransport::PRESERVE_KEYS => false,
+            xPDOTransport::UPDATE_OBJECT => true,
+            xPDOTransport::UNIQUE_KEY => 'name',
+        ),
+        'PluginEvents' => array(
+            xPDOTransport::PRESERVE_KEYS => true,
+            xPDOTransport::UPDATE_OBJECT => false,
+            xPDOTransport::UNIQUE_KEY => array('pluginid', 'event'),
+        ),
+    )
 );
 $elementsVehicle = $builder->createVehicle($category, $elementsAttribute);
 
@@ -184,12 +183,12 @@ $elementsVehicle = $builder->createVehicle($category, $elementsAttribute);
  * FILE RESOLVERS
  */
 $elementsVehicle->resolve('file', array(
-	'source' => $sources['source_core'],
-	'target' => "return MODX_CORE_PATH . 'components/';",
+    'source' => $sources['source_core'],
+    'target' => "return MODX_CORE_PATH . 'components/';",
 ));
 $elementsVehicle->resolve('file', array(
-	'source' => $sources['source_assets'],
-	'target' => "return MODX_ASSETS_PATH . 'components/';",
+    'source' => $sources['source_assets'],
+    'target' => "return MODX_ASSETS_PATH . 'components/';",
 ));
 $modx->log(modX::LOG_LEVEL_INFO, 'Adding in files done.');
 
@@ -199,7 +198,7 @@ $modx->log(modX::LOG_LEVEL_INFO, 'Adding in files done.');
 $modx->log(modX::LOG_LEVEL_INFO, 'Adding in PHP resolvers...');
 flush();
 $elementsVehicle->resolve('php', array(
-	'source' => $sources['resolvers'] . 'tables.resolver.php',
+    'source' => $sources['resolvers'] . 'tables.resolver.php',
 ));
 
 $modx->log(modX::LOG_LEVEL_INFO, 'Adding in PHP resolvers done.');
@@ -223,9 +222,9 @@ flush();
  * license file, readme and setup options
  */
 $builder->setPackageAttributes(array(
-	'license' => file_get_contents($sources['docs'] . 'license.txt'),
-	'readme' => file_get_contents($sources['docs'] . 'readme.txt'),
-	'changelog' => file_get_contents($sources['docs'] . 'changelog.txt'),
+    'license' => file_get_contents($sources['docs'] . 'license.txt'),
+    'readme' => file_get_contents($sources['docs'] . 'readme.txt'),
+    'changelog' => file_get_contents($sources['docs'] . 'changelog.txt'),
 ));
 
 $builder->pack();

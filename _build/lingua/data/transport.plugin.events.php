@@ -45,13 +45,6 @@ $events['OnDocFormSave']->fromArray(array(
     'propertyset' => 0,
         ), '', true, true);
 
-$events['OnResourceDelete'] = $modx->newObject('modPluginEvent');
-$events['OnResourceDelete']->fromArray(array(
-    'event' => 'OnResourceDelete',
-    'priority' => 0,
-    'propertyset' => 0,
-        ), '', true, true);
-
 $events['OnResourceDuplicate'] = $modx->newObject('modPluginEvent');
 $events['OnResourceDuplicate']->fromArray(array(
     'event' => 'OnResourceDuplicate',

@@ -41,8 +41,10 @@ if ($modx = & $object->xpdo) {
             $manager->createObjectContainer('linguaSiteContent');
             $manager->createObjectContainer('linguaSiteTmplvarContentvalues');
             $manager->createObjectContainer('linguaSiteTmplvars');
+            $modx->addExtensionPackage('lingua', '[[++core_path]]components/lingua/model/', array('tablePrefix' => $tablePrefix));
             break;
         case xPDOTransport::ACTION_UNINSTALL:
+            $modx->removeExtensionPackage('lingua');
             break;
     }
 }

@@ -1,5 +1,5 @@
 <?php
-
+header('Content-Type: text/html; charset=utf-8');
 /**
  * Lingua
  *
@@ -47,12 +47,12 @@ switch ($event) {
                 $modx->cultureKey = $langCookieValue;
                 $modx->setOption('cultureKey', $langCookieValue);
             }
-            
+
             if ($modx->cultureKey !== $modx->getOption('cultureKey')) {
                 $modx->setOption('cultureKey', $modx->cultureKey);
                 $modx->context->config['cultureKey'] = $modx->cultureKey;
             }
-            
+
             $modx->setPlaceholder('lingua.cultureKey', $modx->cultureKey);
             $modx->setPlaceholder('lingua.language', $modx->cultureKey);
         }
@@ -204,19 +204,39 @@ Ext.onReady(function() {
             $linguaSiteContent->set('uri', $v['uri']);
             $linguaSiteContent->save();
         }
+        $contexts = array($resource->get('context_key'));
+        $cacheManager = $modx->getCacheManager();
+        $cacheManager->refresh(array(
+            'lingua' => array('contexts' => $contexts),
+        ));
         break;
 
     case 'OnWebPageInit':
         $modx->setOption('cache_resource_key', 'lingua/' . $modx->cultureKey);
         break;
 
-    case 'OnResourceDelete':
-        break;
-    
     case 'OnResourceDuplicate':
+        $linguaSiteContents = $modx->getCollection('linguaSiteContent', array(
+            'resource_id' => $oldResource->get('id')
+        ));
+        if ($linguaSiteContents) {
+            foreach ($linguaSiteContents as $linguaSiteContent) {
+                $params = $linguaSiteContent->toArray();
+                unset($params['id']);
+                $params['resource_id'] = $newResource->get('id');
+                $newLinguaSiteContent = $modx->newObject('linguaSiteContent');
+                $newLinguaSiteContent->fromArray($params);
+                $newLinguaSiteContent->save();
+            }
+        }
         break;
-    
+
     case 'OnEmptyTrash':
+        if (!empty($ids)) {
+            $modx->removeCollection('linguaSiteContent', array(
+                'resource_id:IN' => $ids
+            ));
+        }
         break;
 
     default:
