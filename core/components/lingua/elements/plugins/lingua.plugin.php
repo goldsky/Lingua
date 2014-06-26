@@ -47,7 +47,12 @@ switch ($event) {
                 $modx->cultureKey = $langCookieValue;
                 $modx->setOption('cultureKey', $langCookieValue);
             }
-
+            
+            if ($modx->cultureKey !== $modx->getOption('cultureKey')) {
+                $modx->setOption('cultureKey', $modx->cultureKey);
+                $modx->context->config['cultureKey'] = $modx->cultureKey;
+            }
+            
             $modx->setPlaceholder('lingua.cultureKey', $modx->cultureKey);
             $modx->setPlaceholder('lingua.language', $modx->cultureKey);
         }
@@ -198,6 +203,18 @@ Ext.onReady(function() {
 
     case 'OnWebPageInit':
         $modx->setOption('cache_resource_key', 'lingua/' . $modx->cultureKey);
+        break;
+
+    case 'OnResourceDelete':
+        break;
+    
+    case 'OnResourceDuplicate':
+        break;
+    
+    case 'OnEmptyTrash':
+        break;
+
+    case 'OnEmptyTrash':
         break;
 
     default:

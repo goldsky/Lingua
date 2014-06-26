@@ -51,11 +51,45 @@
             <column key="description" length="" collation="" null="false" />
             <column key="introtext" length="" collation="" null="true" />
             <column key="content" length="" collation="" null="true" />
-        </index>    
+        </index>   
 
         <aggregate alias="Lang" class="linguaLangs" local="lang_id" foreign="id" cardinality="one" owner="foreign" />
         <aggregate alias="Resource" class="extResource" local="resource_id" foreign="id" cardinality="one" owner="foreign" />
 
+    </object>
+    <object class="linguaSiteTmplvarContentvalues" table="site_tmplvar_contentvalues" extends="xPDOSimpleObject">
+        <field key="lang_id" dbtype="int" precision="10" phptype="integer" null="false" default="0" index="index" />
+        <field key="tmplvarid" dbtype="int" precision="10" phptype="integer" null="false" default="0" index="index" />
+        <field key="contentid" dbtype="int" precision="10" phptype="integer" null="false" default="0" index="index" />
+        <field key="value" dbtype="mediumtext" phptype="string" null="false" />
+
+        <index alias="tmplvarid" name="tmplvarid" primary="false" unique="false" type="BTREE" >
+            <column key="tmplvarid" length="" collation="A" null="false" />
+        </index>
+        <index alias="contentid" name="contentid" primary="false" unique="false" type="BTREE" >
+            <column key="contentid" length="" collation="A" null="false" />
+        </index>
+        <index alias="tv_cnt" name="tv_cnt" primary="false" unique="false" type="BTREE" >
+            <column key="tmplvarid" length="" collation="A" null="false" />
+            <column key="contentid" length="" collation="A" null="false" />
+            <column key="lang_id" length="" collation="A" null="false" />
+        </index>
+        <index alias="lang_id" name="lang_id" primary="false" unique="false" type="BTREE" >
+            <column key="lang_id" length="" collation="A" null="false" />
+        </index>
+        
+        <aggregate alias="Tmplvars" class="linguaSiteTmplvars" local="tmplvarid" foreign="tmplvarid" cardinality="one" owner="foreign" />
+        
+    </object>
+    <object class="linguaSiteTmplvars" table="site_tmplvars" extends="xPDOSimpleObject">
+        <field key="tmplvarid" dbtype="int" precision="10" attributes="unsigned" phptype="integer" null="false" default="0" index="index" />
+
+        <index alias="tmplvarid" name="tmplvarid" primary="false" unique="false" type="BTREE" >
+            <column key="tmplvarid" length="" collation="A" null="false" />
+        </index>
+        
+        <composite alias="TmplvarContentvalues" class="linguaSiteTmplvarContentvalues" local="tmplvarid" foreign="tmplvarid" cardinality="many" owner="local" />
+        
     </object>
     <object class="extResource" extends="modDocument">
         <composite alias="SiteContent" class="linguaSiteContent" local="id" foreign="resource_id" cardinality="many" owner="local" />

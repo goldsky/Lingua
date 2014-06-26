@@ -112,6 +112,9 @@ class LinguaRequest extends modRequest {
                     if ($tvs = $resource->getMany('TemplateVars', 'all')) {
                         /** @var modTemplateVar $tv */
                         foreach ($tvs as $tv) {
+                            /**
+                             * @todo Override with LinguaTV
+                             */
                             $resource->set($tv->get('name'), array(
                                 $tv->get('name'),
                                 $tv->getValue($resource->get('id')),
