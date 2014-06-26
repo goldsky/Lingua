@@ -28,10 +28,10 @@ if (empty($field)) {
     return;
 }
 
-$langCodeField = $modx->getOption('codeField', $scriptProperties, $modx->getOption('lingua.code.field', null, 'lang_code'));
+$langCodeField = $modx->getOption('codeField', $scriptProperties, $modx->getOption('lingua.code_field', null, 'lang_code'));
 $defaultLinguaCorePath = $modx->getOption('core_path') . 'components/lingua/';
 $linguaCorePath = $modx->getOption('lingua.core_path', null, $defaultLinguaCorePath);
-$lingua = $modx->getService('lingua', 'Lingua', $linguaCorePath . 'model/', $scriptProperties);
+$lingua = $modx->getService('lingua', 'Lingua', $linguaCorePath . 'model/lingua/', $scriptProperties);
 
 if (!($lingua instanceof Lingua)) {
     return;

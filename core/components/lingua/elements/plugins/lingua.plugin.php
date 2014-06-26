@@ -24,36 +24,37 @@
  */
 $event = $modx->event->name;
 switch ($event) {
-    case 'OnHandleRequest':
+    case 'OnInitCulture':
         if ($modx->context->key !== 'mgr') {
-            $langKey = $modx->getOption('lingua.get.key', $scriptProperties, 'lang');
-            $lang = $modx->cultureKey;
-            if (isset($_GET[$langKey]) &&
-                    $_GET[$langKey] !== '' &&
-                    $_GET[$langKey] !== $lang
+            $langGetKey = $modx->getOption('lingua.request_key', $scriptProperties, 'lang');
+            $langGetKeyValue = filter_input(INPUT_GET, $langGetKey, FILTER_SANITIZE_STRING);
+            $langGetKeyValue = strtolower($langGetKeyValue);
+            $langCookieValue = filter_input(INPUT_COOKIE, 'modx.lingua.switcher', FILTER_SANITIZE_STRING);
+            $langCookieValue = strtolower($langCookieValue);
+            if (!empty($langGetKeyValue) &&
+                    $langGetKeyValue !== $modx->cultureKey &&
+                    strlen($langGetKeyValue) === 2
             ) {
-                $lang = $_GET[$langKey];
-                $_SESSION['cultureKey'] = $lang;
-                $modx->cultureKey = $lang;
-                $modx->setOption('cultureKey', $lang);
-                setcookie('modx.lingua.switcher', $lang, time() + (1 * 24 * 60 * 60));
-            } else if (isset($_COOKIE['modx.lingua.switcher']) &&
-                    $_COOKIE['modx.lingua.switcher'] !== '' &&
-                    $_COOKIE['modx.lingua.switcher'] !== $lang
+                $_SESSION['cultureKey'] = $langGetKeyValue;
+                $modx->cultureKey = $langGetKeyValue;
+                $modx->setOption('cultureKey', $langGetKeyValue);
+                setcookie('modx.lingua.switcher', $langGetKeyValue, time() + (1 * 24 * 60 * 60));
+            } else if (!empty($langCookieValue) &&
+                    $langCookieValue !== $modx->cultureKey &&
+                    strlen($langCookieValue) === 2
             ) {
-                $lang = $_COOKIE['modx.lingua.switcher'];
-                $_SESSION['cultureKey'] = $lang;
-                $modx->cultureKey = $lang;
-                $modx->setOption('cultureKey', $lang);
+                $_SESSION['cultureKey'] = $langCookieValue;
+                $modx->cultureKey = $langCookieValue;
+                $modx->setOption('cultureKey', $langCookieValue);
             }
 
-            $modx->setPlaceholder('lingua.cultureKey', $lang);
-            $modx->setPlaceholder('lingua.language', $lang);
+            $modx->setPlaceholder('lingua.cultureKey', $modx->cultureKey);
+            $modx->setPlaceholder('lingua.language', $modx->cultureKey);
         }
         break;
 
     case 'OnDocFormPrerender':
-        $lingua = $modx->getService('lingua', 'Lingua', MODX_CORE_PATH . 'components/lingua/model/');
+        $lingua = $modx->getService('lingua', 'Lingua', MODX_CORE_PATH . 'components/lingua/model/lingua/');
 
         if (!($lingua instanceof Lingua)) {
             return '';
@@ -63,13 +64,13 @@ switch ($event) {
         if (!empty($languages)) {
             $modx->regClientCSS(MODX_BASE_URL . 'assets/components/lingua/css/mgr.css');
             $modx->controller->addJavascript(MODX_BASE_URL . 'assets/components/lingua/js/mgr/resource.js');
-            
+
             //------------------------------------------------------------------
             $jsHTML = '
     var lingua = new Lingua({
         defaultLang: "' . $modx->getOption('cultureKey') . '"
     });';
-            
+
             //------------------------------------------------------------------
             $storeData = array();
             $linguaSiteContentArray = array();
@@ -99,7 +100,6 @@ switch ($event) {
                 $modx->regClientStartupHTMLBlock('<style>.icon-lingua-flag-' . $language['lcid_string'] . ' {background-image: url(\'../' . $language['flag'] . '\'); background-repeat: no-repeat;}</style>');
                 $createHiddenFields .= 'lingua.createHiddenFields("' . $language['lang_code'] . '");' . "\n";
             } // foreach ($languages as $language)
-            
             //------------------------------------------------------------------
             $jsHTML .= '
     lingua.config.langs = ' . json_encode($languages) . ';
@@ -145,17 +145,16 @@ Ext.onReady(function() {
 });
         </script>');
         } // if (!empty($languages))
-        
-            //------------------------------------------------------------------
+        //------------------------------------------------------------------
         break;
 
     case 'OnDocFormSave':
-        $lingua = $modx->getService('lingua', 'Lingua', MODX_CORE_PATH . 'components/lingua/model/');
+        $lingua = $modx->getService('lingua', 'Lingua', MODX_CORE_PATH . 'components/lingua/model/lingua/');
 
         if (!($lingua instanceof Lingua)) {
             return '';
         }
-        $reverting = array();        
+        $reverting = array();
         foreach ($resource->_fields as $k => $v) {
             if (!preg_match('/_lingua$/', $k)) {
                 continue;
@@ -173,7 +172,6 @@ Ext.onReady(function() {
             $params = array(
                 'resource_id' => $resource->get('id'),
                 'lang_id' => $linguaLangs->get('id'),
-                
             );
             $linguaSiteContent = $modx->getObject('linguaSiteContent', $params);
             if (!$linguaSiteContent) {
@@ -198,13 +196,31 @@ Ext.onReady(function() {
         }
         break;
 
+    case 'OnBeforeHandleRequest':
+    case 'OnHandleRequest':
+        $modx->loadClass('modRequest', '', false, true);
+        if ($className = $modx->loadClass('LinguaRequest', MODX_CORE_PATH . 'components/lingua/model/lingua/', false, true)) {
+            $modx->request = new $className($modx);
+        }
+        
+        break;
+
+    case 'OnWebPageInit':
+        $modx->setOption('cache_resource_key', 'lingua/' . $modx->cultureKey);
+        break;
+
     case 'OnLoadWebDocument':
-        $lingua = $modx->getService('lingua', 'Lingua', MODX_CORE_PATH . 'components/lingua/model/');
+        $modx->loadClass('modResponse', '', false, true);
+        if ($className = $modx->loadClass('LinguaResponse', MODX_CORE_PATH . 'components/lingua/model/lingua/', false, true)) {
+            $modx->response = new $className($modx);
+        }
+        
+        $lingua = $modx->getService('lingua', 'Lingua', MODX_CORE_PATH . 'components/lingua/model/lingua/');
 
         if (!($lingua instanceof Lingua)) {
             return '';
         }
-        
+
         if ($modx->getOption('cultureKey') === $modx->cultureKey) {
             return;
         }
@@ -212,20 +228,19 @@ Ext.onReady(function() {
         $linguaSiteContent = $modx->getObject('linguaSiteContent', array(
             'resource_id' => $modx->resource->get('id'),
             'lang_id' => $linguaLangs->get('id'),
-
         ));
         if (!$linguaSiteContent) {
             return;
         }
         $linguaSiteContentArray = $linguaSiteContent->toArray();
         unset($linguaSiteContentArray['id']);
+        $modx->resource->_processed = false;
+        $modx->resource->_content = '';
         foreach ($linguaSiteContentArray as $k => $v) {
             $modx->resource->set($k, $v);
         }
-        $modx->resource->_processed = false;
-        $modx->resource->_content = false;
         $modx->resource->process();
-        
+
         break;
     default:
         break;

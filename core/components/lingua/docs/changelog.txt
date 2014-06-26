@@ -1,3 +1,9 @@
+Lingua 2.0.0-dev
+=================================
+- Initialize manager language switcher
+- replace options: lingua.get.key to lingua.request_key, lingua.code.field to lingua.code_field
+- replace OnHandleRequest event to OnInitCulture instead
+
 Lingua 1.0.0-pl (June 6, 2013)
 =================================
 - initial public launch

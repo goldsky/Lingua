@@ -23,7 +23,7 @@
  * @subpackage lingua_controller
  */
 
-require_once dirname(__FILE__) . '/model/lingua.class.php';
+require_once dirname(__FILE__) . '/model/lingua/lingua.class.php';
 
 abstract class LinguaManagerController extends modExtraManagerController {
 

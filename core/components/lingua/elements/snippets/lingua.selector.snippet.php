@@ -24,7 +24,7 @@
  */
 $tplWrapper = $modx->getOption('tplWrapper', $scriptProperties, 'lingua.selector.wrapper');
 $tplItem = $modx->getOption('tplItem', $scriptProperties, 'lingua.selector.item');
-$langKey = $modx->getOption('getKey', $scriptProperties, $modx->getOption('lingua.get.key', null, 'lang'));
+$langKey = $modx->getOption('getKey', $scriptProperties, $modx->getOption('lingua.get_key', null, 'lang'));
 $sortby = $modx->getOption('sortby', $scriptProperties, 'id');
 $sortdir = $modx->getOption('sortdir', $scriptProperties, 'asc');
 $phsPrefix = $modx->getOption('phsPrefix', $scriptProperties, 'lingua.');
@@ -32,7 +32,7 @@ $codeField = $modx->getOption('codeField', $scriptProperties, 'lang_code');
 
 $defaultLinguaCorePath = $modx->getOption('core_path') . 'components/lingua/';
 $linguaCorePath = $modx->getOption('lingua.core_path', null, $defaultLinguaCorePath);
-$lingua = $modx->getService('lingua', 'Lingua', $linguaCorePath . 'model/', $scriptProperties);
+$lingua = $modx->getService('lingua', 'Lingua', $linguaCorePath . 'model/lingua/', $scriptProperties);
 
 if (!($lingua instanceof Lingua)) {
     return;
