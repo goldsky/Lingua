@@ -170,6 +170,11 @@ Ext.onReady(function() {
                 }
                 $reverting[$a][preg_replace('/_lingua$/', '', $k)] = $b;
             }
+            /**
+             * json seems has number of characters limit;
+             * that makes saving success report truncated and output modal hangs
+             */
+            $resource->set($k, '');
         }
 
         foreach ($reverting as $k => $v) {
