@@ -239,6 +239,13 @@ Ext.onReady(function() {
         }
         break;
 
+    case 'OnSiteRefresh':
+        $cacheManager = $modx->getCacheManager();
+        $cacheManager->refresh(array(
+            'lingua' => array(),
+        ));
+        break;
+        
     default:
         break;
 }
