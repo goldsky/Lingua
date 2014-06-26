@@ -27,17 +27,21 @@
 if ($modx = & $object->xpdo) {
     switch ($options[xPDOTransport::PACKAGE_ACTION]) {
         case xPDOTransport::ACTION_INSTALL:
+        case xPDOTransport::ACTION_UPGRADE:
             $modelPath = $modx->getOption('core_path') . 'components/lingua/model/';
-            $modx->addPackage('lingua', $modelPath, 'modx_lingua_');
+            $tablePrefix = $modx->getOption('lingua.table_prefix', null, $modx->config[modX::OPT_TABLE_PREFIX] . 'lingua_');
+            $modx->addPackage('lingua', $modelPath, $tablePrefix);
             $manager = $modx->getManager();
-            if ($manager->createObjectContainer('Langs')) {
+            if ($manager->createObjectContainer('linguaLangs')) {
                 $defaults = include $modx->getOption('core_path') . 'components/lingua/defaults/default.langs.php';
                 foreach ($defaults as $default) {
                     $default->save();
                 }
             }
+            $manager->createObjectContainer('linguaSiteContent');
+            $manager->createObjectContainer('linguaSiteTmplvarContentvalues');
+            $manager->createObjectContainer('linguaSiteTmplvars');
             break;
-        case xPDOTransport::ACTION_UPGRADE:
         case xPDOTransport::ACTION_UNINSTALL:
             break;
     }

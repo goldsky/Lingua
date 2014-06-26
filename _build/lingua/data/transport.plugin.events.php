@@ -24,9 +24,51 @@
  */
 $events = array();
 
-$events['OnHandleRequest'] = $modx->newObject('modPluginEvent');
-$events['OnHandleRequest']->fromArray(array(
-    'event' => 'OnHandleRequest',
+$events['OnInitCulture'] = $modx->newObject('modPluginEvent');
+$events['OnInitCulture']->fromArray(array(
+    'event' => 'OnInitCulture',
+    'priority' => 0,
+    'propertyset' => 0,
+        ), '', true, true);
+
+$events['OnDocFormPrerender'] = $modx->newObject('modPluginEvent');
+$events['OnDocFormPrerender']->fromArray(array(
+    'event' => 'OnDocFormPrerender',
+    'priority' => 0,
+    'propertyset' => 0,
+        ), '', true, true);
+
+$events['OnDocFormSave'] = $modx->newObject('modPluginEvent');
+$events['OnDocFormSave']->fromArray(array(
+    'event' => 'OnDocFormSave',
+    'priority' => 0,
+    'propertyset' => 0,
+        ), '', true, true);
+
+$events['OnResourceDelete'] = $modx->newObject('modPluginEvent');
+$events['OnResourceDelete']->fromArray(array(
+    'event' => 'OnResourceDelete',
+    'priority' => 0,
+    'propertyset' => 0,
+        ), '', true, true);
+
+$events['OnResourceDuplicate'] = $modx->newObject('modPluginEvent');
+$events['OnResourceDuplicate']->fromArray(array(
+    'event' => 'OnResourceDuplicate',
+    'priority' => 0,
+    'propertyset' => 0,
+        ), '', true, true);
+
+$events['OnWebPageInit'] = $modx->newObject('modPluginEvent');
+$events['OnWebPageInit']->fromArray(array(
+    'event' => 'OnWebPageInit',
+    'priority' => 0,
+    'propertyset' => 0,
+        ), '', true, true);
+
+$events['OnWebPageInit'] = $modx->newObject('modPluginEvent');
+$events['OnWebPageInit']->fromArray(array(
+    'event' => 'OnWebPageInit',
     'priority' => 0,
     'propertyset' => 0,
         ), '', true, true);

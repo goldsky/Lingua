@@ -25,18 +25,18 @@
  * @subpackage build
  */
 
-$settings['lingua.get.key'] = $modx->newObject('modSystemSetting');
-$settings['lingua.get.key']->fromArray(array(
-    'key' => 'lingua.get.key',
+$settings['lingua.get_key'] = $modx->newObject('modSystemSetting');
+$settings['lingua.get_key']->fromArray(array(
+    'key' => 'lingua.get_key',
     'value' => 'lang',
     'xtype' => 'textfield',
     'namespace' => 'lingua',
     'area' => 'URL',
         ), '', true, true);
 
-$settings['lingua.code.field'] = $modx->newObject('modSystemSetting');
-$settings['lingua.code.field']->fromArray(array(
-    'key' => 'lingua.code.field',
+$settings['lingua.code_field'] = $modx->newObject('modSystemSetting');
+$settings['lingua.code_field']->fromArray(array(
+    'key' => 'lingua.code_field',
     'value' => 'lang_code',
     'xtype' => 'textfield',
     'namespace' => 'lingua',
