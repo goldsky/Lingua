@@ -3,7 +3,7 @@
 /**
  * Lingua
  *
- * Copyright 2013 by goldsky <goldsky@virtudraft.com>
+ * Copyright 2013-2014 by goldsky <goldsky@virtudraft.com>
  *
  * This file is part of Lingua, a MODX's Lexicon switcher for front-end interface
  *
