@@ -15,88 +15,6 @@ require_once MODX_CORE_PATH . 'model/modx/modrequest.class.php';
 class LinguaRequest extends modRequest {
     
     /**
-     * Instantiates a LinguaRequest object.
-     *
-     * @param modX $modx
-     * @return LinguaRequest
-     */
-    function __construct(modX & $modx) {
-        parent :: __construct($modx);
-$this->modx->log(modX::LOG_LEVEL_ERROR, __FILE__ . ' ');
-$this->modx->log(modX::LOG_LEVEL_ERROR, __METHOD__ . ' ');
-    }
-
-    /**
-     * The primary MODX request handler (a.k.a. controller).
-     *
-     * @return boolean True if a request is handled without interruption.
-     */
-    public function handleRequest() {
-$this->modx->log(modX::LOG_LEVEL_ERROR, __FILE__ . ' ');
-$this->modx->log(modX::LOG_LEVEL_ERROR, __METHOD__ . ' ');
-        $this->loadErrorHandler();
-
-        $this->sanitizeRequest();
-        $this->modx->invokeEvent('OnHandleRequest');
-        if (!$this->modx->checkSiteStatus()) {
-            header('HTTP/1.1 503 Service Unavailable');
-            if (!$this->modx->getOption('site_unavailable_page',null,1)) {
-                $this->modx->resource = $this->modx->newObject('modDocument');
-                $this->modx->resource->template = 0;
-                $this->modx->resource->content = $this->modx->getOption('site_unavailable_message');
-            } else {
-                $this->modx->resourceMethod = "id";
-                $this->modx->resourceIdentifier = $this->modx->getOption('site_unavailable_page',null,1);
-            }
-        } else {
-            $this->checkPublishStatus();
-            $this->modx->resourceMethod = $this->getResourceMethod();
-            $this->modx->resourceIdentifier = $this->getResourceIdentifier($this->modx->resourceMethod);
-            if ($this->modx->resourceMethod == 'id' && $this->modx->getOption('friendly_urls', null, false) && !$this->modx->getOption('request_method_strict', null, false)) {
-                $uri = $this->modx->context->getResourceURI($this->modx->resourceIdentifier);
-                if (!empty($uri)) {
-                    if ((integer) $this->modx->resourceIdentifier === (integer) $this->modx->getOption('site_start', null, 1)) {
-                        $url = $this->modx->getOption('site_url', null, MODX_SITE_URL);
-                    } else {
-                        $url = $this->modx->getOption('site_url', null, MODX_SITE_URL) . $uri;
-                    }
-                    $this->modx->sendRedirect($url, array('responseCode' => 'HTTP/1.1 301 Moved Permanently'));
-                }
-            }
-        }
-        if (empty ($this->modx->resourceMethod)) {
-            $this->modx->resourceMethod = "id";
-        }
-        if ($this->modx->resourceMethod == "alias") {
-            $this->modx->resourceIdentifier = $this->_cleanResourceIdentifier($this->modx->resourceIdentifier);
-        }
-        if ($this->modx->resourceMethod == "alias") {
-            $found = $this->modx->findResource($this->modx->resourceIdentifier);
-            if ($found) {
-                $this->modx->resourceIdentifier = $found;
-                $this->modx->resourceMethod = 'id';
-            } else {
-                $this->modx->sendErrorPage();
-            }
-        }
-        $this->modx->beforeRequest();
-        $this->modx->invokeEvent("OnWebPageInit");
-
-        if (!is_object($this->modx->resource)) {
-            if (!$this->modx->resource = $this->getResource($this->modx->resourceMethod, $this->modx->resourceIdentifier)) {
-                $this->modx->sendErrorPage();
-                return true;
-            }
-        }
-
-$this->modx->log(modX::LOG_LEVEL_ERROR, __FILE__ . ' ');
-$this->modx->log(modX::LOG_LEVEL_ERROR, __METHOD__ . ' ');
-$this->modx->log(modX::LOG_LEVEL_ERROR, __LINE__ . ': $this->modx->resourceMethod ' . $this->modx->resourceMethod);
-
-        return $this->prepareResponse();
-    }
-
-    /**
      * Gets a requested resource and all required data.
      *
      * @param string $method The method, 'id', or 'alias', by which to perform
@@ -107,9 +25,6 @@ $this->modx->log(modX::LOG_LEVEL_ERROR, __LINE__ . ': $this->modx->resourceMetho
      * is forwarded to the error page, or unauthorized page.
      */
     public function getResource($method, $identifier, array $options = array()) {
-$this->modx->log(modX::LOG_LEVEL_ERROR, __FILE__ . ' ');
-$this->modx->log(modX::LOG_LEVEL_ERROR, __METHOD__ . ' ');
-$this->modx->log(modX::LOG_LEVEL_ERROR, __LINE__ . ': $method ' . $method);
         $resource = null;
         if ($method == 'alias') {
             $resourceId = $this->modx->findResource($identifier);
@@ -166,6 +81,22 @@ $this->modx->log(modX::LOG_LEVEL_ERROR, __LINE__ . ': $method ' . $method);
                 $criteria->where(array('published' => 1));
             }
             if ($resource = $this->modx->getObject('modResource', $criteria)) {
+                
+                // hack the resource's content in here ------------------------>
+                $linguaLangs = $this->modx->getObject('linguaLangs', array('lang_code' => $this->modx->cultureKey));
+                $linguaSiteContent = $this->modx->getObject('linguaSiteContent', array(
+                    'resource_id' => $resource->get('id'),
+                    'lang_id' => $linguaLangs->get('id'),
+                ));
+                if ($linguaSiteContent) {
+                    $linguaSiteContentArray = $linguaSiteContent->toArray();
+                    unset($linguaSiteContentArray['id']);
+                    foreach ($linguaSiteContentArray as $k => $v) {
+                        $resource->set($k, $v);
+                    }
+                }
+                // hacking ends ----------------------------------------------->
+                
                 if ($resource instanceof modResource) {
                     if ($resource->get('context_key') !== $this->modx->context->get('key')) {
                         if (!$isForward || ($isForward && !$this->modx->getOption('allow_forward_across_contexts', $options, false))) {

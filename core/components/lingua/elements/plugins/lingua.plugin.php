@@ -196,52 +196,10 @@ Ext.onReady(function() {
         }
         break;
 
-    case 'OnBeforeHandleRequest':
-    case 'OnHandleRequest':
-        $modx->loadClass('modRequest', '', false, true);
-        if ($className = $modx->loadClass('LinguaRequest', MODX_CORE_PATH . 'components/lingua/model/lingua/', false, true)) {
-            $modx->request = new $className($modx);
-        }
-        
-        break;
-
     case 'OnWebPageInit':
         $modx->setOption('cache_resource_key', 'lingua/' . $modx->cultureKey);
         break;
 
-    case 'OnLoadWebDocument':
-        $modx->loadClass('modResponse', '', false, true);
-        if ($className = $modx->loadClass('LinguaResponse', MODX_CORE_PATH . 'components/lingua/model/lingua/', false, true)) {
-            $modx->response = new $className($modx);
-        }
-        
-        $lingua = $modx->getService('lingua', 'Lingua', MODX_CORE_PATH . 'components/lingua/model/lingua/');
-
-        if (!($lingua instanceof Lingua)) {
-            return '';
-        }
-
-        if ($modx->getOption('cultureKey') === $modx->cultureKey) {
-            return;
-        }
-        $linguaLangs = $modx->getObject('linguaLangs', array('lang_code' => $modx->cultureKey));
-        $linguaSiteContent = $modx->getObject('linguaSiteContent', array(
-            'resource_id' => $modx->resource->get('id'),
-            'lang_id' => $linguaLangs->get('id'),
-        ));
-        if (!$linguaSiteContent) {
-            return;
-        }
-        $linguaSiteContentArray = $linguaSiteContent->toArray();
-        unset($linguaSiteContentArray['id']);
-        $modx->resource->_processed = false;
-        $modx->resource->_content = '';
-        foreach ($linguaSiteContentArray as $k => $v) {
-            $modx->resource->set($k, $v);
-        }
-        $modx->resource->process();
-
-        break;
     default:
         break;
 }
