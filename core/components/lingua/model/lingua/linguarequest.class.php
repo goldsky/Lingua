@@ -92,7 +92,9 @@ class LinguaRequest extends modRequest {
                     $linguaSiteContentArray = $linguaSiteContent->toArray();
                     unset($linguaSiteContentArray['id']);
                     foreach ($linguaSiteContentArray as $k => $v) {
-                        $resource->set($k, $v);
+                        if (!empty($v)) {
+                            $resource->set($k, $v);
+                        }
                     }
                 }
                 // hacking ends ----------------------------------------------->
