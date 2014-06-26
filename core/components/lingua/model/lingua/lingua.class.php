@@ -481,12 +481,28 @@ class Lingua {
         return $output;
     }
     
+    /**
+     * Get list of the languages. Default cultureKey comes first.
+     * @param   boolean $activeOnly only return active languages (default: 1)
+     * @return  array   languages
+     */
     public function getLanguages($activeOnly = 1) {
         $languages = array();
+        $defaultLang = $this->modx->getObject('linguaLangs', array(
+            'lang_code' => $this->modx->getOption('cultureKey')
+        ));
+        if ($defaultLang) {
+            $languages[$defaultLang->get('lang_code')] = $defaultLang->toArray();
+        }
         $c = $this->modx->newQuery('linguaLangs');
         if ($activeOnly) {
             $c->where(array(
                 'active' => 1
+            ));
+        }
+        if ($defaultLang) {
+            $c->where(array(
+                'id:!=' => $defaultLang->get('id')
             ));
         }
         $collection = $this->modx->getCollection('linguaLangs', $c);
