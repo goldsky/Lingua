@@ -66,9 +66,9 @@ $events['OnWebPageInit']->fromArray(array(
     'propertyset' => 0,
         ), '', true, true);
 
-$events['OnWebPageInit'] = $modx->newObject('modPluginEvent');
-$events['OnWebPageInit']->fromArray(array(
-    'event' => 'OnWebPageInit',
+$events['OnEmptyTrash'] = $modx->newObject('modPluginEvent');
+$events['OnEmptyTrash']->fromArray(array(
+    'event' => 'OnEmptyTrash',
     'priority' => 0,
     'propertyset' => 0,
         ), '', true, true);

@@ -219,9 +219,6 @@ Ext.onReady(function() {
     case 'OnEmptyTrash':
         break;
 
-    case 'OnEmptyTrash':
-        break;
-
     default:
         break;
 }
