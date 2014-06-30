@@ -2,17 +2,41 @@ function Lingua(config) {
     this.config = config;
 }
 
-Lingua.prototype.createHiddenFields = function(lang) {
-    var modxPanelResource = Ext.getCmp('modx-panel-resource');
-    var record = this.config.siteContent[lang];
-    var flag = this.config.langs[lang]['flag'];
+Lingua.prototype.switchLanguage = function(selectedLang) {
+    var els = Ext.query(".lingua-hidden-fields");
+    Ext.each(els, function(item, idx) {
+        var cmp = Ext.getCmp(item.id);
+        if (cmp) {
+            cmp.getEl().setVisibilityMode(Ext.Element.DISPLAY);
+            cmp.hide();
+        } else {
+            var el = Ext.get(item.id);
+            el.setVisibilityMode(Ext.Element.DISPLAY);
+            el.hide();
+        }
+    });
+
+    this.switchMainFields(selectedLang);
+    this.switchTVFields(selectedLang);
+};
+
+Lingua.prototype.createHiddenFields = function(langs) {
+    var _this = this;
+    Ext.each(langs, function(item) {
+        _this.createHiddenField(item);
+    });
+};
+
+Lingua.prototype.createHiddenField = function(lang) {
+    var record = this.config.siteContent[lang['lang_code']];
+    var flag = lang['flag'];
     var pagetitle = Ext.getCmp('modx-resource-pagetitle');
     if (pagetitle) {
         var hiddenCmp = new Ext.form.TextField({
             fieldLabel: _('resource_pagetitle') + '<span class="required">*</span>' + '&nbsp;<img src="../' + flag + '">'
             , description: '<b>[[*pagetitle]]</b><br />' + _('resource_pagetitle_help')
-            , name: 'pagetitle_lingua[' + lang + ']'
-            , id: 'modx-resource-pagetitle-' + lang
+            , name: 'pagetitle_lingua[' + lang['lang_code'] + ']'
+            , id: 'modx-resource-pagetitle-' + lang['lang_code']
             , cls: 'lingua-hidden-fields'
             , maxLength: 255
             , anchor: '100%'
@@ -37,8 +61,8 @@ Lingua.prototype.createHiddenFields = function(lang) {
         var hiddenCmp = new Ext.form.TextField({
             fieldLabel: _('resource_longtitle') + '&nbsp;<img src="../' + flag + '">'
             , description: '<b>[[*longtitle]]</b><br />' + _('resource_longtitle_help')
-            , name: 'longtitle_lingua[' + lang + ']'
-            , id: 'modx-resource-longtitle-' + lang
+            , name: 'longtitle_lingua[' + lang['lang_code'] + ']'
+            , id: 'modx-resource-longtitle-' + lang['lang_code']
             , cls: 'lingua-hidden-fields'
             , maxLength: 255
             , anchor: '100%'
@@ -53,8 +77,8 @@ Lingua.prototype.createHiddenFields = function(lang) {
         var hiddenCmp = new Ext.form.TextArea({
             fieldLabel: _('resource_description') + '&nbsp;<img src="../' + flag + '">'
             , description: '<b>[[*description]]</b><br />' + _('resource_description_help')
-            , name: 'description_lingua[' + lang + ']'
-            , id: 'modx-resource-description-' + lang
+            , name: 'description_lingua[' + lang['lang_code'] + ']'
+            , id: 'modx-resource-description-' + lang['lang_code']
             , cls: 'lingua-hidden-fields'
             , maxLength: 255
             , anchor: '100%'
@@ -69,8 +93,8 @@ Lingua.prototype.createHiddenFields = function(lang) {
         var hiddenCmp = new Ext.form.TextArea({
             fieldLabel: _('resource_summary') + '&nbsp;<img src="../' + flag + '">'
             , description: '<b>[[*introtext]]</b><br />' + _('resource_summary_help')
-            , name: 'introtext_lingua[' + lang + ']'
-            , id: 'modx-resource-introtext-' + lang
+            , name: 'introtext_lingua[' + lang['lang_code'] + ']'
+            , id: 'modx-resource-introtext-' + lang['lang_code']
             , cls: 'lingua-hidden-fields'
             , grow: true
             , anchor: '100%'
@@ -80,12 +104,14 @@ Lingua.prototype.createHiddenFields = function(lang) {
         Ext.getCmp(introtext.ownerCt.id).insert(introtext.ownerCt.items.indexOf(introtext) + 1, hiddenCmp);
     }
 
+    var modxPanelResource = Ext.getCmp('modx-panel-resource');
+
     // textarea content
     var ta = Ext.getCmp('ta');
     if (ta) {
         var hiddenCmp = new Ext.form.TextArea({
-            name: 'ta_lingua[' + lang + ']'
-            , id: 'ta-' + lang
+            name: 'ta_lingua[' + lang['lang_code'] + ']'
+            , id: 'ta-' + lang['lang_code']
             , cls: 'modx-richtext lingua-hidden-fields'
             , hideLabel: true
             , anchor: '100%'
@@ -95,13 +121,14 @@ Lingua.prototype.createHiddenFields = function(lang) {
             , value: (record && record.content ? record.content : (record && record.ta ? record.ta : ''))
         });
         Ext.getCmp(ta.ownerCt.id).insert(ta.ownerCt.items.indexOf(ta) + 1, hiddenCmp);
-        
+
         MODx.triggerRTEOnChange = function() {
-            triggerDirtyField(Ext.getCmp('ta-' + lang));
+            triggerDirtyField(Ext.getCmp('ta-' + lang['lang_code']));
         };
 
-        if (MODx.config.use_editor && MODx.loadRTE) {
-            hiddenCmp.on('afterrender', function(){
+        var usingRTE = Ext.getCmp('modx-resource-richtext');
+        if (MODx.config.use_editor && MODx.loadRTE && usingRTE.checked) {
+            hiddenCmp.on('afterrender', function() {
                 var f = modxPanelResource.getForm().findField('richtext');
                 modxPanelResource.rteLoaded = false;
                 if (f && f.getValue() == 1 && !modxPanelResource.rteLoaded) {
@@ -121,19 +148,19 @@ Lingua.prototype.createHiddenFields = function(lang) {
     var content = Ext.getCmp('content');
     if (content) {
         var hiddenCmp = new Ext.form.Hidden({
-            name: 'content_lingua[' + lang + ']'
-            , id: 'hiddenContent-' + lang
+            name: 'content_lingua[' + lang['lang_code'] + ']'
+            , id: 'hiddenContent-' + lang['lang_code']
             , value: (record && record.content ? record.content : (record && record.ta ? record.ta : ''))
         });
         Ext.getCmp(content.ownerCt.id).insert(content.ownerCt.items.indexOf(content) + 1, hiddenCmp);
     }
 
     // duplicate textarea content to hidden content before form submission
-    modxPanelResource.on('beforeSubmit', function(o){
-        var ta = Ext.get('ta-' + lang);
+    modxPanelResource.on('beforeSubmit', function(o) {
+        var ta = Ext.get('ta-' + lang['lang_code']);
         if (ta) {
             var v = ta.dom.value;
-            var hc = Ext.getCmp('hiddenContent-' + lang);
+            var hc = Ext.getCmp('hiddenContent-' + lang['lang_code']);
             if (hc) {
                 hc.setValue(v);
             }
@@ -145,8 +172,8 @@ Lingua.prototype.createHiddenFields = function(lang) {
         var hiddenCmp = new Ext.form.TextField({
             fieldLabel: _('resource_alias') + '&nbsp;<img src="../' + flag + '">'
             , description: '<b>[[*alias]]</b><br />' + _('resource_alias_help')
-            , name: 'alias_lingua[' + lang + ']'
-            , id: 'modx-resource-alias-' + lang
+            , name: 'alias_lingua[' + lang['lang_code'] + ']'
+            , id: 'modx-resource-alias-' + lang['lang_code']
             , cls: 'lingua-hidden-fields'
             , hidden: true
             , maxLength: 100
@@ -161,8 +188,8 @@ Lingua.prototype.createHiddenFields = function(lang) {
         var hiddenCmp = new Ext.form.TextField({
             fieldLabel: _('resource_menutitle') + '&nbsp;<img src="../' + flag + '">'
             , description: '<b>[[*menutitle]]</b><br />' + _('resource_menutitle_help')
-            , name: 'menutitle_lingua[' + lang + ']'
-            , id: 'modx-resource-menutitle-' + lang
+            , name: 'menutitle_lingua[' + lang['lang_code'] + ']'
+            , id: 'modx-resource-menutitle-' + lang['lang_code']
             , cls: 'lingua-hidden-fields'
             , hidden: true
             , maxLength: 255
@@ -177,8 +204,8 @@ Lingua.prototype.createHiddenFields = function(lang) {
         var hiddenCmp = new Ext.form.TextField({
             fieldLabel: _('resource_link_attributes') + '&nbsp;<img src="../' + flag + '">'
             , description: '<b>[[*link_attributes]]</b><br />' + _('resource_link_attributes_help')
-            , name: 'link_attributes_lingua[' + lang + ']'
-            , id: 'modx-resource-link-attributes-' + lang
+            , name: 'link_attributes_lingua[' + lang['lang_code'] + ']'
+            , id: 'modx-resource-link-attributes-' + lang['lang_code']
             , cls: 'lingua-hidden-fields'
             , hidden: true
             , maxLength: 255
@@ -194,16 +221,16 @@ Lingua.prototype.createHiddenFields = function(lang) {
             boxLabel: _('resource_uri_override') + '&nbsp;<img src="../' + flag + '">'
             , description: _('resource_uri_override_help')
             , hideLabel: true
-            , name: 'uri_override_lingua[' + lang + ']'
+            , name: 'uri_override_lingua[' + lang['lang_code'] + ']'
             , value: 1
             , checked: (record && record.uri_override ? (parseInt(record.uri_override) ? true : false) : false)
-            , id: 'modx-resource-uri-override-' + lang
+            , id: 'modx-resource-uri-override-' + lang['lang_code']
             , cls: 'lingua-hidden-fields'
             , hidden: true
         });
         if (hiddenCmp) {
             hiddenCmp.on('check', function(cb) {
-                var uri = Ext.getCmp('modx-resource-uri-' + lang);
+                var uri = Ext.getCmp('modx-resource-uri-' + lang['lang_code']);
                 if (cb.checked) {
                     uri.show();
                 } else {
@@ -219,8 +246,8 @@ Lingua.prototype.createHiddenFields = function(lang) {
         var hiddenCmp = new Ext.form.TextField({
             fieldLabel: _('resource_uri') + '&nbsp;<img src="../' + flag + '">'
             , description: '<b>[[*uri]]</b><br />' + _('resource_uri_help')
-            , name: 'uri_lingua[' + lang + ']'
-            , id: 'modx-resource-uri-' + lang
+            , name: 'uri_lingua[' + lang['lang_code'] + ']'
+            , id: 'modx-resource-uri-' + lang['lang_code']
             , cls: 'lingua-hidden-fields'
             , hidden: true
             , maxLength: 255
@@ -232,7 +259,7 @@ Lingua.prototype.createHiddenFields = function(lang) {
 
 };
 
-Lingua.prototype.switchLanguage = function(selectedLang) {
+Lingua.prototype.switchMainFields = function(selectedLang) {
     var title;
     if (selectedLang !== this.config.defaultLang) {
         title = Ext.util.Format.stripTags(Ext.getCmp('modx-resource-pagetitle-' + selectedLang).getValue());
@@ -244,11 +271,6 @@ Lingua.prototype.switchLanguage = function(selectedLang) {
     }
     Ext.getCmp('modx-resource-header').getEl().update('<h2>' + title + '</h2>');
 
-    var els = Ext.query(".lingua-hidden-fields");
-    Ext.each(els, function(item, idx) {
-        Ext.getCmp(item.id).hide();
-    });
-    
     var pagetitle = Ext.getCmp('modx-resource-pagetitle');
     if (pagetitle) {
         if (selectedLang !== this.config.defaultLang) {
@@ -353,4 +375,224 @@ Lingua.prototype.switchLanguage = function(selectedLang) {
             }
         }
     }
+};
+
+/**
+ * Initiate All cloned Template Variables' Field
+ * @param {object} langs
+ * @returns {undefined}
+ */
+Lingua.prototype.initAllClonedTVFields = function(langs) {
+    var _this = this;
+    if (typeof (this.config.tmplvars) === 'undefined') {
+        false;
+    }
+    Ext.each(this.config.tmplvars, function(tv) {
+        switch (tv['type']) {
+            case 'tag':
+            case 'autotag':
+                var els = Ext.query('.modx-tag-list');
+                Ext.each(els, function(item, idx) {
+                    var cmp = Ext.getCmp(item.id);
+                    if (cmp) {
+                        cmp.getEl().setVisibilityMode(Ext.Element.DISPLAY);
+                        cmp.hide();
+                    } else {
+                        var el = Ext.get(item.id);
+                        el.setVisibilityMode(Ext.Element.DISPLAY);
+                        el.hide();
+                    }
+                });
+
+                var TVEl = Ext.get('tv-' + tv['id'] + '-tag-list');
+                TVEl.show();
+                break;
+            default:
+                break;
+        }
+
+        var captionEl = Ext.get('tv' + tv['id'] + '-caption');
+        Ext.each(langs, function(lang) {
+            // caption
+            var cloneCaption = captionEl.dom.cloneNode(true);
+            cloneCaption.id = 'tv' + tv['id'] + '_' + lang['lang_code'] + '-caption';
+            cloneCaption = new Ext.Element(cloneCaption);
+            cloneCaption.update(captionEl.dom.innerHTML + ' <img src="../' + lang['flag'] + '">');
+            cloneCaption.addClass('lingua-hidden-fields');
+            cloneCaption.setVisibilityMode(Ext.Element.DISPLAY);
+            cloneCaption.hide();
+            cloneCaption.insertAfter(captionEl);
+            // field
+            _this.initCloneTVField(lang, tv);
+        });
+    });
+};
+
+Lingua.prototype.initCloneTVField = function(lang, tv) {
+    var linguaTVId = 'tv' + tv['id'] + '_' + lang['lang_code'] + '_lingua_tv';
+    var TVEl = Ext.get(linguaTVId);
+    if (TVEl) {
+        TVEl.addClass('lingua-hidden-fields');
+        TVEl.addClass('lingua-tv-fields-' + lang['lang_code']);
+        TVEl.setVisibilityMode(Ext.Element.DISPLAY);
+        TVEl.hide();
+        TVEl.insertAfter(Ext.get('tv' + tv['id']));
+    }
+    var TVCmp = Ext.getCmp(linguaTVId);
+    if (TVCmp) {
+        TVCmp.addClass('lingua-hidden-fields');
+        TVCmp.addClass('lingua-tv-fields-' + lang['lang_code']);
+        TVCmp.dom.setVisibilityMode(Ext.Element.DISPLAY);
+        TVCmp.hide();
+    }
+    switch (tv['type']) {
+        case 'tag':
+        case 'autotag':
+            var tagList = Ext.get('tv-' + tv['id'] + '_' + lang['lang_code'] + '_lingua_tv-tag-list');
+            if (tagList) {
+                tagList.addClass('lingua-hidden-fields');
+                tagList.setVisibilityMode(Ext.Element.DISPLAY);
+                tagList.hide();
+                tagList.insertAfter(Ext.get('tv-' + tv['id'] + '-tag-list'));
+            }
+            break;
+        default:
+            break;
+    }
+};
+
+Lingua.prototype.switchTVFields = function(selectedLang) {
+    var _this = this;
+    if (typeof (this.config.tmplvars) === 'undefined') {
+        false;
+    }
+    Ext.each(this.config.tmplvars, function(tv) {
+        // caption
+        var captionEl = Ext.get('tv' + tv['id'] + '-caption');
+        if (typeof (captionEl) !== 'undefined') {
+            if (selectedLang !== _this.config.defaultLang) {
+                captionEl.setVisibilityMode(Ext.Element.DISPLAY);
+                captionEl.hide();
+                var cloneCaption = Ext.get('tv' + tv['id'] + '_' + selectedLang + '-caption');
+                cloneCaption.show();
+            } else {
+                captionEl.show();
+            }
+        }
+
+        var linguaTVId = 'tv' + tv['id'] + '_' + selectedLang + '_lingua_tv';
+        // field
+        var TVCmp = Ext.getCmp('tv' + tv['id']);
+        if (typeof (TVCmp) !== 'undefined') {
+            if (selectedLang !== _this.config.defaultLang) {
+                TVCmp.getEl().setVisibilityMode(Ext.Element.DISPLAY);
+                TVCmp.hide();
+                var cloneTVCmp = Ext.getCmp(linguaTVId);
+                cloneTVCmp.show();
+            } else {
+                TVCmp.show();
+            }
+        }
+
+        switch (tv['type']) {
+            case 'richtext':
+                // tv2_parent
+                var TVEl = Ext.get('tv' + tv['id'] + '_parent');
+                if (typeof (TVEl) !== 'undefined') {
+                    if (selectedLang !== _this.config.defaultLang) {
+                        TVEl.setVisibilityMode(Ext.Element.DISPLAY);
+                        TVEl.hide();
+                    } else {
+                        TVEl.show();
+                    }
+                }
+                // tv2_zh_lingua_tv_parent
+                var cloneTVEl = Ext.get(linguaTVId + '_parent');
+                var cloneTVCmp = Ext.getCmp(linguaTVId + '_parent');
+                if (typeof (cloneTVEl) !== 'undefined' && cloneTVEl !== null) {
+                    if (selectedLang !== _this.config.defaultLang) {
+                        cloneTVEl.show();
+                    } else {
+                        cloneTVEl.setVisibilityMode(Ext.Element.DISPLAY);
+                        cloneTVEl.hide();
+                    }
+                }
+                break;
+            case 'tag':
+            case 'autotag':
+                // tv3_zh_lingua_tv
+                var TVCmp = Ext.getCmp('tv-' + tv['id']);
+                if (typeof (TVCmp) !== 'undefined' && TVCmp !== null) {
+                    if (selectedLang !== _this.config.defaultLang) {
+                        TVCmp.dom.setVisibilityMode(Ext.Element.DISPLAY);
+                        TVCmp.hide();
+                    } else {
+                        TVCmp.show();
+                    }
+                }
+                var TVEl = Ext.get('tv-' + tv['id']);
+                if (typeof (TVEl) !== 'undefined' && TVEl !== null) {
+                    if (selectedLang !== _this.config.defaultLang) {
+                        TVEl.setVisibilityMode(Ext.Element.DISPLAY);
+                        TVEl.hide();
+                    } else {
+                        TVEl.show();
+                    }
+                }
+                var cloneTVCmp = Ext.getCmp('tv-' + tv['id'] + '_' + selectedLang + '_lingua_tv');
+                if (typeof (cloneTVCmp) !== 'undefined' && cloneTVCmp !== null) {
+                    if (selectedLang !== _this.config.defaultLang) {
+                        cloneTVCmp.show();
+                    } else {
+                        cloneTVCmp.dom.setVisibilityMode(Ext.Element.DISPLAY);
+                        cloneTVCmp.hide();
+                    }
+                }
+                var cloneTVEl = Ext.get('tv-' + tv['id'] + '_' + selectedLang + '_lingua_tv');
+                if (typeof (cloneTVEl) !== 'undefined' && cloneTVEl !== null) {
+                    if (selectedLang !== _this.config.defaultLang) {
+                        cloneTVEl.show();
+                    } else {
+                        cloneTVEl.setVisibilityMode(Ext.Element.DISPLAY);
+                        cloneTVEl.hide();
+                    }
+                }
+                // tv3_zh_lingua_tv-tag-list
+                var TVEl = Ext.get('tv-' + tv['id'] + '-tag-list');
+                if (selectedLang !== _this.config.defaultLang) {
+                    TVEl.setVisibilityMode(Ext.Element.DISPLAY);
+                    TVEl.hide();
+                } else {
+                    TVEl.show();
+                }
+                var cloneTVEl = Ext.get('tv-' + tv['id'] + '_' + selectedLang + '_lingua_tv-tag-list');
+                if (typeof (cloneTVEl) !== 'undefined' && cloneTVEl !== null) {
+                    if (selectedLang !== _this.config.defaultLang) {
+                        cloneTVEl.show();
+                    } else {
+                        cloneTVEl.setVisibilityMode(Ext.Element.DISPLAY);
+                        cloneTVEl.hide();
+                    }
+                }
+                break;
+            default:
+                var TVEl = Ext.get('tv' + tv['id']);
+                if (typeof (TVEl) !== 'undefined') {
+                    TVEl.setVisibilityMode(Ext.Element.DISPLAY);
+                    if (selectedLang !== _this.config.defaultLang) {
+                        TVEl.hide();
+                    } else {
+                        TVEl.show();
+                    }
+                }
+                var cloneTVEl = Ext.get('tv' + tv['id'] + '_' + selectedLang + '_lingua_tv');
+                if (typeof (cloneTVEl) !== 'undefined' && cloneTVEl !== null) {
+                    cloneTVEl.setVisibilityMode(Ext.Element.DISPLAY);
+                    if (selectedLang !== _this.config.defaultLang) {
+                        cloneTVEl.show();
+                    }
+                }
+                break;
+        }
+    });
 };

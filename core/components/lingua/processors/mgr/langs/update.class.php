@@ -22,12 +22,11 @@
  * @package lingua
  * @subpackage lingua_processor
  */
-
 class LangsUpdateProcessor extends modObjectUpdateProcessor {
 
-	public $classKey = 'linguaLangs';
-	public $languageTopics = array('lingua:cmp');
-	public $objectType = 'lingua.LangsUpdate';
+    public $classKey = 'linguaLangs';
+    public $languageTopics = array('lingua:cmp');
+    public $objectType = 'lingua.LangsUpdate';
 
 }
 

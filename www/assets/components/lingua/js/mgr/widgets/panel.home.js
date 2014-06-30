@@ -1,6 +1,6 @@
 Lingua.panel.Home = function(config) {
     config = config || {};
-    Ext.apply(config, {
+    Ext.applyIf(config, {
         border: false,
         baseCls: 'modx-formpanel',
         cls: 'container',
@@ -26,6 +26,20 @@ Lingua.panel.Home = function(config) {
                                 bodyCssClass: 'panel-desc'
                             }, {
                                 xtype: 'lingua-grid-langs',
+                                cls: 'main-wrapper',
+                                preventRender: true
+                            }]
+                    }, {
+                        title: _('tmplvars'),
+                        defaults: {
+                            autoHeight: true
+                        },
+                        items: [{
+                                html: '<p>' + _('lingua.tmplvars_desc') + '</p>',
+                                border: false,
+                                bodyCssClass: 'panel-desc'
+                            }, {
+                                xtype: 'lingua-grid-tvs',
                                 cls: 'main-wrapper',
                                 preventRender: true
                             }]

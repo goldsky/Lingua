@@ -38,6 +38,13 @@ $events['OnDocFormPrerender']->fromArray(array(
     'propertyset' => 0,
         ), '', true, true);
 
+$events['OnResourceTVFormRender'] = $modx->newObject('modPluginEvent');
+$events['OnResourceTVFormRender']->fromArray(array(
+    'event' => 'OnResourceTVFormRender',
+    'priority' => 0,
+    'propertyset' => 0,
+        ), '', true, true);
+
 $events['OnDocFormSave'] = $modx->newObject('modPluginEvent');
 $events['OnDocFormSave']->fromArray(array(
     'event' => 'OnDocFormSave',

@@ -22,12 +22,12 @@
  * @package lingua
  * @subpackage lingua_processor
  */
-class LinguaRemoveProcessor extends modObjectRemoveProcessor {
+class TVCreateProcessor extends modObjectCreateProcessor {
 
-    public $classKey = 'linguaLangs';
+    public $classKey = 'linguaSiteTmplvars';
     public $languageTopics = array('lingua:cmp');
-    public $objectType = 'lingua.LinguaRemove';
+    public $objectType = 'lingua.TVCreate';
 
 }
 
-return 'LinguaRemoveProcessor';
+return 'TVCreateProcessor';

@@ -22,12 +22,31 @@
  * @package lingua
  * @subpackage lingua_processor
  */
-class LinguaRemoveProcessor extends modObjectRemoveProcessor {
 
-    public $classKey = 'linguaLangs';
+class TVGetListProcessor extends modObjectGetListProcessor {
+
+    public $classKey = 'linguaSiteTmplvars';
     public $languageTopics = array('lingua:cmp');
-    public $objectType = 'lingua.LinguaRemove';
+    public $defaultSortField = 'id';
+    public $defaultSortDirection = 'ASC';
+    public $objectType = 'lingua.TVGetList';
+
+    public function prepareQueryBeforeCount(xPDOQuery $c) {
+        $c->leftJoin('modTemplateVar', 'TemplateVar', 'TemplateVar.id = linguaSiteTmplvars.tmplvarid');
+        $c->select(array(
+            'linguaSiteTmplvars.id',
+            'TemplateVar.name',
+            'TemplateVar.type',
+        ));
+        $query = $this->getProperty('query');
+        if (!empty($query)) {
+            $c->where(array(
+                'TemplateVar.name:LIKE' => '%' . $query . '%',
+            ));
+        }
+        return $c;
+    }
 
 }
 
-return 'LinguaRemoveProcessor';
+return 'TVGetListProcessor';
