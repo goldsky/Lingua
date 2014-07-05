@@ -234,100 +234,147 @@ Ext.onReady(function() {
             return '';
         }
         $languages = $lingua->getLanguages(1, false);
-        if (!empty($languages)) {
-            if ($resource) {
-                $tvs = $resource->getTemplateVars();
-            } else {
-                $templateId = $template;
-                $template = $modx->getObject('modTemplate', $templateId);
-                $tvs = $template->getTemplateVars();
-            }
-            if ($tvs) {
-                $tvIds = array();
-                $tvOutputs = array();
-                foreach ($tvs as $tv) {
-                    $tvIds[] = $tv->get('id');
-                }
-                $c = $modx->newQuery('linguaSiteTmplvars');
-                $c->where(array(
-                    'tmplvarid:IN' => $tvIds
-                ));
-                $linguaSiteTmplvars = $modx->getCollection('linguaSiteTmplvars', $c);
-                if ($linguaSiteTmplvars) {
-                    $jsHTML = "<script>\nExt.onReady(function() {\n";             
-                    $tmplvars = array();
-                    $cloneTVFields = array();
-                    foreach ($linguaSiteTmplvars as $linguaTv) {
-                        $tvId = $linguaTv->get('tmplvarid');
-                        $tv = $modx->getObject('modTemplateVar', $tvId);
-                        if (!$tv) {
-                            continue;
-                        }
-                        $tmplvars[] = array(
-                            'id' => $tvId,
-                            'type' => $tv->get('type')
-                        );
-                        foreach ($languages as $language) {
-                            if ($language['lang_code'] === $modx->getOption('cultureKey')) {
-                                continue;
-                            }
-                            $linguaTVContent = $modx->getObject('linguaSiteTmplvarContentvalues', array(
-                                'tmplvarid' => $tvId,
-                                'contentid' => $resourceId,
-                                'lang_id' => $language['id']
-                            ));
-                            /**
-                             * Start to manipulate the ID to parse hidden TVs
-                             */
-                            $content = '';
-                            if ($linguaTVContent) {
-                                $content = $linguaTVContent->get('value');
-                            }
-                            $inputForm = $tv->renderInput($resource, array(
-                                'value'=> $content
-                            ));
-                            $tvCloneId = $tvId . '_' . $language['lang_code'] . '_lingua_tv';
-                            // basic replacements
-                            $inputForm = preg_replace('/("|\')+tv' . $tvId . '("|\')+/', '${1}tv' . $tvCloneId . '${2}', $inputForm);
-                            $inputForm = preg_replace('/("|\')+tv' . $tvId . '\[\]("|\')+/', '${1}tv' . $tvCloneId . '[]${2}', $inputForm);
-                            switch ($tv->get('type')) {
-                                case 'tag':
-                                case 'autotag':
-                                    $inputForm = preg_replace('/("|\')+tv-tags-' . $tvId . '("|\')+/', '${1}tv-tags-' . $tvCloneId . '${2}', $inputForm);
-                                    $inputForm = preg_replace('/fld' . $tvId . '/', 'fld' . $tvCloneId, $inputForm);
-                                    $inputForm = preg_replace('/tv-' . $tvId . '-tag-list/', 'tv-' . $tvCloneId . '-tag-list', $inputForm);
-                                    $inputForm = preg_replace('/o.id != \'' . $tvId . '\'/', 'o.id != \'' . $tvCloneId . '\'', $inputForm);
-                                    break;
-                                case 'radio':
-                                case 'checkbox':
-                                    $inputForm = preg_replace('/("|\')+tv' . $tvId . '-("|\')+/', '${1}tv' . $tvCloneId . '${2}-', $inputForm);
-                                    break;
-                                case 'file':
-                                    $inputForm = preg_replace('/("|\')+tvbrowser' . $tvId . '("|\')+/', '${1}tvbrowser' . $tvCloneId . '${2}', $inputForm);
-                                    $inputForm = preg_replace('/("|\')+tvpanel' . $tvId . '("|\')+/', '${1}tvpanel' . $tvCloneId . '${2}', $inputForm);
-                                    break;
-                                case 'image':
-                                    $inputForm = preg_replace('/("|\')+tvbrowser' . $tvId . '("|\')+/', '${1}tvbrowser' . $tvCloneId . '${2}', $inputForm);
-                                    $inputForm = preg_replace('/("|\')+tv-image-' . $tvId . '("|\')+/', '${1}tv-image-' . $tvCloneId . '${2}', $inputForm);
-                                    $inputForm = preg_replace('/("|\')+tv-image-preview-' . $tvId . '("|\')+/', '${1}tv-image-preview-' . $tvCloneId . '${2}', $inputForm);
-                                    $inputForm = preg_replace('/("|\')+tv-image-' . $tvId . '("|\')+/', '${1}tv-image-' . $tvCloneId . '${2}', $inputForm);
-                                    $inputForm = preg_replace('/fld' . $tvId . '/', 'fld' . $tvCloneId, $inputForm);
-                                    break;
-                                default:
-                                    break;
-                            }
-                            $cloneTVFields[] = $inputForm;
-                        }
-                    }
-                    $jsHTML .= '    lingua.config.tmplvars = ' . json_encode($tmplvars) . ';' . "\n";
-                    $jsHTML .= '    lingua.initAllClonedTVFields(' . json_encode($languages) . ');' . "\n";
-                    $jsHTML .= "});\n</script>";
-                    $modx->event->output($jsHTML);
-                    $modx->event->output(@implode("\n", $cloneTVFields));
-                }
+        if (empty($languages)) {
+            return;
+        }
+        $initAllClonedTVFields = array();
+        foreach ($languages as $language) {
+            $initAllClonedTVFields[] = $language;
+        }
+        
+        if ($resource) {
+            $tvs = $resource->getTemplateVars();
+        } else {
+            $templateId = $template;
+            $template = $modx->getObject('modTemplate', $templateId);
+            $tvs = $template->getTemplateVars();
+        }
+        if (!$tvs) {
+            return;
+        }
+        
+        $tvIds = array();
+        $tvOutputs = array();
+        foreach ($tvs as $tv) {
+            $tvIds[] = $tv->get('id');
+        }
+        $c = $modx->newQuery('linguaSiteTmplvars');
+        $c->where(array(
+            'tmplvarid:IN' => $tvIds
+        ));
+        $linguaSiteTmplvars = $modx->getCollection('linguaSiteTmplvars', $c);
+        if (!$linguaSiteTmplvars) {
+            return;
+        }
+        
+        $formElements = array();
+        foreach ($scriptProperties['categories'] as $category) {
+            foreach ($category['tvs'] as $tv) {
+                $formElements[$tv->get('id')] = $tv;
             }
         }
 
+        if (!empty($modx->controller->scriptProperties['showCheckbox'])) {
+            $showCheckbox = 1;
+        }
+
+        $tmplvars = array();
+        $cloneTVFields = array();
+        $count = 0;
+        foreach ($linguaSiteTmplvars as $linguaTv) {
+            $tvId = $linguaTv->get('tmplvarid');
+            if (!isset($formElements[$tvId])) {
+                continue;
+            }
+            $tv = $formElements[$tvId];
+            $tmplvars[] = array(
+                'id' => $tvId,
+                'type' => $tv->get('type'),
+            );
+            $tvArray = $tv->toArray('tv.');
+            foreach ($languages as $language) {
+                if ($language['lang_code'] === $modx->getOption('cultureKey')) {
+                    continue;
+                }
+                
+                $linguaTVContent = $modx->getObject('linguaSiteTmplvarContentvalues', array(
+                    'tmplvarid' => $tvId,
+                    'contentid' => $resourceId,
+                    'lang_id' => $language['id']
+                ));
+                
+                /**
+                 * Start to manipulate the ID to parse hidden TVs
+                 */
+                $content = '';
+                if ($linguaTVContent) {
+                    $content = $linguaTVContent->get('value');
+                }
+                $inputForm = $tv->renderInput($resource, array(
+                    'value' => $content
+                ));
+                if (empty($inputForm)) {
+                    continue;
+                }
+                
+                $tvCloneId = $tvId . '_' . $language['lang_code'] . '_lingua_tv';
+                // basic replacements
+                $cloneInputForm = $inputForm;
+                $cloneInputForm = preg_replace('/("|\'){1}tv' . $tvId . '("|\'){1}/', '${1}tv' . $tvCloneId . '${2}', $cloneInputForm);
+                $cloneInputForm = preg_replace('/("|\'){1}tv' . $tvId . '\[\]("|\'){1}/', '${1}tv' . $tvCloneId . '[]${2}', $cloneInputForm);
+                switch ($tv->get('type')) {
+                    case 'tag':
+                    case 'autotag':
+                        $cloneInputForm = preg_replace('/("|\'){1}tv\-tags\-' . $tvId . '("|\'){1}/', '${1}tv-tags-' . $tvCloneId . '${2}', $cloneInputForm);
+                        $cloneInputForm = preg_replace('/fld' . $tvId . '/', 'fld' . $tvCloneId, $cloneInputForm);
+                        $cloneInputForm = preg_replace('/tv\-' . $tvId . '\-tag\-list/', 'tv-' . $tvCloneId . '-tag-list', $cloneInputForm);
+                        $cloneInputForm = preg_replace('/o.id != \'' . $tvId . '\'/', 'o.id != \'' . $tvCloneId . '\'', $cloneInputForm);
+                        $cloneInputForm = preg_replace('/("|\'){1}tvdef' . $tvId . '("|\'){1}/', '${1}tvdef' . $tvCloneId . '${2}', $cloneInputForm);
+                        break;
+                    case 'radio':
+                    case 'option':
+                        $cloneInputForm = preg_replace('/("|\'){1}tv' . $tvId . '\-/', '${1}tv' . $tvCloneId . '-', $cloneInputForm);
+                        break;
+                    case 'checkbox':
+                        $cloneInputForm = preg_replace('/("|\'){1}tv' . $tvId . '\-/', '${1}tv' . $tvCloneId . '-', $cloneInputForm);
+                        $cloneInputForm = preg_replace('/("|\'){1}tv\-' . $tvId . '("|\'){1}/', '${1}tv-' . $tvCloneId . '${2}', $cloneInputForm);
+                        $cloneInputForm = preg_replace('/("|\'){1}tvdef' . $tvId . '("|\'){1}/', '${1}tvdef' . $tvCloneId . '${2}', $cloneInputForm);
+                        break;
+                    case 'file':
+                        $cloneInputForm = preg_replace('/("|\'){1}tvbrowser' . $tvId . '("|\'){1}/', '${1}tvbrowser' . $tvCloneId . '${2}', $cloneInputForm);
+                        $cloneInputForm = preg_replace('/("|\'){1}tvpanel' . $tvId . '("|\'){1}/', '${1}tvpanel' . $tvCloneId . '${2}', $cloneInputForm);
+                        $cloneInputForm = preg_replace('/fld' . $tvId . '/', 'fld' . $tvCloneId, $cloneInputForm);
+                        $cloneInputForm = preg_replace('/tv: ("|\'){1}' . $tvId . '("|\'){1}/', 'tv: ${1}' . $tvCloneId . '${2}', $cloneInputForm);
+                        break;
+                    case 'image':
+                        $cloneInputForm = preg_replace('/("|\'){1}tvbrowser' . $tvId . '("|\'){1}/', '${1}tvbrowser' . $tvCloneId . '${2}', $cloneInputForm);
+                        $cloneInputForm = preg_replace('/("|\'){1}tv\-image\-' . $tvId . '("|\'){1}/', '${1}tv-image-' . $tvCloneId . '${2}', $cloneInputForm);
+                        $cloneInputForm = preg_replace('/("|\'){1}tv\-image\-preview\-' . $tvId . '("|\'){1}/', '${1}tv-image-preview-' . $tvCloneId . '${2}', $cloneInputForm);
+                        $cloneInputForm = preg_replace('/fld' . $tvId . '/', 'fld' . $tvCloneId, $cloneInputForm);
+                        $cloneInputForm = preg_replace('/tv: ("|\'){1}' . $tvId . '("|\'){1}/', 'tv: ${1}' . $tvCloneId . '${2}', $cloneInputForm);
+                        break;
+                    case 'url':
+                        $cloneInputForm = preg_replace('/("|\'){1}tv' . $tvId . '_prefix("|\'){1}/', '${1}tv' . $tvId . '_prefix' . '_' . $language['lang_code'] . '_lingua_tv${2}', $cloneInputForm);
+                        break;
+                    default:
+                        break;
+                }
+                $count++;
+                $phs = $tvArray;
+                $phs['tv.id'] = $tvCloneId;
+                $phs['tv.formElement'] = $cloneInputForm;
+                $phs['tv.showCheckbox'] = $showCheckbox;
+                $cloneTVFields[] = $lingua->processElementTags($lingua->parseTpl('lingua.resourcetv.row', $phs));
+            }
+        }
+        
+        $jsHTML = "<script>\nExt.onReady(function() {\n";
+        $jsHTML .= '    lingua.config.tmplvars = ' . json_encode($tmplvars) . ';' . "\n";
+        $jsHTML .= '    lingua.initAllClonedTVFields(' . json_encode($initAllClonedTVFields) . ');' . "\n";
+        $jsHTML .= "});\n</script>";
+        $modx->event->output($jsHTML);
+        $modx->event->output(@implode("\n", $cloneTVFields));
+        
         break;
 
     case 'OnDocFormSave':
@@ -361,7 +408,7 @@ Ext.onReady(function() {
         if (!($lingua instanceof Lingua)) {
             return '';
         }
-        
+
         // update linguaSiteContent
         $reverting = array();
         foreach ($resource->_fields as $k => $v) {
@@ -409,10 +456,10 @@ Ext.onReady(function() {
             $linguaSiteContent->set('uri', $v['uri']);
             $linguaSiteContent->save();
         }
-        
+
         // update linguaSiteTmplvarContentvalues
         $reverting = array();
-        foreach ($resource->_fields as $k => $v) {
+        foreach ($resource->_fields as $k => $value) {
             if (!preg_match('/_lingua_tv$/', $k)) {
                 continue;
             }
@@ -422,7 +469,46 @@ Ext.onReady(function() {
             if ($tvKeys[1] === $modx->getOption('cultureKey')) {
                 continue;
             }
-            $reverting[$tvKeys[1]][$tvId] = $v;
+            $tv = $modx->getObject('modTemplateVar', $tvId);
+            $tvKey = $tvKeys[0];
+            /* validation for different types */
+            switch ($tv->get('type')) {
+                case 'url':
+                    $prefix = $resource->_fields[$tvKey . '_prefix'];
+                    if ($prefix != '--') {
+                        $value = str_replace(array('ftp://', 'http://'), '', $value);
+                        $value = $prefix . $value;
+                    }
+                    break;
+                case 'date':
+                    $value = empty($value) ? '' : strftime('%Y-%m-%d %H:%M:%S', strtotime($value));
+                    break;
+                /* ensure tag types trim whitespace from tags */
+                case 'tag':
+                case 'autotag':
+                    $tags = explode(',', $value);
+                    $newTags = array();
+                    foreach ($tags as $tag) {
+                        $newTags[] = trim($tag);
+                    }
+                    $value = implode(',', $newTags);
+                    break;
+                default:
+                    /* handles checkboxes & multiple selects elements */
+                    if (is_array($value)) {
+                        $featureInsert = array();
+                        while (list($featureValue, $featureItem) = each($value)) {
+                            if (empty($featureItem)) {
+                                continue;
+                            }
+                            $featureInsert[count($featureInsert)] = $featureItem;
+                        }
+                        $value = implode('||', $featureInsert);
+                    }
+                    break;
+            }
+
+            $reverting[$tvKeys[1]][$tvId] = $value;
             /**
              * json seems has number of characters limit;
              * that makes saving success report truncated and output modal hangs
@@ -452,7 +538,7 @@ Ext.onReady(function() {
                 $linguaSiteTmplvarContentvalues->save();
             }
         }
-        
+
         // clear cache
         $contexts = array($resource->get('context_key'));
         $cacheManager = $modx->getCacheManager();

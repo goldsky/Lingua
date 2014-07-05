@@ -1,16 +1,16 @@
 function Lingua(config) {
     this.config = config;
+    this.element = [];
 }
 
 Lingua.prototype.switchLanguage = function(selectedLang) {
     var els = Ext.query(".lingua-hidden-fields");
     Ext.each(els, function(item, idx) {
-        var cmp = Ext.getCmp(item.id);
-        if (cmp) {
+        var cmp, el;
+        if (cmp = Ext.getCmp(item.id)) {
             cmp.getEl().setVisibilityMode(Ext.Element.DISPLAY);
             cmp.hide();
-        } else {
-            var el = Ext.get(item.id);
+        } else if (el = Ext.get(item.id)) {
             el.setVisibilityMode(Ext.Element.DISPLAY);
             el.hide();
         }
@@ -377,51 +377,18 @@ Lingua.prototype.switchMainFields = function(selectedLang) {
     }
 };
 
-/**
+/*******************************************************************************
  * Initiate All cloned Template Variables' Field
  * @param {object} langs
  * @returns {undefined}
- */
+ ******************************************************************************/
 Lingua.prototype.initAllClonedTVFields = function(langs) {
     var _this = this;
     if (typeof (this.config.tmplvars) === 'undefined') {
         false;
     }
     Ext.each(this.config.tmplvars, function(tv) {
-        switch (tv['type']) {
-            case 'tag':
-            case 'autotag':
-                var els = Ext.query('.modx-tag-list');
-                Ext.each(els, function(item, idx) {
-                    var cmp = Ext.getCmp(item.id);
-                    if (cmp) {
-                        cmp.getEl().setVisibilityMode(Ext.Element.DISPLAY);
-                        cmp.hide();
-                    } else {
-                        var el = Ext.get(item.id);
-                        el.setVisibilityMode(Ext.Element.DISPLAY);
-                        el.hide();
-                    }
-                });
-
-                var TVEl = Ext.get('tv-' + tv['id'] + '-tag-list');
-                TVEl.show();
-                break;
-            default:
-                break;
-        }
-
-        var captionEl = Ext.get('tv' + tv['id'] + '-caption');
         Ext.each(langs, function(lang) {
-            // caption
-            var cloneCaption = captionEl.dom.cloneNode(true);
-            cloneCaption.id = 'tv' + tv['id'] + '_' + lang['lang_code'] + '-caption';
-            cloneCaption = new Ext.Element(cloneCaption);
-            cloneCaption.update(captionEl.dom.innerHTML + ' <img src="../' + lang['flag'] + '">');
-            cloneCaption.addClass('lingua-hidden-fields');
-            cloneCaption.setVisibilityMode(Ext.Element.DISPLAY);
-            cloneCaption.hide();
-            cloneCaption.insertAfter(captionEl);
             // field
             _this.initCloneTVField(lang, tv);
         });
@@ -429,35 +396,40 @@ Lingua.prototype.initAllClonedTVFields = function(langs) {
 };
 
 Lingua.prototype.initCloneTVField = function(lang, tv) {
-    var linguaTVId = 'tv' + tv['id'] + '_' + lang['lang_code'] + '_lingua_tv';
-    var TVEl = Ext.get(linguaTVId);
-    if (TVEl) {
-        TVEl.addClass('lingua-hidden-fields');
-        TVEl.addClass('lingua-tv-fields-' + lang['lang_code']);
-        TVEl.setVisibilityMode(Ext.Element.DISPLAY);
-        TVEl.hide();
-        TVEl.insertAfter(Ext.get('tv' + tv['id']));
+    var cloneTVrowId = 'tv' + tv['id'] + '_' + lang['lang_code'] + '_lingua_tv-tr';
+//    console.log('cloneTVrowId', cloneTVrowId);
+    var cloneTVCmp = Ext.getCmp(cloneTVrowId);
+//    console.log('cloneTVCmp', cloneTVCmp);
+    var cloneTVEl = Ext.get(cloneTVrowId);
+//    console.log('cloneTVEl', cloneTVEl);
+    var oriTVrowEl = Ext.get('tv' + tv['id'] + '-tr');
+    if (typeof (cloneTVCmp) !== 'undefined' && cloneTVCmp !== null) {
+        cloneTVCmp.addClass('lingua-hidden-fields');
+        cloneTVCmp.addClass('lingua-tv-fields-' + lang['lang_code']);
+        if (oriTVrowEl.hasClass('tv-first')) {
+            cloneTVCmp.addClass('tv-first');
+        } else if (oriTVrowEl.hasClass('tv-last')) {
+            cloneTVCmp.addClass('tv-last');
+        }
+        cloneTVCmp.getEl().insertAfter(oriTVrowEl);
+        cloneTVCmp.dom.setVisibilityMode(Ext.Element.DISPLAY);
+        cloneTVCmp.hide();
+    } else if (typeof (cloneTVEl) !== 'undefined' && cloneTVEl !== null) {
+        cloneTVEl.addClass('lingua-hidden-fields');
+        cloneTVEl.addClass('lingua-tv-fields-' + lang['lang_code']);
+        if (oriTVrowEl.hasClass('tv-first')) {
+            cloneTVEl.addClass('tv-first');
+        } else if (oriTVrowEl.hasClass('tv-last')) {
+            cloneTVEl.addClass('tv-last');
+        }
+        cloneTVEl.insertAfter(oriTVrowEl);
+        cloneTVEl.setVisibilityMode(Ext.Element.DISPLAY);
+        cloneTVEl.hide();
     }
-    var TVCmp = Ext.getCmp(linguaTVId);
-    if (TVCmp) {
-        TVCmp.addClass('lingua-hidden-fields');
-        TVCmp.addClass('lingua-tv-fields-' + lang['lang_code']);
-        TVCmp.dom.setVisibilityMode(Ext.Element.DISPLAY);
-        TVCmp.hide();
-    }
-    switch (tv['type']) {
-        case 'tag':
-        case 'autotag':
-            var tagList = Ext.get('tv-' + tv['id'] + '_' + lang['lang_code'] + '_lingua_tv-tag-list');
-            if (tagList) {
-                tagList.addClass('lingua-hidden-fields');
-                tagList.setVisibilityMode(Ext.Element.DISPLAY);
-                tagList.hide();
-                tagList.insertAfter(Ext.get('tv-' + tv['id'] + '-tag-list'));
-            }
-            break;
-        default:
-            break;
+    // caption
+    var captionEl = Ext.get('tv' + tv['id'] + '_' + lang['lang_code'] + '_lingua_tv-caption');
+    if (typeof (captionEl) !== 'undefined' && captionEl !== null) {
+        captionEl.dom.innerHTML += ' <img src="../' + lang['flag'] + '">';
     }
 };
 
@@ -467,132 +439,27 @@ Lingua.prototype.switchTVFields = function(selectedLang) {
         false;
     }
     Ext.each(this.config.tmplvars, function(tv) {
-        // caption
-        var captionEl = Ext.get('tv' + tv['id'] + '-caption');
-        if (typeof (captionEl) !== 'undefined') {
-            if (selectedLang !== _this.config.defaultLang) {
-                captionEl.setVisibilityMode(Ext.Element.DISPLAY);
-                captionEl.hide();
-                var cloneCaption = Ext.get('tv' + tv['id'] + '_' + selectedLang + '-caption');
-                cloneCaption.show();
-            } else {
-                captionEl.show();
-            }
-        }
-
-        var linguaTVId = 'tv' + tv['id'] + '_' + selectedLang + '_lingua_tv';
-        // field
-        var TVCmp = Ext.getCmp('tv' + tv['id']);
-        if (typeof (TVCmp) !== 'undefined') {
-            if (selectedLang !== _this.config.defaultLang) {
-                TVCmp.getEl().setVisibilityMode(Ext.Element.DISPLAY);
-                TVCmp.hide();
-                var cloneTVCmp = Ext.getCmp(linguaTVId);
-                cloneTVCmp.show();
-            } else {
-                TVCmp.show();
-            }
-        }
-
-        switch (tv['type']) {
-            case 'richtext':
-                // tv2_parent
-                var TVEl = Ext.get('tv' + tv['id'] + '_parent');
-                if (typeof (TVEl) !== 'undefined') {
-                    if (selectedLang !== _this.config.defaultLang) {
-                        TVEl.setVisibilityMode(Ext.Element.DISPLAY);
-                        TVEl.hide();
-                    } else {
-                        TVEl.show();
-                    }
-                }
-                // tv2_zh_lingua_tv_parent
-                var cloneTVEl = Ext.get(linguaTVId + '_parent');
-                var cloneTVCmp = Ext.getCmp(linguaTVId + '_parent');
-                if (typeof (cloneTVEl) !== 'undefined' && cloneTVEl !== null) {
-                    if (selectedLang !== _this.config.defaultLang) {
-                        cloneTVEl.show();
-                    } else {
-                        cloneTVEl.setVisibilityMode(Ext.Element.DISPLAY);
-                        cloneTVEl.hide();
-                    }
-                }
-                break;
-            case 'tag':
-            case 'autotag':
-                // tv3_zh_lingua_tv
-                var TVCmp = Ext.getCmp('tv-' + tv['id']);
-                if (typeof (TVCmp) !== 'undefined' && TVCmp !== null) {
-                    if (selectedLang !== _this.config.defaultLang) {
-                        TVCmp.dom.setVisibilityMode(Ext.Element.DISPLAY);
-                        TVCmp.hide();
-                    } else {
-                        TVCmp.show();
-                    }
-                }
-                var TVEl = Ext.get('tv-' + tv['id']);
-                if (typeof (TVEl) !== 'undefined' && TVEl !== null) {
-                    if (selectedLang !== _this.config.defaultLang) {
-                        TVEl.setVisibilityMode(Ext.Element.DISPLAY);
-                        TVEl.hide();
-                    } else {
-                        TVEl.show();
-                    }
-                }
-                var cloneTVCmp = Ext.getCmp('tv-' + tv['id'] + '_' + selectedLang + '_lingua_tv');
-                if (typeof (cloneTVCmp) !== 'undefined' && cloneTVCmp !== null) {
-                    if (selectedLang !== _this.config.defaultLang) {
-                        cloneTVCmp.show();
-                    } else {
-                        cloneTVCmp.dom.setVisibilityMode(Ext.Element.DISPLAY);
-                        cloneTVCmp.hide();
-                    }
-                }
-                var cloneTVEl = Ext.get('tv-' + tv['id'] + '_' + selectedLang + '_lingua_tv');
-                if (typeof (cloneTVEl) !== 'undefined' && cloneTVEl !== null) {
-                    if (selectedLang !== _this.config.defaultLang) {
-                        cloneTVEl.show();
-                    } else {
-                        cloneTVEl.setVisibilityMode(Ext.Element.DISPLAY);
-                        cloneTVEl.hide();
-                    }
-                }
-                // tv3_zh_lingua_tv-tag-list
-                var TVEl = Ext.get('tv-' + tv['id'] + '-tag-list');
-                if (selectedLang !== _this.config.defaultLang) {
-                    TVEl.setVisibilityMode(Ext.Element.DISPLAY);
-                    TVEl.hide();
-                } else {
-                    TVEl.show();
-                }
-                var cloneTVEl = Ext.get('tv-' + tv['id'] + '_' + selectedLang + '_lingua_tv-tag-list');
-                if (typeof (cloneTVEl) !== 'undefined' && cloneTVEl !== null) {
-                    if (selectedLang !== _this.config.defaultLang) {
-                        cloneTVEl.show();
-                    } else {
-                        cloneTVEl.setVisibilityMode(Ext.Element.DISPLAY);
-                        cloneTVEl.hide();
-                    }
-                }
-                break;
-            default:
-                var TVEl = Ext.get('tv' + tv['id']);
-                if (typeof (TVEl) !== 'undefined') {
-                    TVEl.setVisibilityMode(Ext.Element.DISPLAY);
-                    if (selectedLang !== _this.config.defaultLang) {
-                        TVEl.hide();
-                    } else {
-                        TVEl.show();
-                    }
-                }
-                var cloneTVEl = Ext.get('tv' + tv['id'] + '_' + selectedLang + '_lingua_tv');
-                if (typeof (cloneTVEl) !== 'undefined' && cloneTVEl !== null) {
-                    cloneTVEl.setVisibilityMode(Ext.Element.DISPLAY);
-                    if (selectedLang !== _this.config.defaultLang) {
-                        cloneTVEl.show();
-                    }
-                }
-                break;
-        }
+        _this.toggleFieldByLanguage('tv' + tv['id'] + '-tr', 'tv' + tv['id'] + '_' + selectedLang + '_lingua_tv-tr', selectedLang);
     });
+    var modxPanelResource = Ext.getCmp('modx-panel-resource');
+    modxPanelResource.doLayout(false, true);
+};
+
+Lingua.prototype.toggleFieldByLanguage = function(sourceId, cloneId, selectedLang) {
+    var TVEl = Ext.get(sourceId);
+    if (typeof (TVEl) !== 'undefined' && TVEl !== null) {
+        if (selectedLang !== this.config.defaultLang) {
+            TVEl.setVisibilityMode(Ext.Element.DISPLAY);
+            TVEl.hide();
+        } else {
+            TVEl.show();
+        }
+    }
+    var cloneTVEl = Ext.get(cloneId);
+    if (typeof (cloneTVEl) !== 'undefined' && cloneTVEl !== null) {
+        cloneTVEl.addClass('lingua-hidden-fields');
+        if (selectedLang !== this.config.defaultLang) {
+            cloneTVEl.show();
+        }
+    }
 };
