@@ -393,28 +393,29 @@ Lingua.prototype.initAllClonedTVFields = function(langs) {
             _this.initCloneTVField(lang, tv);
         });
     });
+    
+    // lazy hiding
+    setTimeout(function(){
+        var els = Ext.query(".lingua-hidden-fields");
+        Ext.each(els, function(item, idx) {
+            var cmp, el;
+            if (cmp = Ext.getCmp(item.id)) {
+                cmp.getEl().setVisibilityMode(Ext.Element.DISPLAY);
+                cmp.hide();
+            } else if (el = Ext.get(item.id)) {
+                el.setVisibilityMode(Ext.Element.DISPLAY);
+                el.hide();
+            }
+        });
+    }, 1);
 };
 
 Lingua.prototype.initCloneTVField = function(lang, tv) {
+    // tv row
     var cloneTVrowId = 'tv' + tv['id'] + '_' + lang['lang_code'] + '_lingua_tv-tr';
-//    console.log('cloneTVrowId', cloneTVrowId);
-    var cloneTVCmp = Ext.getCmp(cloneTVrowId);
-//    console.log('cloneTVCmp', cloneTVCmp);
     var cloneTVEl = Ext.get(cloneTVrowId);
-//    console.log('cloneTVEl', cloneTVEl);
     var oriTVrowEl = Ext.get('tv' + tv['id'] + '-tr');
-    if (typeof (cloneTVCmp) !== 'undefined' && cloneTVCmp !== null) {
-        cloneTVCmp.addClass('lingua-hidden-fields');
-        cloneTVCmp.addClass('lingua-tv-fields-' + lang['lang_code']);
-        if (oriTVrowEl.hasClass('tv-first')) {
-            cloneTVCmp.addClass('tv-first');
-        } else if (oriTVrowEl.hasClass('tv-last')) {
-            cloneTVCmp.addClass('tv-last');
-        }
-        cloneTVCmp.getEl().insertAfter(oriTVrowEl);
-        cloneTVCmp.dom.setVisibilityMode(Ext.Element.DISPLAY);
-        cloneTVCmp.hide();
-    } else if (typeof (cloneTVEl) !== 'undefined' && cloneTVEl !== null) {
+    if (typeof (cloneTVEl) !== 'undefined' && cloneTVEl !== null) {
         cloneTVEl.addClass('lingua-hidden-fields');
         cloneTVEl.addClass('lingua-tv-fields-' + lang['lang_code']);
         if (oriTVrowEl.hasClass('tv-first')) {
@@ -423,8 +424,15 @@ Lingua.prototype.initCloneTVField = function(lang, tv) {
             cloneTVEl.addClass('tv-last');
         }
         cloneTVEl.insertAfter(oriTVrowEl);
-        cloneTVEl.setVisibilityMode(Ext.Element.DISPLAY);
-        cloneTVEl.hide();
+        
+        /**
+         * DO NOT HIDE IT IN HERE, use "lazy hiding" above!
+         * Otherwise the component under this element won't be rendered
+         * correctly inside the container.
+         * 
+         * cloneTVEl.setVisibilityMode(Ext.Element.DISPLAY);
+         * cloneTVEl.hide();
+         */
     }
     // caption
     var captionEl = Ext.get('tv' + tv['id'] + '_' + lang['lang_code'] + '_lingua_tv-caption');
@@ -441,8 +449,6 @@ Lingua.prototype.switchTVFields = function(selectedLang) {
     Ext.each(this.config.tmplvars, function(tv) {
         _this.toggleFieldByLanguage('tv' + tv['id'] + '-tr', 'tv' + tv['id'] + '_' + selectedLang + '_lingua_tv-tr', selectedLang);
     });
-    var modxPanelResource = Ext.getCmp('modx-panel-resource');
-    modxPanelResource.doLayout(false, true);
 };
 
 Lingua.prototype.toggleFieldByLanguage = function(sourceId, cloneId, selectedLang) {

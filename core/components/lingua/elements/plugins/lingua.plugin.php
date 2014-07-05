@@ -58,7 +58,7 @@ switch ($event) {
             $modx->setPlaceholder('lingua.language', $modx->cultureKey);
         }
         break;
-
+    
     case 'OnDocFormPrerender':
         $contexts = $modx->getOption('lingua.contexts', $scriptProperties, 'web');
         if (!empty($contexts)) {
@@ -179,11 +179,12 @@ switch ($event) {
         actionButtons.insertButton(0, [languageBtn, "-"]);
         actionButtons.doLayout();
     }';
-            $modx->controller->addHtml('<script type="text/javascript">
+            $modx->controller->addHtml('
+<script type="text/javascript">
 Ext.onReady(function() {
     ' . $jsHTML . '
 });
-        </script>');
+</script>');
         } // if (!empty($languages))
         //------------------------------------------------------------------
         break;
