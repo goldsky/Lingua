@@ -1,10 +1,12 @@
-Always uncache your lexicon tags, and then add snippet ([[!lingua.cultureKey]])
-to get the current language:
+-----------------------
+Package: Lingua
+-----------------------
+Author: goldsky <goldsky@virtudraft.com>
+        http://twitter.com/_goldsky
+Collab: Adam Wintle <adam@monogon.co>
+        https://twitter.com/adamwintle
 
-[[!%foo.bar? &namespace=`sky` &language=`[[!lingua.cultureKey]]`]]
-
-After installation, please make sure the Lingua's plugin has "OnHandleRequest"
-checked.
+Lingua is a multi-lingual plugin system for MODX Revolution.
 
 References:
 1. http://en.wikipedia.org/wiki/ISO_639-1_language_matrix

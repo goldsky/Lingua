@@ -25,7 +25,7 @@
 class Lingua {
 
     const VERSION = '2.0.0';
-    const RELEASE = 'dev';
+    const RELEASE = 'beta1';
 
     /**
      * modX object
@@ -503,11 +503,21 @@ class Lingua {
             }
         }
         $c = $this->modx->newQuery('linguaLangs');
-        if ($activeOnly) {
+        
+        $definedLanguages = $this->getOption('lingua.langs');
+        if (!empty($definedLanguages)) {
+            $definedLanguages = array_map('trim', @explode(',', $definedLanguages));
             $c->where(array(
-                'active' => 1
+                'lang_code:IN' => $definedLanguages
             ));
+        } else {
+            if ($activeOnly) {
+                $c->where(array(
+                    'active' => 1
+                ));
+            }
         }
+        
         if ($defaultLang) {
             $c->where(array(
                 'id:!=' => $defaultLang->get('id')
@@ -526,4 +536,51 @@ class Lingua {
         return $this->_placeholders['languages_array'];
     }
     
+    /**
+     * Get system's option
+     * @param   string  $key    option's key
+     * @return  string  value
+     */
+    public function getOption($key) {
+        // Scope's setting overrides CMP's setting of defining active languages
+        $config = array();
+        // system wide
+        $config = array_merge($config, $this->modx->config);
+        // context wide
+        if ($this->modx->resource) {
+            if ($this->modx->context->get('key') === 'mgr') {
+                $docId = intval(filter_input(INPUT_GET, 'id', FILTER_SANITIZE_NUMBER_INT));
+                if ($docId === 0) {
+                    $ctxKey = filter_input(INPUT_GET, 'context_key', FILTER_SANITIZE_STRING);
+                } else {
+                    $ctxKey = $this->modx->resource->get('context_key');
+                }
+                $contextSettings = $this->modx->getCollection('modContextSetting', array(
+                    'context_key' => $ctxKey,
+                ));
+                if ($contextSettings) {
+                    foreach ($contextSettings as $setting) {
+                        $config[$setting->get('key')] = $setting->get('value');
+                    }
+                }
+            }
+        }
+        // user's defined properties
+        if ($this->modx->context->get('key') !== 'mgr') {
+            if ($this->modx->user->get('id') !== 0) {
+                $userSettings = $this->modx->getCollection('modUserSetting', array(
+                    'user' => $this->modx->user->get('id'),
+                ));
+                if ($userSettings) {
+                    foreach ($userSettings as $setting) {
+                        $config[$setting->get('key')] = $setting->get('value');
+                    }
+                }
+            }
+        }
+        // element's properties
+        $config = array_merge($config, $this->config);
+        
+        return $this->modx->getOption($key, $config);
+    }
 }

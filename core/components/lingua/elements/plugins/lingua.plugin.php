@@ -356,6 +356,7 @@ Ext.onReady(function() {
                         break;
                     case 'url':
                         $cloneInputForm = preg_replace('/("|\'){1}tv' . $tvId . '_prefix("|\'){1}/', '${1}tv' . $tvId . '_prefix' . '_' . $language['lang_code'] . '_lingua_tv${2}', $cloneInputForm);
+                        
                         break;
                     default:
                         break;
@@ -467,7 +468,12 @@ Ext.onReady(function() {
             $tvKey = preg_replace('/_lingua_tv$/', '', $k);
             $tvKeys = @explode('_', $tvKey);
             $tvId = str_replace('tv', '', $tvKeys[0]);
-            if ($tvKeys[1] === $modx->getOption('cultureKey')) {
+            if (!is_numeric($tvId)) {
+                continue;
+            }
+            $reverse = array_reverse($tvKeys);
+            $lang = $reverse[0];
+            if ($lang === $modx->getOption('cultureKey')) {
                 continue;
             }
             $tv = $modx->getObject('modTemplateVar', $tvId);
@@ -475,14 +481,18 @@ Ext.onReady(function() {
             /* validation for different types */
             switch ($tv->get('type')) {
                 case 'url':
-                    $prefix = $resource->_fields[$tvKey . '_prefix'];
+                    // tv16_prefix_id_lingua_tv
+                    $prefix = $resource->_fields[$tvKey . '_prefix_' . $lang . '_lingua_tv'];
                     if ($prefix != '--') {
-                        $value = str_replace(array('ftp://', 'http://'), '', $value);
+                        $value = str_replace(array('ftp://', 'http://', 'https://', 'ftp://', 'mailto:'), '', $value);
                         $value = $prefix . $value;
                     }
+                    $reverting[$lang][$tvId] = $value;
+                    
                     break;
                 case 'date':
                     $value = empty($value) ? '' : strftime('%Y-%m-%d %H:%M:%S', strtotime($value));
+                    
                     break;
                 /* ensure tag types trim whitespace from tags */
                 case 'tag':
@@ -493,6 +503,7 @@ Ext.onReady(function() {
                         $newTags[] = trim($tag);
                     }
                     $value = implode(',', $newTags);
+                    
                     break;
                 default:
                     /* handles checkboxes & multiple selects elements */
@@ -506,14 +517,18 @@ Ext.onReady(function() {
                         }
                         $value = implode('||', $featureInsert);
                     }
+                    
                     break;
             }
-
-            $reverting[$tvKeys[1]][$tvId] = $value;
-            /**
-             * json seems has number of characters limit;
-             * that makes saving success report truncated and output modal hangs
-             */
+            $reverting[$lang][$tvId] = $value;
+        }
+        
+        /**
+         * json seems has number of characters limit;
+         * that makes saving success report truncated and output modal hangs,
+         * TV's procces does this outside of reverting's loops
+         */
+        foreach ($resource->_fields as $k => $value) {
             $resource->set($k, '');
         }
 

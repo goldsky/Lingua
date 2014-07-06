@@ -8,3 +8,5 @@ $_lang['setting_lingua.code_field'] = 'Field\'s name for the selector';
 $_lang['setting_lingua.code_field_desc'] = 'Define field\'s name that will be used by the selector as the values of the option. Options: lang_code, lcid_string';
 $_lang['setting_lingua.get_key'] = 'GET request\'s key' ;
 $_lang['setting_lingua.get_key_desc'] = 'URL\'s request key that will trigger the language switching.';
+$_lang['setting_lingua.langs'] = 'Active languages';
+$_lang['setting_lingua.langs_desc'] = 'Define active languages for the setting\'s scope. This will override CMP\'s setting.';

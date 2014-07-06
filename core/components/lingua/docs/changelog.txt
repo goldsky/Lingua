@@ -1,4 +1,4 @@
-Lingua 2.0.0-dev
+Lingua 2.0.0-beta1
 =================================
 - Initialize manager language switcher
 - replace options: lingua.get.key to lingua.request_key, lingua.code.field to lingua.code_field
