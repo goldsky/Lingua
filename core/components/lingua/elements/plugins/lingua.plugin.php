@@ -616,6 +616,13 @@ Ext.onReady(function() {
         }
         break;
 
+    case 'OnTemplateSave':
+    case 'OnTempFormSave':
+    case 'OnTVFormSave':
+    case 'OnSnipFormSave':
+    case 'OnPluginFormSave':
+    case 'OnMediaSourceFormSave':
+    case 'OnChunkFormSave':
     case 'OnSiteRefresh':
         $cacheManager = $modx->getCacheManager();
         $cacheManager->refresh(array(

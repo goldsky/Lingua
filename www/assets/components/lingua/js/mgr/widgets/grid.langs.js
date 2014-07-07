@@ -25,7 +25,7 @@ Lingua.grid.Langs = function(config) {
                 tooltip: _('lingua.active'),
                 dataIndex: 'active',
                 sortable: false,
-                width: 30,
+                width: 40,
                 processEvent: function(name, e, grid, rowIndex, colIndex) {
                     if (name === 'mousedown') {
                         var record = grid.store.getAt(rowIndex);
@@ -122,8 +122,9 @@ Lingua.grid.Langs = function(config) {
             }, {
                 xtype: 'checkcolumn',
                 header: _('lingua.rtl'),
+                tooltip: _('lingua.right_to_left'),
                 dataIndex: 'is_rtl',
-                width: 30,
+                width: 40,
                 sortable: false,
                 processEvent: function(name, e, grid, rowIndex, colIndex) {
                     if (name === 'mousedown') {
