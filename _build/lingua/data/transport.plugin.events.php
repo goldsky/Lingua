@@ -22,62 +22,37 @@
  * @package Lingua
  * @subpackage build
  */
-$events = array();
 
-$events['OnInitCulture'] = $modx->newObject('modPluginEvent');
-$events['OnInitCulture']->fromArray(array(
-    'event' => 'OnInitCulture',
-    'priority' => 0,
-    'propertyset' => 0,
-        ), '', true, true);
+function setEventObjects(array $events = array()) {
+    global $modx;
+    $eventObjects = array();
+    foreach ($events as $k => $v) {
+        $eventObjects[$v] = $modx->newObject('modPluginEvent');
+        $eventObjects[$v]->fromArray(array(
+            'event' => $v,
+            'priority' => 0,
+            'propertyset' => 0,
+                ), '', true, true);
 
-$events['OnDocFormPrerender'] = $modx->newObject('modPluginEvent');
-$events['OnDocFormPrerender']->fromArray(array(
-    'event' => 'OnDocFormPrerender',
-    'priority' => 0,
-    'propertyset' => 0,
-        ), '', true, true);
-
-$events['OnResourceTVFormRender'] = $modx->newObject('modPluginEvent');
-$events['OnResourceTVFormRender']->fromArray(array(
-    'event' => 'OnResourceTVFormRender',
-    'priority' => 0,
-    'propertyset' => 0,
-        ), '', true, true);
-
-$events['OnDocFormSave'] = $modx->newObject('modPluginEvent');
-$events['OnDocFormSave']->fromArray(array(
-    'event' => 'OnDocFormSave',
-    'priority' => 0,
-    'propertyset' => 0,
-        ), '', true, true);
-
-$events['OnResourceDuplicate'] = $modx->newObject('modPluginEvent');
-$events['OnResourceDuplicate']->fromArray(array(
-    'event' => 'OnResourceDuplicate',
-    'priority' => 0,
-    'propertyset' => 0,
-        ), '', true, true);
-
-$events['OnWebPageInit'] = $modx->newObject('modPluginEvent');
-$events['OnWebPageInit']->fromArray(array(
-    'event' => 'OnWebPageInit',
-    'priority' => 0,
-    'propertyset' => 0,
-        ), '', true, true);
-
-$events['OnEmptyTrash'] = $modx->newObject('modPluginEvent');
-$events['OnEmptyTrash']->fromArray(array(
-    'event' => 'OnEmptyTrash',
-    'priority' => 0,
-    'propertyset' => 0,
-        ), '', true, true);
-
-$events['OnSiteRefresh'] = $modx->newObject('modPluginEvent');
-$events['OnSiteRefresh']->fromArray(array(
-    'event' => 'OnSiteRefresh',
-    'priority' => 0,
-    'propertyset' => 0,
-        ), '', true, true);
+    }
+    return $eventObjects;
+}
+$events = setEventObjects(array(
+    'OnChunkFormSave',
+    'OnDocFormPrerender',
+    'OnDocFormSave',
+    'OnEmptyTrash',
+    'OnInitCulture',
+    'OnMediaSourceFormSave',
+    'OnPluginFormSave',
+    'OnResourceDuplicate',
+    'OnResourceTVFormRender',
+    'OnSiteRefresh',
+    'OnSnipFormSave',
+    'OnTempFormSave',
+    'OnTemplateSave',
+    'OnTVFormSave',
+    'OnWebPageInit',
+));
 
 return $events;
