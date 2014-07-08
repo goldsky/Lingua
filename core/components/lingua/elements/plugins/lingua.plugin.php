@@ -28,57 +28,56 @@ switch ($event) {
     case 'OnPageNotFound':
         $lingua = $modx->getService('lingua', 'Lingua', MODX_CORE_PATH . 'components/lingua/model/lingua/');
 
-        if (!($lingua instanceof Lingua)) {
-            return '';
-        }
-        $modx->lexicon->load('lingua:default');
-        
-        $search = $_SERVER['REQUEST_URI'];
-        $baseUrl = $modx->getOption('base_url',null,MODX_BASE_URL);
-        if(!empty($baseUrl) && $baseUrl != '/' && $baseUrl != ' ' && $baseUrl != '/'.$modx->context->get('key').'/') {
-            $search = str_replace($baseUrl,'',$search);
-        }
+        if ($lingua instanceof Lingua) {
+            $modx->lexicon->load('lingua:default');
 
-        $search = ltrim($search,'/');
-        if(!empty($search)) {
-            $parts = @explode('/', $search);
-            $reversed = array_reverse($parts);
-            $aliases = @explode('.', $reversed[0]);
-            $reversedAliases = array_reverse($aliases);
-            
-            $modContentTypes = $modx->getCollection('modContentType');
-            $contentTypes = array();
-            if ($modContentTypes) {
-                foreach ($modContentTypes as $modContentType) {
-                    $contentTypes[] = $modContentType->get('file_extensions');
+            $search = $_SERVER['REQUEST_URI'];
+            $baseUrl = $modx->getOption('base_url',null,MODX_BASE_URL);
+            if(!empty($baseUrl) && $baseUrl != '/' && $baseUrl != ' ' && $baseUrl != '/'.$modx->context->get('key').'/') {
+                $search = str_replace($baseUrl,'',$search);
+            }
+
+            $search = ltrim($search,'/');
+            if(!empty($search)) {
+                $parts = @explode('/', $search);
+                $reversed = array_reverse($parts);
+                $aliases = @explode('.', $reversed[0]);
+                $reversedAliases = array_reverse($aliases);
+
+                $modContentTypes = $modx->getCollection('modContentType');
+                $contentTypes = array();
+                if ($modContentTypes) {
+                    foreach ($modContentTypes as $modContentType) {
+                        $contentTypes[] = $modContentType->get('file_extensions');
+                    }
                 }
-            }
-            if (in_array('.' . $reversedAliases[0], $contentTypes)) {
-                $extension = array_pop($aliases);
-            }
-            $cleanAlias = @implode('.', $aliases);
-            if (!empty($cleanAlias)) {
-                $c = $modx->newQuery('linguaSiteContent');
-                $c->leftJoin('modResource', 'Resource', 'Resource.id = linguaSiteContent.resource_id');
-                $c->where(array(
-                    'alias:LIKE' => $cleanAlias,
-                    'Resource.published:=' => 1,
-                    'Resource.deleted:!=' => 1,
-                ));
-                $clone = $modx->getObject('linguaSiteContent', $c);
-                if ($clone) {
-                    $resource = $modx->getObject('modResource', $clone->get('resource_id'));
-                    if ($resource) {
-                        $lang = $modx->getObject('linguaLangs', $clone->get('lang_id'));
-                        if ($lang) {
-                            $_SESSION['cultureKey'] = $lang->get('lang_code');
+                if (in_array('.' . $reversedAliases[0], $contentTypes)) {
+                    $extension = array_pop($aliases);
+                }
+                $cleanAlias = @implode('.', $aliases);
+                if (!empty($cleanAlias)) {
+                    $c = $modx->newQuery('linguaSiteContent');
+                    $c->leftJoin('modResource', 'Resource', 'Resource.id = linguaSiteContent.resource_id');
+                    $c->where(array(
+                        'alias:LIKE' => $cleanAlias,
+                        'Resource.published:=' => 1,
+                        'Resource.deleted:!=' => 1,
+                    ));
+                    $clone = $modx->getObject('linguaSiteContent', $c);
+                    if ($clone) {
+                        $resource = $modx->getObject('modResource', $clone->get('resource_id'));
+                        if ($resource) {
+                            $lang = $modx->getObject('linguaLangs', $clone->get('lang_id'));
+                            if ($lang) {
+                                $_SESSION['cultureKey'] = $lang->get('lang_code');
+                            }
+                            $modx->sendForward($resource->get('id'));
+//                            $url = $modx->makeUrl($resource->get('id'));
+//                            if (!empty($url)) {
+//                                $options = array('responseCode' => 'HTTP/1.1 301 Moved Permanently');
+//                                $modx->sendRedirect($url, $options);
+//                            }
                         }
-                        $modx->sendForward($resource->get('id'));
-//                        $url = $modx->makeUrl($resource->get('id'));
-//                        if (!empty($url)) {
-//                            $options = array('responseCode' => 'HTTP/1.1 301 Moved Permanently');
-//                            $modx->sendRedirect($url, $options);
-//                        }
                     }
                 }
             }
