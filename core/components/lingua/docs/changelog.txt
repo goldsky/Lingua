@@ -1,9 +1,14 @@
-Lingua 2.0.0-beta2
+Lingua 2.0.0-beta3 (July 8, 2014)
+=================================
+- add OnHandleRequest event back to override global lexicon's language.
+- [#2] add redirector for translated alias
+
+Lingua 2.0.0-beta2 (July 7, 2014)
 =================================
 - bugfix TVs' values overriding on front-end
 - add cache clearing on all elements' form saving actions.
 
-Lingua 2.0.0-beta1
+Lingua 2.0.0-beta1 (July 6, 2014)
 =================================
 - Initialize manager language switcher
 - replace options: lingua.get.key to lingua.request_key, lingua.code.field to lingua.code_field

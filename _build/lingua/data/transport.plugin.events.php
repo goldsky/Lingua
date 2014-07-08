@@ -42,6 +42,7 @@ $events = setEventObjects(array(
     'OnDocFormPrerender',
     'OnDocFormSave',
     'OnEmptyTrash',
+    'OnHandleRequest',
     'OnInitCulture',
     'OnMediaSourceFormSave',
     'OnPluginFormSave',

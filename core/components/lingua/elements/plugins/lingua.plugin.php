@@ -25,7 +25,69 @@ header('Content-Type: text/html; charset=utf-8');
  */
 $event = $modx->event->name;
 switch ($event) {
-    case 'OnInitCulture':
+    case 'OnPageNotFound':
+        $lingua = $modx->getService('lingua', 'Lingua', MODX_CORE_PATH . 'components/lingua/model/lingua/');
+
+        if (!($lingua instanceof Lingua)) {
+            return '';
+        }
+        $modx->lexicon->load('lingua:default');
+        
+        $search = $_SERVER['REQUEST_URI'];
+        $baseUrl = $modx->getOption('base_url',null,MODX_BASE_URL);
+        if(!empty($baseUrl) && $baseUrl != '/' && $baseUrl != ' ' && $baseUrl != '/'.$modx->context->get('key').'/') {
+            $search = str_replace($baseUrl,'',$search);
+        }
+
+        $search = ltrim($search,'/');
+        if(!empty($search)) {
+            $parts = @explode('/', $search);
+            $reversed = array_reverse($parts);
+            $aliases = @explode('.', $reversed[0]);
+            $reversedAliases = array_reverse($aliases);
+            
+            $modContentTypes = $modx->getCollection('modContentType');
+            $contentTypes = array();
+            if ($modContentTypes) {
+                foreach ($modContentTypes as $modContentType) {
+                    $contentTypes[] = $modContentType->get('file_extensions');
+                }
+            }
+            if (in_array('.' . $reversedAliases[0], $contentTypes)) {
+                $extension = array_pop($aliases);
+            }
+            $cleanAlias = @implode('.', $aliases);
+            if (!empty($cleanAlias)) {
+                $c = $modx->newQuery('linguaSiteContent');
+                $c->leftJoin('modResource', 'Resource', 'Resource.id = linguaSiteContent.resource_id');
+                $c->where(array(
+                    'alias:LIKE' => $cleanAlias,
+                    'Resource.published:=' => 1,
+                    'Resource.deleted:!=' => 1,
+                ));
+                $clone = $modx->getObject('linguaSiteContent', $c);
+                if ($clone) {
+                    $resource = $modx->getObject('modResource', $clone->get('resource_id'));
+                    if ($resource) {
+                        $lang = $modx->getObject('linguaLangs', $clone->get('lang_id'));
+                        if ($lang) {
+                            $_SESSION['cultureKey'] = $lang->get('lang_code');
+                        }
+                        $modx->sendForward($resource->get('id'));
+//                        $url = $modx->makeUrl($resource->get('id'));
+//                        if (!empty($url)) {
+//                            $options = array('responseCode' => 'HTTP/1.1 301 Moved Permanently');
+//                            $modx->sendRedirect($url, $options);
+//                        }
+                    }
+                }
+            }
+        }
+        
+        break;
+    
+    case 'OnHandleRequest': // for global
+    case 'OnInitCulture':   // for request class
         if ($modx->context->key !== 'mgr') {
             $langGetKey = $modx->getOption('lingua.request_key', $scriptProperties, 'lang');
             $langGetKeyValue = filter_input(INPUT_GET, $langGetKey, FILTER_SANITIZE_STRING);
@@ -413,6 +475,7 @@ Ext.onReady(function() {
 
         // update linguaSiteContent
         $reverting = array();
+        $clearKeys = array();
         foreach ($resource->_fields as $k => $v) {
             if (!preg_match('/_lingua$/', $k)) {
                 continue;
@@ -423,11 +486,7 @@ Ext.onReady(function() {
                 }
                 $reverting[$a][preg_replace('/_lingua$/', '', $k)] = $b;
             }
-            /**
-             * json seems has number of characters limit;
-             * that makes saving success report truncated and output modal hangs
-             */
-            $resource->set($k, '');
+            $clearKeys[] = $k;
         }
 
         $resourceId = $resource->get('id');
@@ -521,15 +580,18 @@ Ext.onReady(function() {
                     break;
             }
             $reverting[$lang][$tvId] = $value;
+            $clearKeys[] = $k;
         }
         
         /**
-         * json seems has number of characters limit;
+         * json seems to have number of characters limit;
          * that makes saving success report truncated and output modal hangs,
          * TV's procces does this outside of reverting's loops
          */
-        foreach ($resource->_fields as $k => $value) {
-            $resource->set($k, '');
+        if (!empty($clearKeys)) {
+            foreach ($clearKeys as $k) {
+                $resource->set($k, '');
+            }
         }
 
         foreach ($reverting as $k => $tmplvars) {
