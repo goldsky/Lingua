@@ -34,7 +34,7 @@ set_time_limit(0);
 define('PKG_NAME', 'Lingua');
 define('PKG_NAME_LOWER', 'lingua');
 define('PKG_VERSION', '2.0.0');
-define('PKG_RELEASE', 'beta2');
+define('PKG_RELEASE', 'beta3');
 
 /* override with your own defines here (see build.config.sample.php) */
 require_once dirname(__FILE__) . '/build.config.php';
