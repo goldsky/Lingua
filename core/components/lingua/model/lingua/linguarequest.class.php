@@ -104,24 +104,6 @@ class LinguaRequest extends modRequest {
                 $criteria->where(array('published' => 1));
             }
             if ($resource = $this->modx->getObject('modResource', $criteria)) {
-
-                // hack the resource's content in here ------------------------>
-                $linguaLangs = $this->modx->getObject('linguaLangs', array('lang_code' => $this->modx->cultureKey));
-                $linguaSiteContent = $this->modx->getObject('linguaSiteContent', array(
-                    'resource_id' => $resource->get('id'),
-                    'lang_id' => $linguaLangs->get('id'),
-                ));
-                if ($linguaSiteContent) {
-                    $linguaSiteContentArray = $linguaSiteContent->toArray();
-                    unset($linguaSiteContentArray['id']);
-                    foreach ($linguaSiteContentArray as $k => $v) {
-                        if (!empty($v)) {
-                            $resource->set($k, $v);
-                        }
-                    }
-                }
-                // hacking ends ----------------------------------------------->
-
                 if ($resource instanceof modResource) {
                     if ($resource->get('context_key') !== $this->modx->context->get('key')) {
                         if (!$isForward || ($isForward && !$this->modx->getOption('allow_forward_across_contexts', $options, false))) {
@@ -134,29 +116,51 @@ class LinguaRequest extends modRequest {
                     if (!$resource->checkPolicy('view')) {
                         $this->modx->sendUnauthorizedPage();
                     }
+                    
+                    // hack the resource's content in here -------------------->
+                    $cultureKey = !empty($this->modx->cultureKey) ? $this->modx->cultureKey : $this->modx->getOption('cultureKey', null, 'en');
+                    $lingua = $this->modx->getService('lingua', 'Lingua', MODX_CORE_PATH . 'components/lingua/model/lingua/');
+                    $linguaLangs = $this->modx->getObject('linguaLangs', array('lang_code' => $this->modx->cultureKey));
+                    if (($lingua instanceof Lingua) && $linguaLangs) {
+                        $linguaSiteContent = $this->modx->getObject('linguaSiteContent', array(
+                            'resource_id' => $resource->get('id'),
+                            'lang_id' => $linguaLangs->get('id'),
+                        ));
+                        if ($linguaSiteContent) {
+                            $linguaSiteContentArray = $linguaSiteContent->toArray();
+                            unset($linguaSiteContentArray['id']);
+                            foreach ($linguaSiteContentArray as $k => $v) {
+                                if (!empty($v)) {
+                                    $resource->set($k, $v);
+                                }
+                            }
+                        }
+                    }
+                    // hacking ends ------------------------------------------->
+
                     if ($tvs = $resource->getMany('TemplateVars', 'all')) {
                         /** @var modTemplateVar $tv */
                         /**
                          * Override with LinguaTV when applicable
                          */
-                        $lingua = $this->modx->getService('lingua', 'Lingua', MODX_CORE_PATH . 'components/lingua/model/lingua/');
-
-                        if (!($lingua instanceof Lingua)) {
-                            return '';
-                        }
                         foreach ($tvs as $tv) {
                             $value = $tv->getValue($resource->get('id'));
-                            $linguaTVContent = $this->modx->getObject('linguaSiteTmplvarContentvalues', array(
-                                'tmplvarid' => $tv->get('id'),
-                                'contentid' => $resourceId,
-                                'lang_id' => $linguaLangs->get('id')
-                            ));
-                            if ($linguaTVContent) {
-                                $linguaTVContentValue = $linguaTVContent->get('value');
-                                if (!empty($linguaTVContentValue)) {
-                                    $value = $linguaTVContentValue;
+                            // hack the tv's content in here ------------------>
+                            if (($lingua instanceof Lingua) && $linguaLangs) {
+                                $linguaTVContent = $this->modx->getObject('linguaSiteTmplvarContentvalues', array(
+                                    'tmplvarid' => $tv->get('id'),
+                                    'contentid' => $resourceId,
+                                    'lang_id' => $linguaLangs->get('id')
+                                ));
+                                if ($linguaTVContent) {
+                                    $linguaTVContentValue = $linguaTVContent->get('value');
+                                    if (!empty($linguaTVContentValue)) {
+                                        $value = $linguaTVContentValue;
+                                    }
                                 }
                             }
+                            // hacking ends ----------------------------------->
+                            
                             $resource->set($tv->get('name'), array(
                                 $tv->get('name'),
                                 $value,

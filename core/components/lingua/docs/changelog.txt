@@ -1,3 +1,8 @@
+Lingua 2.0.0-dev
+=================================
+- add lingua.getValue snippet to switch placeholder's value on other snippet
+- fix default lang value on LinguaRequest
+
 Lingua 2.0.0-beta3 (July 8, 2014)
 =================================
 - add OnHandleRequest event back to override global lexicon's language.
