@@ -56,7 +56,7 @@ class LinguaRequest extends modRequest {
         $fromCache = false;
         $cacheKey = $this->modx->context->get('key') . "/resources/{$resourceId}";
         $cachedResource = $this->modx->cacheManager->get($cacheKey, array(
-            xPDO::OPT_CACHE_KEY => $this->modx->getOption('cache_resource_key', null, 'resource'),
+            xPDO::OPT_CACHE_KEY => $this->modx->getOption('cache_resource_key', null, 'lingua/resource' . $this->modx->cultureKey),
             xPDO::OPT_CACHE_HANDLER => $this->modx->getOption('cache_resource_handler', null, $this->modx->getOption(xPDO::OPT_CACHE_HANDLER)),
             xPDO::OPT_CACHE_FORMAT => (integer) $this->modx->getOption('cache_resource_format', null, $this->modx->getOption(xPDO::OPT_CACHE_FORMAT, null, xPDOCacheManager::CACHE_PHP)),
         ));

@@ -507,6 +507,7 @@ Ext.onReady(function() {
             $linguaSiteContent->set('content', (isset($v['content']) && !empty($v['content']) ? $v['content'] : $v['ta']));
             if (empty($v['alias'])) {
                 $v['alias'] = $resource->get('alias');
+                $linguaSiteContent->setDirty('alias');
             }
             $linguaSiteContent->set('introtext', $v['introtext']);
             $linguaSiteContent->set('alias', $v['alias']);
@@ -514,6 +515,13 @@ Ext.onReady(function() {
             $linguaSiteContent->set('link_attributes', $v['link_attributes']);
             $linguaSiteContent->set('uri_override', $v['uri_override']);
             $linguaSiteContent->set('uri', $v['uri']);
+            $linguaSiteContent->set('parent', $resource->get('parent'));
+            $linguaSiteContent->set('isfolder', $resource->get('isfolder'));
+            $linguaSiteContent->set('context_key', $resource->get('context_key'));
+            $linguaSiteContent->set('content_type', $resource->get('content_type'));
+            if ($resource->get('refreshURIs')) {
+                $linguaSiteContent->set('refreshURIs', true);
+            }
             $linguaSiteContent->save();
         }
 

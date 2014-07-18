@@ -26,9 +26,13 @@
         <field key="description" dbtype="varchar" precision="255" phptype="string" null="false" default="" />
         <field key="alias" dbtype="varchar" precision="255" phptype="string" null="true" default="" index="index" />
         <field key="link_attributes" dbtype="varchar" precision="255" phptype="string" null="false" default="" />
+        <field key="parent" dbtype="int" precision="10" phptype="integer" null="false" default="0" index="index" />
+        <field key="isfolder" dbtype="tinyint" precision="1" attributes="unsigned" phptype="boolean" null="false" default="0" index="index" />
         <field key="introtext" dbtype="text" phptype="string" null="true" />
         <field key="content" dbtype="mediumtext" phptype="string" null="true" />
         <field key="menutitle" dbtype="varchar" precision="255" phptype="string" null="false" default="" />
+        <field key="context_key" dbtype="varchar" precision="100" phptype="string" null="false" default="web" index="index" />
+        <field key="content_type" dbtype="int" precision="11" attributes="unsigned" phptype="integer" null="false" default="1" />
         <field key="uri" dbtype="text" phptype="string" null="true" index="index" />
         <field key="uri_override" dbtype="tinyint" precision="1" phptype="integer" null="false" default="0" index="index" />
         <field key="properties" dbtype="mediumtext" phptype="string" null="true" />

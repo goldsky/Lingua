@@ -1,5 +1,7 @@
 Lingua 2.0.0-dev
 =================================
+- fix uri update when alias/parent's alias is changed, including by adding some
+  fields to initiate the refreshment: parent, isfolder, context_key, content_type
 - add lingua.getValue snippet to switch placeholder's value on other snippet
 - fix default lang value on LinguaRequest
 

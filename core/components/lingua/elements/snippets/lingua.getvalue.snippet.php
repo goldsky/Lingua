@@ -34,7 +34,7 @@ $linguaCorePath = $modx->getOption('lingua.core_path', null, $defaultLinguaCoreP
 $lingua = $modx->getService('lingua', 'Lingua', $linguaCorePath . 'model/lingua/', $scriptProperties);
 
 if (!($lingua instanceof Lingua)) {
-    $modx->log(modX::LOG_LEVEL_ERROR, '[linguaValue]: !($lingua instanceof Lingua)');
+    $modx->log(modX::LOG_LEVEL_ERROR, '[lingua.getValue]: !($lingua instanceof Lingua)');
     return;
 }
 

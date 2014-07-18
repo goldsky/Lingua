@@ -13,9 +13,13 @@ $xpdo_meta_map['linguaSiteContent']= array (
     'description' => '',
     'alias' => '',
     'link_attributes' => '',
+    'parent' => 0,
+    'isfolder' => 0,
     'introtext' => NULL,
     'content' => NULL,
     'menutitle' => '',
+    'context_key' => 'web',
+    'content_type' => 1,
     'uri' => NULL,
     'uri_override' => 0,
     'properties' => NULL,
@@ -82,6 +86,25 @@ $xpdo_meta_map['linguaSiteContent']= array (
       'null' => false,
       'default' => '',
     ),
+    'parent' => 
+    array (
+      'dbtype' => 'int',
+      'precision' => '10',
+      'phptype' => 'integer',
+      'null' => false,
+      'default' => 0,
+      'index' => 'index',
+    ),
+    'isfolder' => 
+    array (
+      'dbtype' => 'tinyint',
+      'precision' => '1',
+      'attributes' => 'unsigned',
+      'phptype' => 'boolean',
+      'null' => false,
+      'default' => 0,
+      'index' => 'index',
+    ),
     'introtext' => 
     array (
       'dbtype' => 'text',
@@ -101,6 +124,24 @@ $xpdo_meta_map['linguaSiteContent']= array (
       'phptype' => 'string',
       'null' => false,
       'default' => '',
+    ),
+    'context_key' => 
+    array (
+      'dbtype' => 'varchar',
+      'precision' => '100',
+      'phptype' => 'string',
+      'null' => false,
+      'default' => 'web',
+      'index' => 'index',
+    ),
+    'content_type' => 
+    array (
+      'dbtype' => 'int',
+      'precision' => '11',
+      'attributes' => 'unsigned',
+      'phptype' => 'integer',
+      'null' => false,
+      'default' => 1,
     ),
     'uri' => 
     array (
