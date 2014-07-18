@@ -31,6 +31,8 @@ if ($modx = & $object->xpdo) {
             $modelPath = $modx->getOption('core_path') . 'components/lingua/model/';
             $tablePrefix = $modx->getOption('lingua.table_prefix', null, $modx->config[modX::OPT_TABLE_PREFIX] . 'lingua_');
             $modx->addPackage('lingua', $modelPath, $tablePrefix);
+            $modx->addExtensionPackage('lingua', '[[++core_path]]components/lingua/model/', array('tablePrefix' => $tablePrefix));
+            
             $manager = $modx->getManager();
             if ($manager->createObjectContainer('linguaLangs')) {
                 $defaults = include $modx->getOption('core_path') . 'components/lingua/defaults/default.langs.php';
@@ -41,7 +43,12 @@ if ($modx = & $object->xpdo) {
             $manager->createObjectContainer('linguaSiteContent');
             $manager->createObjectContainer('linguaSiteTmplvarContentvalues');
             $manager->createObjectContainer('linguaSiteTmplvars');
-            $modx->addExtensionPackage('lingua', '[[++core_path]]components/lingua/model/', array('tablePrefix' => $tablePrefix));
+            
+            $manager->addField('linguaSiteContent', 'parent', array('after' => 'link_attributes'));
+            $manager->addField('linguaSiteContent', 'isfolder', array('after' => 'parent'));
+            $manager->addField('linguaSiteContent', 'context_key', array('after' => 'menutitle'));
+            $manager->addField('linguaSiteContent', 'content_type', array('after' => 'context_key'));
+
             break;
         case xPDOTransport::ACTION_UNINSTALL:
             $modx->removeExtensionPackage('lingua');
