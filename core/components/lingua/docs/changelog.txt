@@ -1,5 +1,6 @@
-Lingua 2.0.0-dev
+Lingua 2.0.0-rc1 (July 21, 2014)
 =================================
+- [#3] move the plugin's setting into System Settings instead
 - [#5] fix update window's URL of language CMP
 - [#4] fix default lang value on manager's dropdown
 - fix uri update when alias/parent's alias is changed, including by adding some

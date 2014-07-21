@@ -49,9 +49,6 @@ $plugins[0]->fromArray(array(
     'description' => '',
     'plugincode' => getSnippetContent($sources['source_core'] . '/elements/plugins/lingua.plugin.php'),
         ), '', true, true);
-$properties = include $sources['properties'] . 'lingua.plugin.properties.php';
-$plugins[0]->setProperties($properties);
-unset($properties);
 
 /* add plugin events */
 $events = include $sources['data'] . 'transport.plugin.events.php';

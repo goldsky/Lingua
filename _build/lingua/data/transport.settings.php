@@ -43,4 +43,31 @@ $settings['lingua.code_field']->fromArray(array(
     'area' => 'URL',
         ), '', true, true);
 
+$settings['lingua.contexts'] = $modx->newObject('modSystemSetting');
+$settings['lingua.contexts']->fromArray(array(
+    'key' => 'lingua.contexts',
+    'value' => 'web',
+    'xtype' => 'textfield',
+    'namespace' => 'lingua',
+    'area' => 'general',
+        ), '', true, true);
+
+$settings['lingua.parents'] = $modx->newObject('modSystemSetting');
+$settings['lingua.parents']->fromArray(array(
+    'key' => 'lingua.parents',
+    'value' => '',
+    'xtype' => 'textfield',
+    'namespace' => 'lingua',
+    'area' => 'general',
+        ), '', true, true);
+
+$settings['lingua.ids'] = $modx->newObject('modSystemSetting');
+$settings['lingua.ids']->fromArray(array(
+    'key' => 'lingua.ids',
+    'value' => '',
+    'xtype' => 'textfield',
+    'namespace' => 'lingua',
+    'area' => 'general',
+        ), '', true, true);
+
 return $settings;
