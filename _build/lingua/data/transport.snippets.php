@@ -29,12 +29,14 @@
  * @param   string  $filename   filename
  * @return  string  file content
  */
-function getSnippetContent($filename) {
-    $o = file_get_contents($filename);
-    $o = str_replace('<?php', '', $o);
-    $o = str_replace('?>', '', $o);
-    $o = trim($o);
-    return $o;
+if (!function_exists('getSnippetContent')) {
+    function getSnippetContent($filename) {
+        $o = file_get_contents($filename);
+        $o = str_replace('<?php', '', $o);
+        $o = str_replace('?>', '', $o);
+        $o = trim($o);
+        return $o;
+    }
 }
 
 $snippets = array();
@@ -67,6 +69,15 @@ $snippets[2]->fromArray(array(
     'name' => 'lingua.getField',
     'description' => 'Get the value of the given field for the run time culture key.',
     'snippet' => getSnippetContent($sources['source_core'] . '/elements/snippets/lingua.getfield.snippet.php'),
+        ), '', true, true);
+
+$snippets[3] = $modx->newObject('modSnippet');
+$snippets[3]->fromArray(array(
+    'id' => 0,
+    'property_preprocess' => 0,
+    'name' => 'lingua.getValue',
+    'description' => 'Get the value of the clone\'s field for the run time culture key.',
+    'snippet' => getSnippetContent($sources['source_core'] . '/elements/snippets/lingua.getvalue.snippet.php'),
         ), '', true, true);
 
 return $snippets;
