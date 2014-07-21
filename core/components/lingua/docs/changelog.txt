@@ -1,5 +1,6 @@
 Lingua 2.0.0-dev
 =================================
+- [#5] fix update window's URL of language CMP
 - [#4] fix default lang value on manager's dropdown
 - fix uri update when alias/parent's alias is changed, including by adding some
   fields to initiate the refreshment: parent, isfolder, context_key, content_type

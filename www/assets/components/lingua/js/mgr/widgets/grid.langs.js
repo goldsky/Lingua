@@ -211,7 +211,8 @@ Ext.extend(Lingua.grid.Langs, MODx.grid.Grid, {
                 xtype: 'lingua-window-lang',
                 title: _('lingua.update'),
                 baseParams: {
-                    action: 'mgr/lang/update'
+                    action: 'mgr/langs/update',
+                    id: this.menu.record.id
                 },
                 listeners: {
                     'success': {

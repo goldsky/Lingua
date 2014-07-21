@@ -75,14 +75,14 @@ Lingua.window.Lang = function(config) {
                                 },
                                 items: [{
                                         items: [{
-                                                xtype: 'checkbox',
+                                                xtype: 'xcheckbox',
                                                 fieldLabel: _('lingua.right_to_left'),
                                                 name: 'is_rtl',
                                                 anchor: '50%'
                                             }]
                                     }, {
                                         items: [{
-                                                xtype: 'checkbox',
+                                                xtype: 'xcheckbox',
                                                 fieldLabel: _('lingua.active'),
                                                 name: 'active',
                                                 anchor: '50%'
