@@ -42,14 +42,14 @@ $c = $modx->newQuery('linguaLangs');
 $c->where('active=1');
 $linguaLangs = $modx->context->config['lingua.langs'];
 if (!empty($linguaLangs)) {
-    $linguaLangs = @explode(',', $linguaLangs);
+    $linguaLangs = array_map('trim', @explode(',', $linguaLangs));
     $c->where(array(
         'lang_code:IN' => $linguaLangs
     ));
 }
 $linguaLcids = $modx->context->config['lingua.lcids'];
 if (!empty($linguaLcids)) {
-    $linguaLcids = @explode(',', $linguaLcids);
+    $linguaLcids = array_map('trim', @explode(',', $linguaLcids));
     $c->where(array(
         'lcid_string:IN' => $linguaLcids
     ));
@@ -175,6 +175,7 @@ if (!empty($parseUrl['query'])) {
     parse_str($parseUrl['query'], $queries);
     unset($queries[$langKey]);
     $parseUrl['query'] = http_build_query($queries);
+
     $pageURL = http_build_url($pageURL, $parseUrl);
     $pageURL = urldecode($pageURL);
     // replace: &queryarray[0]=foo&queryarray[1]=bar
@@ -186,9 +187,33 @@ $pageURL = rtrim($pageURL, '?');
 $hasQuery = strstr($pageURL, '?');
 
 $languages = array();
+$originPageUrl = $pageURL;
+$requestUri = str_replace(MODX_BASE_URL, '', $parseUrl['path']);
 foreach ($collection as $item) {
+    if ($item->get('lang_code') === $modx->cultureKey) {
+        continue;
+    }
     $itemArray = $item->toArray($phsPrefix);
+    $cloneSite = $modx->getObject('linguaSiteContent', array(
+        'resource_id' => $modx->resource->get('id'),
+        'lang_id' => $item->get('id'),
+    ));
+    if ($modx->getOption('friendly_urls')) {
+        if ($cloneSite) {
+            $itemUri = $cloneSite->get('uri');
+            if (!empty($itemUri)) {
+                $pageURL = str_replace($requestUri, $itemUri, $originPageUrl);
+            }
+        } elseif ($itemArray[$phsPrefix . 'lang_code'] === $modx->getOption('cultureKey', null, 'en')) {
+            $itemUri = $modx->resource->get('uri');
+            if (!empty($itemUri)) {
+                $pageURL = str_replace($requestUri, $itemUri, $originPageUrl);
+            }
+        }
+    }
+
     $itemArray[$phsPrefix . 'url'] = $pageURL . (!empty($hasQuery) ? '&' : '?') . $langKey . '=' . $itemArray[$phsPrefix . $codeField];
+//    $itemArray[$phsPrefix . 'url'] = $pageURL;
 
     if (!empty($toArray)) {
         $languages[] = $itemArray;

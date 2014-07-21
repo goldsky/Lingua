@@ -130,7 +130,8 @@ class LinguaRequest extends modRequest {
                             $linguaSiteContentArray = $linguaSiteContent->toArray();
                             unset($linguaSiteContentArray['id']);
                             foreach ($linguaSiteContentArray as $k => $v) {
-                                if (!empty($v)) {
+                                // exclude URI to reveal back the original URI later
+                                if (!empty($v) && $k !== 'uri') {
                                     $resource->set($k, $v);
                                 }
                             }

@@ -40,18 +40,16 @@ class linguaSiteContent extends xPDOSimpleObject {
         $resetOverrides = array_key_exists('resetOverrides', $options) ? (boolean) $options['resetOverrides'] : false;
         $contexts = array_key_exists('contexts', $options) ? explode(',', $options['contexts']) : null;
         $criteria = $modx->newQuery('linguaSiteContent');
-        $criteria->leftJoin('extResource', 'Resource', 'Resource.id = linguaSiteContent.resource_id');
         $criteria->where(array(
-            'linguaSiteContent.lang_id' => $options['lang_id'],
-            'Resource.parent' => $parent,
+            'lang_id' => $options['lang_id'],
+            'parent' => $parent,
         ));
         if (!$resetOverrides) {
-            $criteria->where(array('Resource.uri_override' => false));
+            $criteria->where(array('uri_override' => false));
         }
         if (!empty($contexts)) {
-            $criteria->where(array('Resource.context_key:IN' => $contexts));
+            $criteria->where(array('context_key:IN' => $contexts));
         }
-        $criteria->sortby('Resource.menuindex', 'ASC');
         /** @var Resource $resource */
         $resources = $modx->getIterator('linguaSiteContent', $criteria);
         foreach ($resources as $resource) {
@@ -114,7 +112,7 @@ class linguaSiteContent extends xPDOSimpleObject {
         if ($rt && $refreshChildURIs) {
             $this->xpdo->call('linguaSiteContent', 'refreshURIs', array(
                 &$this->xpdo,
-                $this->get('id'),
+                $this->get('resource_id'),
                 array(
                     'lang_id' => $this->get('lang_id')
                 )

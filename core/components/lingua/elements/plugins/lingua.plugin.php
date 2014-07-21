@@ -31,67 +31,51 @@ switch ($event) {
         if ($lingua instanceof Lingua) {
             $modx->lexicon->load('lingua:default');
 
-            $search = $_SERVER['REQUEST_URI'];
-            $baseUrl = $modx->getOption('base_url',null,MODX_BASE_URL);
-            if(!empty($baseUrl) && $baseUrl != '/' && $baseUrl != ' ' && $baseUrl != '/'.$modx->context->get('key').'/') {
-                $search = str_replace($baseUrl,'',$search);
+            $parseUrl = parse_url($_SERVER['REQUEST_URI']);
+            $search = $parseUrl['path'];
+            $baseUrl = $modx->getOption('base_url', null, MODX_BASE_URL);
+            if (!empty($baseUrl) &&
+                    $baseUrl !== '/' &&
+                    $baseUrl !== ' ' &&
+                    $baseUrl !== '/' . $modx->context->get('key') . '/'
+            ) {
+                $search = str_replace($baseUrl, '', $search);
             }
 
-            $search = ltrim($search,'/');
-            if(!empty($search)) {
-                $parts = @explode('/', $search);
-                $reversed = array_reverse($parts);
-                $aliases = @explode('.', $reversed[0]);
-                $reversedAliases = array_reverse($aliases);
-
-                $modContentTypes = $modx->getCollection('modContentType');
-                $contentTypes = array();
-                if ($modContentTypes) {
-                    foreach ($modContentTypes as $modContentType) {
-                        $contentTypes[] = $modContentType->get('file_extensions');
-                    }
-                }
-                if (in_array('.' . $reversedAliases[0], $contentTypes)) {
-                    $extension = array_pop($aliases);
-                }
-                $cleanAlias = @implode('.', $aliases);
-                if (!empty($cleanAlias)) {
-                    $c = $modx->newQuery('linguaSiteContent');
-                    $c->leftJoin('modResource', 'Resource', 'Resource.id = linguaSiteContent.resource_id');
-                    $c->where(array(
-                        'alias:LIKE' => $cleanAlias,
-                        'Resource.published:=' => 1,
-                        'Resource.deleted:!=' => 1,
-                    ));
-                    $clone = $modx->getObject('linguaSiteContent', $c);
-                    if ($clone) {
-                        $resource = $modx->getObject('modResource', $clone->get('resource_id'));
-                        if ($resource) {
-                            $lang = $modx->getObject('linguaLangs', $clone->get('lang_id'));
-                            if ($lang) {
-                                $_SESSION['cultureKey'] = $lang->get('lang_code');
-                            }
-                            $modx->sendForward($resource->get('id'));
-//                            $url = $modx->makeUrl($resource->get('id'));
-//                            if (!empty($url)) {
-//                                $options = array('responseCode' => 'HTTP/1.1 301 Moved Permanently');
-//                                $modx->sendRedirect($url, $options);
-//                            }
-                        }
+            $search = ltrim($search, '/');
+            if (!empty($search)) {
+                $c = $modx->newQuery('linguaSiteContent');
+                $c->leftJoin('modResource', 'Resource', 'Resource.id = linguaSiteContent.resource_id');
+                $c->where(array(
+                    'uri:LIKE' => $search,
+                    'Resource.published:=' => 1,
+                    'Resource.deleted:!=' => 1,
+                ));
+                
+                $c->leftJoin('linguaLangs', 'Lang', 'Lang.id = linguaSiteContent.lang_id');
+                $c->where(array(
+                    'Lang.lang_code:=' => $modx->cultureKey,
+                ));
+                
+                $clone = $modx->getObject('linguaSiteContent', $c);
+                if ($clone) {
+                    $resource = $modx->getObject('modResource', $clone->get('resource_id'));
+                    if ($resource) {
+                        $modx->sendForward($resource->get('id'));
                     }
                 }
             }
         }
-        
+
         break;
-    
+
     case 'OnHandleRequest': // for global
     case 'OnInitCulture':   // for request class
         if ($modx->context->key !== 'mgr') {
             $langGetKey = $modx->getOption('lingua.request_key', $scriptProperties, 'lang');
             $langGetKeyValue = filter_input(INPUT_GET, $langGetKey, FILTER_SANITIZE_STRING);
             $langGetKeyValue = strtolower($langGetKeyValue);
-            $langCookieValue = filter_input(INPUT_COOKIE, 'modx.lingua.switcher', FILTER_SANITIZE_STRING);
+            $langCookieValue = filter_input(INPUT_COOKIE, 'modx_lingua_switcher', FILTER_SANITIZE_STRING);
             $langCookieValue = strtolower($langCookieValue);
             if (!empty($langGetKeyValue) &&
                     $langGetKeyValue !== $modx->cultureKey &&
@@ -99,19 +83,19 @@ switch ($event) {
             ) {
                 $_SESSION['cultureKey'] = $langGetKeyValue;
                 $modx->cultureKey = $langGetKeyValue;
-                $modx->setOption('cultureKey', $langGetKeyValue);
-                setcookie('modx.lingua.switcher', $langGetKeyValue, time() + (1 * 24 * 60 * 60));
+//                $modx->setOption('cultureKey', $langGetKeyValue);
+                setcookie('modx_lingua_switcher', $langGetKeyValue, time() + (1 * 24 * 60 * 60));
             } else if (!empty($langCookieValue) &&
                     $langCookieValue !== $modx->cultureKey &&
                     strlen($langCookieValue) === 2
             ) {
                 $_SESSION['cultureKey'] = $langCookieValue;
                 $modx->cultureKey = $langCookieValue;
-                $modx->setOption('cultureKey', $langCookieValue);
+//                $modx->setOption('cultureKey', $langCookieValue);
             }
 
             if ($modx->cultureKey !== $modx->getOption('cultureKey')) {
-                $modx->setOption('cultureKey', $modx->cultureKey);
+//                $modx->setOption('cultureKey', $modx->cultureKey);
                 $modx->context->config['cultureKey'] = $modx->cultureKey;
             }
 
@@ -119,7 +103,7 @@ switch ($event) {
             $modx->setPlaceholder('lingua.language', $modx->cultureKey);
         }
         break;
-    
+
     case 'OnDocFormPrerender':
         $contexts = $modx->getOption('lingua.contexts', $scriptProperties, 'web');
         if (!empty($contexts)) {
@@ -303,7 +287,7 @@ Ext.onReady(function() {
         foreach ($languages as $language) {
             $initAllClonedTVFields[] = $language;
         }
-        
+
         if ($resource) {
             $tvs = $resource->getTemplateVars();
         } else {
@@ -314,7 +298,7 @@ Ext.onReady(function() {
         if (!$tvs) {
             return;
         }
-        
+
         $tvIds = array();
         $tvOutputs = array();
         foreach ($tvs as $tv) {
@@ -328,7 +312,7 @@ Ext.onReady(function() {
         if (!$linguaSiteTmplvars) {
             return;
         }
-        
+
         $formElements = array();
         foreach ($scriptProperties['categories'] as $category) {
             foreach ($category['tvs'] as $tv) {
@@ -358,13 +342,13 @@ Ext.onReady(function() {
                 if ($language['lang_code'] === $modx->getOption('cultureKey')) {
                     continue;
                 }
-                
+
                 $linguaTVContent = $modx->getObject('linguaSiteTmplvarContentvalues', array(
                     'tmplvarid' => $tvId,
                     'contentid' => $resourceId,
                     'lang_id' => $language['id']
                 ));
-                
+
                 /**
                  * Start to manipulate the ID to parse hidden TVs
                  */
@@ -378,7 +362,7 @@ Ext.onReady(function() {
                 if (empty($inputForm)) {
                     continue;
                 }
-                
+
                 $tvCloneId = $tvId . '_' . $language['lang_code'] . '_lingua_tv';
                 // basic replacements
                 $cloneInputForm = $inputForm;
@@ -417,7 +401,7 @@ Ext.onReady(function() {
                         break;
                     case 'url':
                         $cloneInputForm = preg_replace('/("|\'){1}tv' . $tvId . '_prefix("|\'){1}/', '${1}tv' . $tvId . '_prefix' . '_' . $language['lang_code'] . '_lingua_tv${2}', $cloneInputForm);
-                        
+
                         break;
                     default:
                         break;
@@ -430,14 +414,14 @@ Ext.onReady(function() {
                 $cloneTVFields[] = $lingua->processElementTags($lingua->parseTpl('lingua.resourcetv.row', $phs));
             }
         }
-        
+
         $jsHTML = "<script>\nExt.onReady(function() {\n";
         $jsHTML .= '    lingua.config.tmplvars = ' . json_encode($tmplvars) . ';' . "\n";
         $jsHTML .= '    lingua.initAllClonedTVFields(' . json_encode($initAllClonedTVFields) . ');' . "\n";
         $jsHTML .= "});\n</script>";
         $modx->event->output($jsHTML);
         $modx->event->output(@implode("\n", $cloneTVFields));
-        
+
         break;
 
     case 'OnDocFormSave':
@@ -554,11 +538,11 @@ Ext.onReady(function() {
                         $value = $prefix . $value;
                     }
                     $reverting[$lang][$tvId] = $value;
-                    
+
                     break;
                 case 'date':
                     $value = empty($value) ? '' : strftime('%Y-%m-%d %H:%M:%S', strtotime($value));
-                    
+
                     break;
                 /* ensure tag types trim whitespace from tags */
                 case 'tag':
@@ -569,7 +553,7 @@ Ext.onReady(function() {
                         $newTags[] = trim($tag);
                     }
                     $value = implode(',', $newTags);
-                    
+
                     break;
                 default:
                     /* handles checkboxes & multiple selects elements */
@@ -583,13 +567,13 @@ Ext.onReady(function() {
                         }
                         $value = implode('||', $featureInsert);
                     }
-                    
+
                     break;
             }
             $reverting[$lang][$tvId] = $value;
             $clearKeys[] = $k;
         }
-        
+
         /**
          * json seems to have number of characters limit;
          * that makes saving success report truncated and output modal hangs,
