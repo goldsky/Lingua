@@ -483,21 +483,31 @@ class Lingua {
     
     /**
      * Get list of the languages. Default cultureKey comes first.
-     * @param   boolean $activeOnly only return active languages (default: 1)
+     * @param   boolean $activeOnly only return active languages (default: true)
      * @param   boolean $assoc      returned as associative array
      * @return  array   languages
      */
-    public function getLanguages($activeOnly = 1, $assoc = true) {
-        if (isset($this->_placeholders['languages_array']) && !empty($this->_placeholders['languages_array'])) {
-            return $this->_placeholders['languages_array'];
+    public function getLanguages($activeOnly = true, $assoc = true) {
+        if ($assoc) {
+            if (isset($this->_placeholders['languages_assoc_array']) && !empty($this->_placeholders['languages_assoc_array'])) {
+                return $this->_placeholders['languages_assoc_array'];
+            }
+        } else {
+            if (isset($this->_placeholders['languages_array']) && !empty($this->_placeholders['languages_array'])) {
+                return $this->_placeholders['languages_array'];
+            }
         }
+        $this->_placeholders['languages_assoc_array'] = array();
         $this->_placeholders['languages_array'] = array();
+        // $modx->getOption('cultureKey') doesn't work!
+        $modCultureKey = $this->modx->getObject('modSystemSetting', array('key' => 'cultureKey'));
+        $cultureKey = $modCultureKey->get('value');
         $defaultLang = $this->modx->getObject('linguaLangs', array(
-            'lang_code' => $this->modx->getOption('cultureKey')
+            'lang_code' => $cultureKey
         ));
         if ($defaultLang) {
             if ($assoc) {
-                $this->_placeholders['languages_array'][$defaultLang->get('lang_code')] = $defaultLang->toArray();
+                $this->_placeholders['languages_assoc_array'][$defaultLang->get('lang_code')] = $defaultLang->toArray();
             } else {
                 $this->_placeholders['languages_array'][] = $defaultLang->toArray();
             }
@@ -527,13 +537,17 @@ class Lingua {
         if ($collection) {
             foreach ($collection as $item) {
                 if ($assoc) {
-                    $this->_placeholders['languages_array'][$item->get('lang_code')] = $item->toArray();
+                    $this->_placeholders['languages_assoc_array'][$item->get('lang_code')] = $item->toArray();
                 } else {
                     $this->_placeholders['languages_array'][] = $item->toArray();
                 }
             }
         }
-        return $this->_placeholders['languages_array'];
+        if ($assoc) {
+            return $this->_placeholders['languages_assoc_array'];
+        } else {
+            return $this->_placeholders['languages_array'];
+        }
     }
     
     /**

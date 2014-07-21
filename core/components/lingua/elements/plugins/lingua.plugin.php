@@ -146,30 +146,38 @@ switch ($event) {
             return '';
         }
         $modx->lexicon->load('lingua:default');
-        $languages = $lingua->getLanguages(1);
+        $languages = $lingua->getLanguages();
         if (!empty($languages)) {
             $modx->regClientCSS(MODX_BASE_URL . 'assets/components/lingua/css/mgr.css');
             $modx->controller->addJavascript(MODX_BASE_URL . 'assets/components/lingua/js/mgr/resource.js');
-
+            // $modx->getOption('cultureKey') doesn't work!
+            $modCultureKey = $modx->getObject('modSystemSetting', array('key' => 'cultureKey'));
+            $cultureKey = $modCultureKey->get('value');
             //------------------------------------------------------------------
             $jsHTML = '
     window.lingua = new Lingua({
-        defaultLang: "' . $modx->getOption('cultureKey') . '"
+        defaultLang: "' . $cultureKey . '"
     });';
 
             //------------------------------------------------------------------
             $storeData = array();
+            $storeDefaultData = array();
             $linguaSiteContentArray = array();
             $createHiddenFields = array();
             foreach ($languages as $language) {
+                if ($language['lang_code'] === $cultureKey) {
+                    $storeDefaultData[] = array(
+                        $language['lang_code'],
+                        $language['local_name'],
+                        $language['flag'],
+                    );
+                    continue;
+                }
                 $storeData[] = array(
                     $language['lang_code'],
                     $language['local_name'],
                     $language['flag'],
                 );
-                if ($language['lang_code'] === $modx->getOption('cultureKey')) {
-                    continue;
-                }
                 if ($mode === modSystemEvent::MODE_UPD) {
                     $linguaSiteContent = $modx->getObject('linguaSiteContent', array(
                         'resource_id' => $resource->get('id'),
@@ -193,6 +201,7 @@ switch ($event) {
     var actionButtons = Ext.getCmp("modx-action-buttons");
     if (actionButtons) {
         var languageBtn = new Ext.form.ComboBox({
+            id: "lingua-languageBtn",
             tpl: \'<tpl for="."><div class="x-combo-list-item"><img src="../{flag}" class="icon"/> {local_name}</div></tpl>\',
             store: new Ext.data.ArrayStore({
                 id: 0,
@@ -201,21 +210,37 @@ switch ($event) {
                     "local_name",
                     "flag"
                 ],
-                data: ' . json_encode($storeData) . '
+                data: ' . json_encode(array_merge($storeDefaultData, $storeData)) . '
             }),
+            valueField: "lang_code",
             displayField: "local_name",
             typeAhead: false,
             forceSelection: true,
             editable: false,
             mode: "local",
             triggerAction: "all",
-            emptyText: "' . $languages[$modx->getOption('cultureKey')]['local_name'] . '",
+            //emptyText: "' . $languages[$cultureKey]['local_name'] . '",
             selectOnFocus: true,
             width: 150,
             listeners: {
                 select: {
                     fn: function(combo, record, index) {
                         lingua.switchLanguage(record.get("lang_code"));
+                    },
+                    scope: this
+                },
+                render: {
+                    fn: function(comboBox) {
+                        var store = comboBox.store;
+                        var valueField = comboBox.valueField;
+                        var displayField = comboBox.displayField;
+                        var recordNumber = store.findExact(valueField, "' . $cultureKey . '", 0);
+                        if (recordNumber !== -1) {
+                            var displayValue = store.getAt(recordNumber).data[displayField];
+                            comboBox.setValue("' . $cultureKey . '");
+                            comboBox.setRawValue(displayValue);
+                            comboBox.selectedIndex = recordNumber;
+                        }
                     },
                     scope: this
                 }
@@ -327,6 +352,9 @@ Ext.onReady(function() {
         $tmplvars = array();
         $cloneTVFields = array();
         $count = 0;
+        // $modx->getOption('cultureKey') doesn't work!
+        $modCultureKey = $modx->getObject('modSystemSetting', array('key' => 'cultureKey'));
+        $cultureKey = $modCultureKey->get('value');
         foreach ($linguaSiteTmplvars as $linguaTv) {
             $tvId = $linguaTv->get('tmplvarid');
             if (!isset($formElements[$tvId])) {
@@ -339,7 +367,7 @@ Ext.onReady(function() {
             );
             $tvArray = $tv->toArray('tv.');
             foreach ($languages as $language) {
-                if ($language['lang_code'] === $modx->getOption('cultureKey')) {
+                if ($language['lang_code'] === $cultureKey) {
                     continue;
                 }
 
@@ -459,12 +487,15 @@ Ext.onReady(function() {
         // update linguaSiteContent
         $reverting = array();
         $clearKeys = array();
+        // $modx->getOption('cultureKey') doesn't work!
+        $modCultureKey = $modx->getObject('modSystemSetting', array('key' => 'cultureKey'));
+        $cultureKey = $modCultureKey->get('value');
         foreach ($resource->_fields as $k => $v) {
             if (!preg_match('/_lingua$/', $k)) {
                 continue;
             }
             foreach ($v as $a => $b) {
-                if ($a === $modx->getOption('cultureKey')) {
+                if ($a === $cultureKey) {
                     continue;
                 }
                 $reverting[$a][preg_replace('/_lingua$/', '', $k)] = $b;
@@ -523,7 +554,7 @@ Ext.onReady(function() {
             }
             $reverse = array_reverse($tvKeys);
             $lang = $reverse[0];
-            if ($lang === $modx->getOption('cultureKey')) {
+            if ($lang === $cultureKey) {
                 continue;
             }
             $tv = $modx->getObject('modTemplateVar', $tvId);

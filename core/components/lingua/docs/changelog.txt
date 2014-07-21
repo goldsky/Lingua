@@ -1,5 +1,6 @@
 Lingua 2.0.0-dev
 =================================
+- [#4] fix default lang value on manager's dropdown
 - fix uri update when alias/parent's alias is changed, including by adding some
   fields to initiate the refreshment: parent, isfolder, context_key, content_type
 - add lingua.getValue snippet to switch placeholder's value on other snippet
