@@ -48,10 +48,17 @@ switch ($event) {
                 $c->leftJoin('modResource', 'Resource', 'Resource.id = linguaSiteContent.resource_id');
                 $c->where(array(
                     'uri:LIKE' => $search,
-                    'Resource.published:=' => 1,
-                    'Resource.deleted:!=' => 1,
                 ));
-                
+                if (!$modx->user->get('sudo') || !$modx->hasPermission('view_offline')) {
+                    $c->where(array(
+                        'Resource.deleted:!=' => 1,
+                    ));
+                    if (!$modx->hasPermission('view_unpublished')) {
+                        $c->where(array(
+                            'Resource.published:=' => 1,
+                        ));
+                    }
+                }
                 $c->leftJoin('linguaLangs', 'Lang', 'Lang.id = linguaSiteContent.lang_id');
                 $c->where(array(
                     'Lang.lang_code:=' => $modx->cultureKey,
@@ -70,6 +77,8 @@ switch ($event) {
         break;
 
     case 'OnHandleRequest': // for global
+        break;
+    
     case 'OnInitCulture':   // for request class
         if ($modx->context->key !== 'mgr') {
             $langGetKey = $modx->getOption('lingua.request_key', $scriptProperties, 'lang');
@@ -83,7 +92,7 @@ switch ($event) {
             ) {
                 $_SESSION['cultureKey'] = $langGetKeyValue;
                 $modx->cultureKey = $langGetKeyValue;
-//                $modx->setOption('cultureKey', $langGetKeyValue);
+                $modx->setOption('cultureKey', $langGetKeyValue);
                 setcookie('modx_lingua_switcher', $langGetKeyValue, time() + (1 * 24 * 60 * 60));
             } else if (!empty($langCookieValue) &&
                     $langCookieValue !== $modx->cultureKey &&
@@ -91,11 +100,11 @@ switch ($event) {
             ) {
                 $_SESSION['cultureKey'] = $langCookieValue;
                 $modx->cultureKey = $langCookieValue;
-//                $modx->setOption('cultureKey', $langCookieValue);
+                $modx->setOption('cultureKey', $langCookieValue);
             }
 
             if ($modx->cultureKey !== $modx->getOption('cultureKey')) {
-//                $modx->setOption('cultureKey', $modx->cultureKey);
+                $modx->setOption('cultureKey', $modx->cultureKey);
                 $modx->context->config['cultureKey'] = $modx->cultureKey;
             }
 
@@ -631,9 +640,10 @@ Ext.onReady(function() {
                 $linguaSiteTmplvarContentvalues = $modx->getObject('linguaSiteTmplvarContentvalues', $params);
                 if (!$linguaSiteTmplvarContentvalues) {
                     $linguaSiteTmplvarContentvalues = $modx->newObject('linguaSiteTmplvarContentvalues');
-                    $linguaSiteTmplvarContentvalues->fromArray($params);
-                    $linguaSiteTmplvarContentvalues->save();
                 }
+                $linguaSiteTmplvarContentvalues->set('lang_id', $langId);
+                $linguaSiteTmplvarContentvalues->set('tmplvarid', $key);
+                $linguaSiteTmplvarContentvalues->set('contentid', $resourceId);
                 $linguaSiteTmplvarContentvalues->set('value', $val);
                 $linguaSiteTmplvarContentvalues->save();
             }

@@ -189,6 +189,9 @@ $hasQuery = strstr($pageURL, '?');
 $languages = array();
 $originPageUrl = $pageURL;
 $requestUri = str_replace(MODX_BASE_URL, '', $parseUrl['path']);
+// $modx->getOption('cultureKey') is overriden by plugin!
+$modCultureKey = $modx->getObject('modSystemSetting', array('key' => 'cultureKey'));
+$cultureKey = $modCultureKey->get('value');
 foreach ($collection as $item) {
     if ($item->get('lang_code') === $modx->cultureKey) {
         continue;
@@ -199,13 +202,13 @@ foreach ($collection as $item) {
         'lang_id' => $item->get('id'),
     ));
     if ($modx->getOption('friendly_urls')) {
-        if ($cloneSite) {
-            $itemUri = $cloneSite->get('uri');
+        if ($itemArray[$phsPrefix . 'lang_code'] === $cultureKey) {
+            $itemUri = $modx->resource->get('uri');
             if (!empty($itemUri)) {
                 $pageURL = str_replace($requestUri, $itemUri, $originPageUrl);
             }
-        } elseif ($itemArray[$phsPrefix . 'lang_code'] === $modx->getOption('cultureKey', null, 'en')) {
-            $itemUri = $modx->resource->get('uri');
+        } elseif ($cloneSite) {
+            $itemUri = $cloneSite->get('uri');
             if (!empty($itemUri)) {
                 $pageURL = str_replace($requestUri, $itemUri, $originPageUrl);
             }

@@ -16,3 +16,5 @@ $_lang['setting_lingua.parents'] = 'Lingua\'s Parents';
 $_lang['setting_lingua.parents_desc'] = 'Comma separated parents where this plugin should run';
 $_lang['setting_lingua.ids'] = 'Lingua\'s Resource IDs';
 $_lang['setting_lingua.ids_desc'] = 'Comma separated resources\' IDs where this plugin should run';
+$_lang['setting_lingua.debug'] = 'Lingua\'s debug mode';
+$_lang['setting_lingua.debug_desc'] = 'Set this to Yes to get dump outputs to MODX\'s error log';

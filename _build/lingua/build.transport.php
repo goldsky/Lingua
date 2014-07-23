@@ -33,8 +33,6 @@ set_time_limit(0);
 /* define version */
 define('PKG_NAME', 'Lingua');
 define('PKG_NAME_LOWER', 'lingua');
-define('PKG_VERSION', '2.0.0');
-define('PKG_RELEASE', 'rc1');
 
 /* override with your own defines here (see build.config.sample.php) */
 require_once dirname(__FILE__) . '/build.config.php';
@@ -61,6 +59,14 @@ $modx->initialize('mgr');
 $modx->setLogLevel(modX::LOG_LEVEL_INFO);
 $modx->setLogTarget(XPDO_CLI_MODE ? 'ECHO' : 'HTML');
 echo '<pre>';
+
+$lingua = $modx->getService('lingua', 'Lingua', MODX_CORE_PATH . 'components/lingua/model/lingua/');
+
+if (!($lingua instanceof Lingua)) {
+    return '';
+}
+define('PKG_VERSION', Lingua::VERSION);
+define('PKG_RELEASE', Lingua::RELEASE);
 
 $modx->loadClass('transport.modPackageBuilder', '', false, true);
 $builder = new modPackageBuilder($modx);

@@ -1,3 +1,11 @@
+Lingua 2.0.0-rc2 (July 23, 2014)
+=================================
+- add debug mode
+- add version checker on table alteration
+- fix cacheKey on LinguaRequest class
+- disable OnHandleRequest back, to avoid weird 2nd overriding
+- revert setOption, and use getObject to get original cultureKey data
+
 Lingua 2.0.0-rc1 (July 21, 2014)
 =================================
 - [#3] move the plugin's setting into System Settings instead

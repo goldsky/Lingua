@@ -55,8 +55,9 @@ class LinguaRequest extends modRequest {
         $isForward = array_key_exists('forward', $options) && !empty($options['forward']);
         $fromCache = false;
         $cacheKey = $this->modx->context->get('key') . "/resources/{$resourceId}";
+        $cultureKey = !empty($this->modx->cultureKey) ? $this->modx->cultureKey : $this->modx->getOption('cultureKey', null, 'en');
         $cachedResource = $this->modx->cacheManager->get($cacheKey, array(
-            xPDO::OPT_CACHE_KEY => $this->modx->getOption('cache_resource_key', null, 'lingua/resource' . $this->modx->cultureKey),
+            xPDO::OPT_CACHE_KEY => $this->modx->getOption('cache_resource_key', null, 'lingua/resource/' . $cultureKey),
             xPDO::OPT_CACHE_HANDLER => $this->modx->getOption('cache_resource_handler', null, $this->modx->getOption(xPDO::OPT_CACHE_HANDLER)),
             xPDO::OPT_CACHE_FORMAT => (integer) $this->modx->getOption('cache_resource_format', null, $this->modx->getOption(xPDO::OPT_CACHE_FORMAT, null, xPDOCacheManager::CACHE_PHP)),
         ));
@@ -118,9 +119,8 @@ class LinguaRequest extends modRequest {
                     }
                     
                     // hack the resource's content in here -------------------->
-                    $cultureKey = !empty($this->modx->cultureKey) ? $this->modx->cultureKey : $this->modx->getOption('cultureKey', null, 'en');
                     $lingua = $this->modx->getService('lingua', 'Lingua', MODX_CORE_PATH . 'components/lingua/model/lingua/');
-                    $linguaLangs = $this->modx->getObject('linguaLangs', array('lang_code' => $this->modx->cultureKey));
+                    $linguaLangs = $this->modx->getObject('linguaLangs', array('lang_code' => $cultureKey));
                     if (($lingua instanceof Lingua) && $linguaLangs) {
                         $linguaSiteContent = $this->modx->getObject('linguaSiteContent', array(
                             'resource_id' => $resource->get('id'),
@@ -190,6 +190,11 @@ class LinguaRequest extends modRequest {
                 return null;
             }
             $this->modx->invokeEvent('OnLoadWebPageCache');
+        }
+        if ($this->modx->getOption('lingua.debug')) {
+            $this->modx->log(modX::LOG_LEVEL_ERROR, __FILE__ . ' ');
+            $this->modx->log(modX::LOG_LEVEL_ERROR, __METHOD__ . ' ');
+            $this->modx->log(modX::LOG_LEVEL_ERROR, __LINE__ . ': $resourceArray: ' . print_r($resource->toArray(), 1));
         }
         return $resource;
     }

@@ -32,7 +32,7 @@ $id = $modx->getOption('id', $scriptProperties, $modx->resource->get('id'));
 $defaultLinguaCorePath = $modx->getOption('core_path') . 'components/lingua/';
 $linguaCorePath = $modx->getOption('lingua.core_path', null, $defaultLinguaCorePath);
 $lingua = $modx->getService('lingua', 'Lingua', $linguaCorePath . 'model/lingua/', $scriptProperties);
-
+$debug = $modx->getOption('lingua.debug');
 if (!($lingua instanceof Lingua)) {
     $modx->log(modX::LOG_LEVEL_ERROR, '[lingua.getValue]: !($lingua instanceof Lingua)');
     return;
@@ -42,6 +42,9 @@ $langObj = $modx->getObject('linguaLangs', array(
     'lang_code' => $modx->cultureKey
 ));
 if (!$langObj) {
+    if ($debug) {
+        $modx->log(modX::LOG_LEVEL_ERROR, '[lingua.getValue]: Missing field\'s value for ' . $field . ' in ' . $modx->cultureKey);
+    }
     return;
 }
 $c = $modx->newQuery('linguaSiteContent');
@@ -52,9 +55,12 @@ $c->where(array(
 $linguaSiteContent = $modx->getObject('linguaSiteContent', $c);
 $resource = $modx->getObject('modResource', $id);
 if (!$resource) {
+    if ($debug) {
+        $modx->log(modX::LOG_LEVEL_ERROR, '[lingua.getValue]: Missing resource for ' . $field . ' in ' . $modx->cultureKey);
+    }
     return;
 }
-
+     
 $tableFields = array('pagetitle', 'longtitle', 'description', 'alias',
     'link_attributes', 'introtext', 'content', 'menutitle', 'uri', 'uri_override',
     'properties');

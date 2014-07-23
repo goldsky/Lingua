@@ -25,6 +25,15 @@
  * @subpackage build
  */
 
+$settings['lingua.debug'] = $modx->newObject('modSystemSetting');
+$settings['lingua.debug']->fromArray(array(
+    'key' => 'lingua.debug',
+    'value' => '0',
+    'xtype' => 'combo-boolean',
+    'namespace' => 'lingua',
+    'area' => 'general',
+        ), '', true, true);
+
 $settings['lingua.get_key'] = $modx->newObject('modSystemSetting');
 $settings['lingua.get_key']->fromArray(array(
     'key' => 'lingua.get_key',
