@@ -65,8 +65,26 @@ $tableFields = array('pagetitle', 'longtitle', 'description', 'alias',
     'link_attributes', 'introtext', 'content', 'menutitle', 'uri', 'uri_override',
     'properties');
 $output = '';
-if ($linguaSiteContent && in_array($field, $tableFields)) {
-    $output = $linguaSiteContent->get($field);
+if (in_array($field, $tableFields)) {
+    if ($linguaSiteContent) {
+        $output = $linguaSiteContent->get($field);
+    }
+}
+// try TV
+else {
+    $tv = $modx->getObject('modTemplateVar', array(
+        'name' => $field,
+    ));
+    if ($tv) {
+        $linguaSiteTmplvarContentvalues = $modx->getObject('linguaSiteTmplvarContentvalues', array(
+            'lang_id' => $langObj->get('id'),
+            'tmplvarid' => $tv->get('id'),
+            'contentid' => $id,
+        ));
+        if ($linguaSiteTmplvarContentvalues) {
+            $output = $linguaSiteTmplvarContentvalues->get('value');
+        }
+    }
 }
 
 return $output;
