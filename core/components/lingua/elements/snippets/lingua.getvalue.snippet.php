@@ -82,7 +82,9 @@ else {
             'contentid' => $id,
         ));
         if ($linguaSiteTmplvarContentvalues) {
-            $output = $linguaSiteTmplvarContentvalues->get('value');
+            $value = $linguaSiteTmplvarContentvalues->get('value');
+            $tv->setValue($tv->get('id'), $value);
+            $output = $tv->renderOutput($resource->get('id'));
         }
     }
 }
