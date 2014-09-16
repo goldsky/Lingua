@@ -3,6 +3,7 @@ Lingua 2.0.0
 - add domain path on setcookie()
 - [#6][#9] Add TV Value to getValue snippet
 - [#6] process TV
+- [#8] detect browser language
 
 Lingua 2.0.0-rc2 (July 23, 2014)
 =================================

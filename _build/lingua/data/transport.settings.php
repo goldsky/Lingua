@@ -79,4 +79,13 @@ $settings['lingua.ids']->fromArray(array(
     'area' => 'general',
         ), '', true, true);
 
+$settings['lingua.detect_browser'] = $modx->newObject('modSystemSetting');
+$settings['lingua.detect_browser']->fromArray(array(
+    'key' => 'lingua.detect_browser',
+    'value' => '0',
+    'xtype' => 'combo-boolean',
+    'namespace' => 'lingua',
+    'area' => 'general',
+        ), '', true, true);
+
 return $settings;

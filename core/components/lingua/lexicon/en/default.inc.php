@@ -18,3 +18,5 @@ $_lang['setting_lingua.ids'] = 'Lingua\'s Resource IDs';
 $_lang['setting_lingua.ids_desc'] = 'Comma separated resources\' IDs where this plugin should run';
 $_lang['setting_lingua.debug'] = 'Lingua\'s debug mode';
 $_lang['setting_lingua.debug_desc'] = 'Set this to Yes to get dump outputs to MODX\'s error log';
+$_lang['setting_lingua.detect_browser'] = 'Detect browser\'s language';
+$_lang['setting_lingua.detect_browser_desc'] = 'Set this to Yes to detect browser\'s language of the visitor on their first visit.';

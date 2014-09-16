@@ -63,7 +63,7 @@ switch ($event) {
                 $c->where(array(
                     'Lang.lang_code:=' => $modx->cultureKey,
                 ));
-                
+
                 $clone = $modx->getObject('linguaSiteContent', $c);
                 if ($clone) {
                     $resource = $modx->getObject('modResource', $clone->get('resource_id'));
@@ -78,7 +78,7 @@ switch ($event) {
 
     case 'OnHandleRequest': // for global
         break;
-    
+
     case 'OnInitCulture':   // for request class
         if ($modx->context->key !== 'mgr') {
             $langGetKey = $modx->getOption('lingua.request_key', $scriptProperties, 'lang');
@@ -101,6 +101,56 @@ switch ($event) {
                 $_SESSION['cultureKey'] = $langCookieValue;
                 $modx->cultureKey = $langCookieValue;
                 $modx->setOption('cultureKey', $langCookieValue);
+            } else if(empty($langGetKeyValue) &&
+                    empty($langCookieValue)
+            ){
+                $detectBrowser = $modx->getOption('lingua.detect_browser');
+                if ($detectBrowser === '1') {
+                    $languages = explode(',', filter_input(INPUT_SERVER, 'HTTP_ACCEPT_LANGUAGE', FILTER_SANITIZE_STRING));
+                    $sortedLangs = array();
+                    foreach ($languages as $language) {
+                        $language = strtolower($language);
+                        $parts = @explode(';', $language);
+                        if (!isset($parts[1])) {
+                            $sort = 1.0;
+                        } else {
+                            $x = @explode('=', $parts[1]);
+                            $sort = $x[1] - 0;
+                        }
+                        $sortedLangs[$parts[0]] = $sort;
+                    }
+                    arsort($sortedLangs);
+                    $langs = array_keys($sortedLangs);
+                    $linguaLangs = $modx->getCollection('linguaLangs', array(
+                        'active' => 1
+                    ));
+                    $c = $modx->newQuery('linguaLangs');
+                    $c->where('active=1');
+                    $contextLangs = $modx->context->config['lingua.langs'];
+                    if (!empty($contextLangs)) {
+                        $contextLangs = array_map('trim', @explode(',', $contextLangs));
+                        $c->where(array(
+                            'lang_code:IN' => $contextLangs
+                        ));
+                    }
+                    $linguaLangs = $modx->getCollection('linguaLangs', $c);
+                    $existingLangs = array();
+                    if ($linguaLangs) {
+                        foreach ($linguaLangs as $linguaLang) {
+                            $existingLangs[] = $linguaLang->get('lang_code');
+                        }
+                    }
+                    
+                    $acceptedLangs = array_intersect($existingLangs, $langs);
+                    $acceptedLangs = array_values($acceptedLangs); // reset index
+
+                    if (!empty($acceptedLangs) && is_array($acceptedLangs)) {
+                        $_SESSION['cultureKey'] = $acceptedLangs[0];
+                        $modx->cultureKey = $acceptedLangs[0];
+                        $modx->setOption('cultureKey', $acceptedLangs[0]);
+                        setcookie('modx_lingua_switcher', $acceptedLangs[0], time() + (1 * 24 * 60 * 60), '/');
+                    }
+                }
             }
 
             if ($modx->cultureKey !== $modx->getOption('cultureKey')) {
