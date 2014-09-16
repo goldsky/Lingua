@@ -1,3 +1,7 @@
+Lingua 2.0.0
+=================================
+- add domain path on setcookie()
+
 Lingua 2.0.0-rc2 (July 23, 2014)
 =================================
 - add debug mode

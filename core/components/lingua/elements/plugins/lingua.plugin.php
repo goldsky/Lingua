@@ -93,7 +93,7 @@ switch ($event) {
                 $_SESSION['cultureKey'] = $langGetKeyValue;
                 $modx->cultureKey = $langGetKeyValue;
                 $modx->setOption('cultureKey', $langGetKeyValue);
-                setcookie('modx_lingua_switcher', $langGetKeyValue, time() + (1 * 24 * 60 * 60));
+                setcookie('modx_lingua_switcher', $langGetKeyValue, time() + (1 * 24 * 60 * 60), '/');
             } else if (!empty($langCookieValue) &&
                     $langCookieValue !== $modx->cultureKey &&
                     strlen($langCookieValue) === 2
