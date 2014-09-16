@@ -1,4 +1,4 @@
-Lingua 2.0.0
+Lingua 2.0.0-rc3 (September 16, 2014)
 =================================
 - add domain path on setcookie()
 - [#6][#9] Add TV Value to getValue snippet
