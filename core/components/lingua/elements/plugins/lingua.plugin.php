@@ -27,51 +27,49 @@ $event = $modx->event->name;
 switch ($event) {
     case 'OnPageNotFound':
         $lingua = $modx->getService('lingua', 'Lingua', MODX_CORE_PATH . 'components/lingua/model/lingua/');
+        if (!($lingua instanceof Lingua)) {
+            return;
+        }
+        $modx->lexicon->load('lingua:default');
 
-        if ($lingua instanceof Lingua) {
-            $modx->lexicon->load('lingua:default');
-
-            $parseUrl = parse_url($_SERVER['REQUEST_URI']);
-            $search = $parseUrl['path'];
-            $baseUrl = $modx->getOption('base_url', null, MODX_BASE_URL);
-            if (!empty($baseUrl) &&
-                    $baseUrl !== '/' &&
-                    $baseUrl !== ' ' &&
-                    $baseUrl !== '/' . $modx->context->get('key') . '/'
-            ) {
-                $search = str_replace($baseUrl, '', $search);
-            }
-
-            $search = ltrim($search, '/');
-            if (!empty($search)) {
-                $c = $modx->newQuery('linguaSiteContent');
-                $c->leftJoin('modResource', 'Resource', 'Resource.id = linguaSiteContent.resource_id');
+        $parseUrl = parse_url($_SERVER['REQUEST_URI']);
+        $search = $parseUrl['path'];
+        $baseUrl = $modx->getOption('base_url', null, MODX_BASE_URL);
+        $baseUrl = trim($baseUrl, '/');
+        if (empty($baseUrl)) {
+            return;
+        }
+        $search = str_replace(MODX_BASE_URL . $baseUrl . '/', '', $search);
+        if (empty($search)) {
+            return;
+        }
+        $c = $modx->newQuery('linguaSiteContent');
+        $c->leftJoin('modResource', 'Resource', 'Resource.id = linguaSiteContent.resource_id');
+        $c->where(array(
+            'uri:LIKE' => $search,
+        ));
+        if (!$modx->user->get('sudo') || !$modx->hasPermission('view_offline')) {
+            $c->where(array(
+                'Resource.deleted:!=' => 1,
+            ));
+            if (!$modx->hasPermission('view_unpublished')) {
                 $c->where(array(
-                    'uri:LIKE' => $search,
+                    'Resource.published:=' => 1,
                 ));
-                if (!$modx->user->get('sudo') || !$modx->hasPermission('view_offline')) {
-                    $c->where(array(
-                        'Resource.deleted:!=' => 1,
-                    ));
-                    if (!$modx->hasPermission('view_unpublished')) {
-                        $c->where(array(
-                            'Resource.published:=' => 1,
-                        ));
-                    }
-                }
-                $c->leftJoin('linguaLangs', 'Lang', 'Lang.id = linguaSiteContent.lang_id');
-                $c->where(array(
-                    'Lang.lang_code:=' => $modx->cultureKey,
-                ));
-
-                $clone = $modx->getObject('linguaSiteContent', $c);
-                if ($clone) {
-                    $resource = $modx->getObject('modResource', $clone->get('resource_id'));
-                    if ($resource) {
-                        $modx->sendForward($resource->get('id'));
-                    }
-                }
             }
+        }
+        $c->leftJoin('linguaLangs', 'Lang', 'Lang.id = linguaSiteContent.lang_id');
+        $c->where(array(
+            'Lang.lang_code:=' => $modx->cultureKey,
+        ));
+
+        $clone = $modx->getObject('linguaSiteContent', $c);
+        if (empty($clone)) {
+            return;
+        }
+        $resource = $modx->getObject('modResource', $clone->get('resource_id'));
+        if ($resource) {
+            $modx->sendForward($resource->get('id'));
         }
 
         break;
@@ -80,87 +78,88 @@ switch ($event) {
         break;
 
     case 'OnInitCulture':   // for request class
-        if ($modx->context->key !== 'mgr') {
-            $langGetKey = $modx->getOption('lingua.request_key', $scriptProperties, 'lang');
-            $langGetKeyValue = filter_input(INPUT_GET, $langGetKey, FILTER_SANITIZE_STRING);
-            $langGetKeyValue = strtolower($langGetKeyValue);
-            $langCookieValue = filter_input(INPUT_COOKIE, 'modx_lingua_switcher', FILTER_SANITIZE_STRING);
-            $langCookieValue = strtolower($langCookieValue);
-            if (!empty($langGetKeyValue) &&
-                    $langGetKeyValue !== $modx->cultureKey &&
-                    strlen($langGetKeyValue) === 2
-            ) {
-                $_SESSION['cultureKey'] = $langGetKeyValue;
-                $modx->cultureKey = $langGetKeyValue;
-                $modx->setOption('cultureKey', $langGetKeyValue);
-                setcookie('modx_lingua_switcher', $langGetKeyValue, time() + (1 * 24 * 60 * 60), '/');
-            } else if (!empty($langCookieValue) &&
-                    $langCookieValue !== $modx->cultureKey &&
-                    strlen($langCookieValue) === 2
-            ) {
-                $_SESSION['cultureKey'] = $langCookieValue;
-                $modx->cultureKey = $langCookieValue;
-                $modx->setOption('cultureKey', $langCookieValue);
-            } else if(empty($langGetKeyValue) &&
-                    empty($langCookieValue)
-            ){
-                $detectBrowser = $modx->getOption('lingua.detect_browser');
-                if ($detectBrowser === '1') {
-                    $languages = explode(',', filter_input(INPUT_SERVER, 'HTTP_ACCEPT_LANGUAGE', FILTER_SANITIZE_STRING));
-                    $sortedLangs = array();
-                    foreach ($languages as $language) {
-                        $language = strtolower($language);
-                        $parts = @explode(';', $language);
-                        if (!isset($parts[1])) {
-                            $sort = 1.0;
-                        } else {
-                            $x = @explode('=', $parts[1]);
-                            $sort = $x[1] - 0;
-                        }
-                        $sortedLangs[$parts[0]] = $sort;
+        if ($modx->context->key === 'mgr') {
+            return;
+        }
+        $langGetKey = $modx->getOption('lingua.request_key', $scriptProperties, 'lang');
+        $langGetKeyValue = filter_input(INPUT_GET, $langGetKey, FILTER_SANITIZE_STRING);
+        $langGetKeyValue = strtolower($langGetKeyValue);
+        $langCookieValue = filter_input(INPUT_COOKIE, 'modx_lingua_switcher', FILTER_SANITIZE_STRING);
+        $langCookieValue = strtolower($langCookieValue);
+        if (!empty($langGetKeyValue) &&
+                $langGetKeyValue !== $modx->cultureKey &&
+                strlen($langGetKeyValue) === 2
+        ) {
+            $_SESSION['cultureKey'] = $langGetKeyValue;
+            $modx->cultureKey = $langGetKeyValue;
+            $modx->setOption('cultureKey', $langGetKeyValue);
+            setcookie('modx_lingua_switcher', $langGetKeyValue, time() + (1 * 24 * 60 * 60), '/');
+        } else if (!empty($langCookieValue) &&
+                $langCookieValue !== $modx->cultureKey &&
+                strlen($langCookieValue) === 2
+        ) {
+            $_SESSION['cultureKey'] = $langCookieValue;
+            $modx->cultureKey = $langCookieValue;
+            $modx->setOption('cultureKey', $langCookieValue);
+        } else if(empty($langGetKeyValue) &&
+                empty($langCookieValue)
+        ){
+            $detectBrowser = $modx->getOption('lingua.detect_browser');
+            if ($detectBrowser === '1') {
+                $languages = explode(',', filter_input(INPUT_SERVER, 'HTTP_ACCEPT_LANGUAGE', FILTER_SANITIZE_STRING));
+                $sortedLangs = array();
+                foreach ($languages as $language) {
+                    $language = strtolower($language);
+                    $parts = @explode(';', $language);
+                    if (!isset($parts[1])) {
+                        $sort = 1.0;
+                    } else {
+                        $x = @explode('=', $parts[1]);
+                        $sort = $x[1] - 0;
                     }
-                    arsort($sortedLangs);
-                    $langs = array_keys($sortedLangs);
-                    $linguaLangs = $modx->getCollection('linguaLangs', array(
-                        'active' => 1
+                    $sortedLangs[$parts[0]] = $sort;
+                }
+                arsort($sortedLangs);
+                $langs = array_keys($sortedLangs);
+                $linguaLangs = $modx->getCollection('linguaLangs', array(
+                    'active' => 1
+                ));
+                $c = $modx->newQuery('linguaLangs');
+                $c->where('active=1');
+                $contextLangs = $modx->context->config['lingua.langs'];
+                if (!empty($contextLangs)) {
+                    $contextLangs = array_map('trim', @explode(',', $contextLangs));
+                    $c->where(array(
+                        'lang_code:IN' => $contextLangs
                     ));
-                    $c = $modx->newQuery('linguaLangs');
-                    $c->where('active=1');
-                    $contextLangs = $modx->context->config['lingua.langs'];
-                    if (!empty($contextLangs)) {
-                        $contextLangs = array_map('trim', @explode(',', $contextLangs));
-                        $c->where(array(
-                            'lang_code:IN' => $contextLangs
-                        ));
-                    }
-                    $linguaLangs = $modx->getCollection('linguaLangs', $c);
-                    $existingLangs = array();
-                    if ($linguaLangs) {
-                        foreach ($linguaLangs as $linguaLang) {
-                            $existingLangs[] = $linguaLang->get('lang_code');
-                        }
-                    }
-                    
-                    $acceptedLangs = array_intersect($existingLangs, $langs);
-                    $acceptedLangs = array_values($acceptedLangs); // reset index
-
-                    if (!empty($acceptedLangs) && is_array($acceptedLangs)) {
-                        $_SESSION['cultureKey'] = $acceptedLangs[0];
-                        $modx->cultureKey = $acceptedLangs[0];
-                        $modx->setOption('cultureKey', $acceptedLangs[0]);
-                        setcookie('modx_lingua_switcher', $acceptedLangs[0], time() + (1 * 24 * 60 * 60), '/');
+                }
+                $linguaLangs = $modx->getCollection('linguaLangs', $c);
+                $existingLangs = array();
+                if ($linguaLangs) {
+                    foreach ($linguaLangs as $linguaLang) {
+                        $existingLangs[] = $linguaLang->get('lang_code');
                     }
                 }
-            }
 
-            if ($modx->cultureKey !== $modx->getOption('cultureKey')) {
-                $modx->setOption('cultureKey', $modx->cultureKey);
-                $modx->context->config['cultureKey'] = $modx->cultureKey;
-            }
+                $acceptedLangs = array_intersect($existingLangs, $langs);
+                $acceptedLangs = array_values($acceptedLangs); // reset index
 
-            $modx->setPlaceholder('lingua.cultureKey', $modx->cultureKey);
-            $modx->setPlaceholder('lingua.language', $modx->cultureKey);
+                if (!empty($acceptedLangs) && is_array($acceptedLangs)) {
+                    $_SESSION['cultureKey'] = $acceptedLangs[0];
+                    $modx->cultureKey = $acceptedLangs[0];
+                    $modx->setOption('cultureKey', $acceptedLangs[0]);
+                    setcookie('modx_lingua_switcher', $acceptedLangs[0], time() + (1 * 24 * 60 * 60), '/');
+                }
+            }
         }
+
+        if ($modx->cultureKey !== $modx->getOption('cultureKey')) {
+            $modx->setOption('cultureKey', $modx->cultureKey);
+            $modx->context->config['cultureKey'] = $modx->cultureKey;
+        }
+
+        $modx->setPlaceholder('lingua.cultureKey', $modx->cultureKey);
+        $modx->setPlaceholder('lingua.language', $modx->cultureKey);
         break;
 
     case 'OnDocFormPrerender':
@@ -200,61 +199,63 @@ switch ($event) {
         }
 
         $lingua = $modx->getService('lingua', 'Lingua', MODX_CORE_PATH . 'components/lingua/model/lingua/');
-
         if (!($lingua instanceof Lingua)) {
-            return '';
+            return;
         }
+        
         $modx->lexicon->load('lingua:default');
         $languages = $lingua->getLanguages();
-        if (!empty($languages)) {
-            $modx->regClientCSS(MODX_BASE_URL . 'assets/components/lingua/css/mgr.css');
-            $modx->controller->addJavascript(MODX_BASE_URL . 'assets/components/lingua/js/mgr/resource.js');
-            // $modx->getOption('cultureKey') doesn't work!
-            $modCultureKey = $modx->getObject('modSystemSetting', array('key' => 'cultureKey'));
-            $cultureKey = $modCultureKey->get('value');
-            //------------------------------------------------------------------
-            $jsHTML = '
+        if (empty($languages)) {
+            return;
+        }
+        $modx->regClientCSS(MODX_BASE_URL . 'assets/components/lingua/css/mgr.css');
+        $modx->controller->addJavascript(MODX_BASE_URL . 'assets/components/lingua/js/mgr/resource.js');
+        // $modx->getOption('cultureKey') doesn't work!
+        $modCultureKey = $modx->getObject('modSystemSetting', array('key' => 'cultureKey'));
+        $cultureKey = $modCultureKey->get('value');
+        //------------------------------------------------------------------
+        $jsHTML = '
     window.lingua = new Lingua({
         defaultLang: "' . $cultureKey . '"
     });';
 
-            //------------------------------------------------------------------
-            $storeData = array();
-            $storeDefaultData = array();
-            $linguaSiteContentArray = array();
-            $createHiddenFields = array();
-            foreach ($languages as $language) {
-                if ($language['lang_code'] === $cultureKey) {
-                    $storeDefaultData[] = array(
-                        $language['lang_code'],
-                        $language['local_name'],
-                        $language['flag'],
-                    );
-                    continue;
-                }
-                $storeData[] = array(
+        //------------------------------------------------------------------
+        $storeData = array();
+        $storeDefaultData = array();
+        $linguaSiteContentArray = array();
+        $createHiddenFields = array();
+        foreach ($languages as $language) {
+            if ($language['lang_code'] === $cultureKey) {
+                $storeDefaultData[] = array(
                     $language['lang_code'],
                     $language['local_name'],
                     $language['flag'],
                 );
-                if ($mode === modSystemEvent::MODE_UPD) {
-                    $linguaSiteContent = $modx->getObject('linguaSiteContent', array(
-                        'resource_id' => $resource->get('id'),
-                        'lang_id' => $language['id']
-                    ));
-                    if ($linguaSiteContent) {
-                        $linguaSiteContentArray[$language['lang_code']] = $linguaSiteContent->toArray();
-                    } else {
-                        $linguaSiteContentArray[$language['lang_code']] = array();
-                    }
+                continue;
+            }
+            $storeData[] = array(
+                $language['lang_code'],
+                $language['local_name'],
+                $language['flag'],
+            );
+            if ($mode === modSystemEvent::MODE_UPD) {
+                $linguaSiteContent = $modx->getObject('linguaSiteContent', array(
+                    'resource_id' => $resource->get('id'),
+                    'lang_id' => $language['id']
+                ));
+                if ($linguaSiteContent) {
+                    $linguaSiteContentArray[$language['lang_code']] = $linguaSiteContent->toArray();
                 } else {
                     $linguaSiteContentArray[$language['lang_code']] = array();
                 }
-                $modx->regClientStartupHTMLBlock('<style>.icon-lingua-flag-' . $language['lcid_string'] . ' {background-image: url(\'../' . $language['flag'] . '\'); background-repeat: no-repeat;}</style>');
-                $createHiddenFields[] = $language;
-            } // foreach ($languages as $language)
-            //------------------------------------------------------------------
-            $jsHTML .= '
+            } else {
+                $linguaSiteContentArray[$language['lang_code']] = array();
+            }
+            $modx->regClientStartupHTMLBlock('<style>.icon-lingua-flag-' . $language['lcid_string'] . ' {background-image: url(\'../' . $language['flag'] . '\'); background-repeat: no-repeat;}</style>');
+            $createHiddenFields[] = $language;
+        } // foreach ($languages as $language)
+        //------------------------------------------------------------------
+        $jsHTML .= '
     lingua.config.siteContent = ' . json_encode($linguaSiteContentArray) . ';
     lingua.createHiddenFields(' . json_encode($createHiddenFields) . ');
     var actionButtons = Ext.getCmp("modx-action-buttons");
@@ -308,13 +309,12 @@ switch ($event) {
         actionButtons.insertButton(0, [languageBtn, "-"]);
         actionButtons.doLayout();
     }';
-            $modx->controller->addHtml('
+        $modx->controller->addHtml('
 <script type="text/javascript">
 Ext.onReady(function() {
     ' . $jsHTML . '
 });
 </script>');
-        } // if (!empty($languages))
         //------------------------------------------------------------------
         break;
 
@@ -359,9 +359,8 @@ Ext.onReady(function() {
         }
 
         $lingua = $modx->getService('lingua', 'Lingua', MODX_CORE_PATH . 'components/lingua/model/lingua/');
-
         if (!($lingua instanceof Lingua)) {
-            return '';
+            return;
         }
         $languages = $lingua->getLanguages(1, false);
         if (empty($languages)) {
@@ -538,9 +537,8 @@ Ext.onReady(function() {
         }
 
         $lingua = $modx->getService('lingua', 'Lingua', MODX_CORE_PATH . 'components/lingua/model/lingua/');
-
         if (!($lingua instanceof Lingua)) {
-            return '';
+            return;
         }
 
         // update linguaSiteContent
