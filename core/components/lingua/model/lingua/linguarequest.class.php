@@ -52,6 +52,18 @@ class LinguaRequest extends modRequest {
         if (!is_numeric($resourceId)) {
             $this->modx->sendErrorPage();
         }
+        
+        $resource = parent::getResource($method, $identifier, $options);
+        if ($resource) {
+            $context = $resource->get('context_key');
+            $allowedContexts = $this->modx->getOption('lingua.contexts');
+            $allowedContexts = array_map('trim', @explode(',', $allowedContexts));
+            if (empty($context) || empty($allowedContexts) || !in_array($context, $allowedContexts)) {
+                return $resource;
+            }
+        }
+        $this->modx->setOption('cache_resource_key', 'lingua/resource/' . $this->modx->cultureKey);
+        
         $isForward = array_key_exists('forward', $options) && !empty($options['forward']);
         $fromCache = false;
         $cacheKey = $this->modx->context->get('key') . "/resources/{$resourceId}";

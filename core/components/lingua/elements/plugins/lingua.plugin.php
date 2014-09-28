@@ -707,10 +707,6 @@ Ext.onReady(function() {
         ));
         break;
 
-    case 'OnWebPageInit':
-        $modx->setOption('cache_resource_key', 'lingua/resource/' . $modx->cultureKey);
-        break;
-
     case 'OnResourceDuplicate':
         $contexts = $modx->getOption('lingua.contexts', $scriptProperties, 'web');
         if (!empty($contexts)) {

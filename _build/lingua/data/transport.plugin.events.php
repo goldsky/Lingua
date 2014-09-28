@@ -53,7 +53,6 @@ $events = setEventObjects(array(
     'OnTempFormSave',
     'OnTemplateSave',
     'OnTVFormSave',
-    'OnWebPageInit',
 ));
 
 return $events;
