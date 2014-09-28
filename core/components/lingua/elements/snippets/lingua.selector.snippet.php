@@ -192,6 +192,11 @@ $requestUri = str_replace(MODX_BASE_URL, '', $parseUrl['path']);
 // $modx->getOption('cultureKey') is overriden by plugin!
 $modCultureKey = $modx->getObject('modSystemSetting', array('key' => 'cultureKey'));
 $cultureKey = $modCultureKey->get('value');
+
+$baseUrl = $modx->getOption('base_url', $scriptProperties);
+$baseUrl = str_replace(MODX_BASE_URL, '', $baseUrl);
+$baseUrl = trim($baseUrl, '/');
+        
 foreach ($collection as $item) {
     if ($item->get('lang_code') === $modx->cultureKey) {
         continue;
@@ -202,8 +207,6 @@ foreach ($collection as $item) {
         'lang_id' => $item->get('id'),
     ));
     if ($modx->getOption('friendly_urls')) {
-        $baseUrl = $modx->getOption('base_url', $scriptProperties, MODX_BASE_URL);
-        $baseUrl = trim($baseUrl, '/');
         if ($itemArray[$phsPrefix . 'lang_code'] === $cultureKey) {
             $itemUri = $modx->resource->get('uri');
             if (!empty($itemUri)) {
