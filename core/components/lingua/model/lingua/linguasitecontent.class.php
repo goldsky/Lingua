@@ -23,7 +23,6 @@
  * @subpackage lingua_site_content
  */
 class linguaSiteContent extends xPDOSimpleObject {
-    protected $_extResource;
     
     /**
      * Refresh Resource URI fields for children of the specified parent.
@@ -75,12 +74,9 @@ class linguaSiteContent extends xPDOSimpleObject {
      *  -content_type: Sets the contentType field appropriately
      */
     public function set($k, $v = null, $vType = '') {
-        if (!$this->_extResource) {
-            $this->_extResource = $this->getOne('Resource');
-        }
         switch ($k) {
             case 'alias' :
-                $v = $this->_extResource->cleanAlias($v);
+                $v = $this->cleanAlias($v);
                 break;
         }
         return parent :: set($k, $v, $vType);
@@ -134,18 +130,15 @@ class linguaSiteContent extends xPDOSimpleObject {
         if (empty($fields)) {
             $fields = $this->toArray();
         }
-        if (!$this->_extResource) {
-            $this->_extResource = $this->getOne('Resource');
-        }
         $workingContext = $this->xpdo->getContext($fields['context_key']);
         if (empty($fields['uri_override']) || empty($fields['uri'])) {
             /* auto assign alias if using automatic_alias */
             if (empty($alias) && $workingContext->getOption('automatic_alias', false)) {
-                $alias = $this->_extResource->cleanAlias($fields['pagetitle']);
+                $alias = $this->cleanAlias($fields['pagetitle']);
             } elseif (empty($alias) && isset($fields['resource_id']) && !empty($fields['resource_id'])) {
-                $alias = $this->_extResource->cleanAlias($fields['resource_id']);
+                $alias = $this->cleanAlias($fields['resource_id']);
             } else {
-                $alias = $this->_extResource->cleanAlias($alias);
+                $alias = $this->cleanAlias($alias);
             }
 
             $fullAlias = $alias;
@@ -214,4 +207,8 @@ class linguaSiteContent extends xPDOSimpleObject {
         return $fullAlias;
     }
 
+    protected function cleanAlias($alias, array $options = array()) {
+        $resource = $this->xpdo->getService('modResource');
+        return $resource->cleanAlias($alias, $options);
+    }
 }

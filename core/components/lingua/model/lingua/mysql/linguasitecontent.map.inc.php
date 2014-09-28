@@ -283,13 +283,5 @@ $xpdo_meta_map['linguaSiteContent']= array (
       'cardinality' => 'one',
       'owner' => 'foreign',
     ),
-    'Resource' => 
-    array (
-      'class' => 'extResource',
-      'local' => 'resource_id',
-      'foreign' => 'id',
-      'cardinality' => 'one',
-      'owner' => 'foreign',
-    ),
   ),
 );

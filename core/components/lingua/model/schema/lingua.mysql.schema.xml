@@ -58,7 +58,6 @@
         </index>   
 
         <aggregate alias="Lang" class="linguaLangs" local="lang_id" foreign="id" cardinality="one" owner="foreign" />
-        <aggregate alias="Resource" class="extResource" local="resource_id" foreign="id" cardinality="one" owner="foreign" />
 
     </object>
     <object class="linguaSiteTmplvarContentvalues" table="site_tmplvar_contentvalues" extends="xPDOSimpleObject">
@@ -94,8 +93,5 @@
         
         <composite alias="TmplvarContentvalues" class="linguaSiteTmplvarContentvalues" local="tmplvarid" foreign="tmplvarid" cardinality="many" owner="local" />
         
-    </object>
-    <object class="extResource" extends="modDocument">
-        <composite alias="SiteContent" class="linguaSiteContent" local="id" foreign="resource_id" cardinality="many" owner="local" />
     </object>
 </model>

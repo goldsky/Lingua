@@ -8,8 +8,4 @@ $xpdo_meta_map = array (
     2 => 'linguaSiteTmplvarContentvalues',
     3 => 'linguaSiteTmplvars',
   ),
-  'modDocument' => 
-  array (
-    0 => 'extResource',
-  ),
 );
