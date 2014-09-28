@@ -202,7 +202,7 @@ foreach ($collection as $item) {
         'lang_id' => $item->get('id'),
     ));
     if ($modx->getOption('friendly_urls')) {
-        $baseUrl = $modx->getOption('baseUrl');
+        $baseUrl = $modx->getOption('base_url', $scriptProperties, MODX_BASE_URL);
         $baseUrl = trim($baseUrl, '/');
         if ($itemArray[$phsPrefix . 'lang_code'] === $cultureKey) {
             $itemUri = $modx->resource->get('uri');
