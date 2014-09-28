@@ -747,10 +747,15 @@ Ext.onReady(function() {
         break;
 
     case 'OnEmptyTrash':
-        if (!empty($ids)) {
-            $modx->removeCollection('linguaSiteContent', array(
+        if (!empty($ids) && is_array($ids)) {
+            $collection = $modx->getCollection('linguaSiteContent', array(
                 'resource_id:IN' => $ids
             ));
+            if ($collection) {
+                foreach ($collection as $item) {
+                    $item->remove();
+                }
+            }
         }
         break;
 
