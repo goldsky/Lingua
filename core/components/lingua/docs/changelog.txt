@@ -2,6 +2,7 @@ Lingua 2.0.0-dev
 =================================
 - remove OnWebPageInit event
 - check context key before responding to request handler
+- add baseUrl on language selector
 
 Lingua 2.0.0-rc3 (September 16, 2014)
 =================================

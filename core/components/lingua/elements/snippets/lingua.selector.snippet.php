@@ -202,15 +202,17 @@ foreach ($collection as $item) {
         'lang_id' => $item->get('id'),
     ));
     if ($modx->getOption('friendly_urls')) {
+        $baseUrl = $modx->getOption('baseUrl');
+        $baseUrl = trim($baseUrl, '/');
         if ($itemArray[$phsPrefix . 'lang_code'] === $cultureKey) {
             $itemUri = $modx->resource->get('uri');
             if (!empty($itemUri)) {
-                $pageURL = str_replace($requestUri, $itemUri, $originPageUrl);
+                $pageURL = str_replace($requestUri, (!empty($baseUrl) ? $baseUrl . '/' : '') . $itemUri, $originPageUrl);
             }
         } elseif ($cloneSite) {
             $itemUri = $cloneSite->get('uri');
             if (!empty($itemUri)) {
-                $pageURL = str_replace($requestUri, $itemUri, $originPageUrl);
+                $pageURL = str_replace($requestUri, (!empty($baseUrl) ? $baseUrl . '/' : '') . $itemUri, $originPageUrl);
             }
         }
     }
