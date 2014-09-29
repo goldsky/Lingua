@@ -597,4 +597,39 @@ class Lingua {
         
         return $this->modx->getOption($key, $config);
     }
+    
+    /**
+     * Get culture key down the stream from all overridings probabilities
+     * @return string   cultureKey
+     */
+    public function getCultureKey() {
+        $langGetKey = $this->modx->getOption('lingua.request_key', $this->config, 'lang');
+        $langGetKeyValue = filter_input(INPUT_GET, $langGetKey, FILTER_SANITIZE_STRING);
+        if (!empty($langGetKeyValue)) {
+            return strtolower($langGetKeyValue);
+        }
+        
+        $langCookieValue = filter_input(INPUT_COOKIE, 'modx_lingua_switcher', FILTER_SANITIZE_STRING);
+        if (!empty($langCookieValue)) {
+            return strtolower($langCookieValue);
+        }
+        
+        $langSessionValue = filter_input(INPUT_SESSION, 'cultureKey', FILTER_SANITIZE_STRING);
+        if (!empty($langSessionValue)) {
+            return strtolower($langSessionValue);
+        }
+        
+        return $this->modx->cultureKey;
+    }
+    
+    /**
+     * Override cultureKeys
+     * @param void all environments
+     */
+    public function setCultureKey($cultureKey) {
+        $_SESSION['cultureKey'] = $cultureKey;
+        $this->modx->cultureKey = $cultureKey;
+        $this->modx->setOption('cultureKey', $cultureKey);
+        setcookie('modx_lingua_switcher', $cultureKey, time() + (1 * 24 * 60 * 60), '/');
+    }
 }

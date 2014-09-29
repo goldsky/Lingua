@@ -196,7 +196,7 @@ $cultureKey = $modCultureKey->get('value');
 $baseUrl = $modx->getOption('base_url', $scriptProperties);
 $baseUrl = str_replace(MODX_BASE_URL, '', $baseUrl);
 $baseUrl = trim($baseUrl, '/');
-        
+$originResource = $modx->getObject('modResource', $modx->resource->get('id'));
 foreach ($collection as $item) {
     if ($item->get('lang_code') === $modx->cultureKey) {
         continue;
@@ -208,7 +208,7 @@ foreach ($collection as $item) {
     ));
     if ($modx->getOption('friendly_urls')) {
         if ($itemArray[$phsPrefix . 'lang_code'] === $cultureKey) {
-            $itemUri = $modx->resource->get('uri');
+            $itemUri = $originResource->get('uri');
             if (!empty($itemUri)) {
                 $pageURL = str_replace($requestUri, (!empty($baseUrl) ? $baseUrl . '/' : '') . $itemUri, $originPageUrl);
             }

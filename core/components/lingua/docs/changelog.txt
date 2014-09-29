@@ -4,6 +4,7 @@ Lingua 2.0.0-dev
 - check context key before responding to request handler
 - add baseUrl on language selector
 - slightly redefining schema
+- refactor cultureKey overrides
 
 Lingua 2.0.0-rc3 (September 16, 2014)
 =================================

@@ -38,21 +38,24 @@ function setEventObjects(array $events = array()) {
     return $eventObjects;
 }
 $events = setEventObjects(array(
-    'OnChunkFormSave',
-    'OnDocFormPrerender',
-    'OnDocFormSave',
-    'OnEmptyTrash',
+    'OnPageNotFound',
     'OnHandleRequest',
     'OnInitCulture',
-    'OnMediaSourceFormSave',
-    'OnPluginFormSave',
-    'OnResourceDuplicate',
+    'OnLoadWebDocument',
+    /////////////////// MANAGER SIDE ///////////////////
+    'OnDocFormPrerender',
     'OnResourceTVFormRender',
-    'OnSiteRefresh',
-    'OnSnipFormSave',
-    'OnTempFormSave',
+    'OnDocFormSave',
+    'OnResourceDuplicate',
+    'OnEmptyTrash',
     'OnTemplateSave',
+    'OnTempFormSave',
     'OnTVFormSave',
+    'OnSnipFormSave',
+    'OnPluginFormSave',
+    'OnMediaSourceFormSave',
+    'OnChunkFormSave',
+    'OnSiteRefresh',
 ));
 
 return $events;
