@@ -38,6 +38,13 @@ if (!($lingua instanceof Lingua)) {
     return;
 }
 
+$allowedContexts = $modx->getOption('lingua.contexts');
+$allowedContexts = array_map('trim', @explode(',', $allowedContexts));
+$currentContext = $modx->context->get('key');
+if (!in_array($currentContext, $allowedContexts)) {
+    return;
+}
+
 $c = $modx->newQuery('linguaLangs');
 $c->where('active=1');
 $linguaLangs = $modx->context->config['lingua.langs'];
@@ -197,6 +204,7 @@ $baseUrl = $modx->getOption('base_url', $scriptProperties);
 $baseUrl = str_replace(MODX_BASE_URL, '', $baseUrl);
 $baseUrl = trim($baseUrl, '/');
 $originResource = $modx->getObject('modResource', $modx->resource->get('id'));
+
 foreach ($collection as $item) {
     if ($item->get('lang_code') === $modx->cultureKey) {
         continue;
