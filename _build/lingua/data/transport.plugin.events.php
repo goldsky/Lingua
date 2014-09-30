@@ -38,10 +38,8 @@ function setEventObjects(array $events = array()) {
     return $eventObjects;
 }
 $events = setEventObjects(array(
-    'OnPageNotFound',
     'OnHandleRequest',
     'OnInitCulture',
-    'OnLoadWebDocument',
     /////////////////// MANAGER SIDE ///////////////////
     'OnDocFormPrerender',
     'OnResourceTVFormRender',

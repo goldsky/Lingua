@@ -25,64 +25,6 @@ header('Content-Type: text/html; charset=utf-8');
  */
 $event = $modx->event->name;
 switch ($event) {
-    case 'OnPageNotFound':
-        $lingua = $modx->getService('lingua', 'Lingua', MODX_CORE_PATH . 'components/lingua/model/lingua/');
-        if (!($lingua instanceof Lingua)) {
-            return;
-        }
-        $modx->lexicon->load('lingua:default');
-        $parseUrl = parse_url($_SERVER['REQUEST_URI']);
-        $search = $parseUrl['path'];
-        $baseUrl = $modx->getOption('base_url', null, MODX_BASE_URL);
-        if (empty($baseUrl)) {
-            $baseUrl = MODX_BASE_URL;
-        }
-        $search = str_replace($baseUrl, '', $search);
-        if (empty($search)) {
-            return;
-        }
-        $c = $modx->newQuery('linguaSiteContent');
-        $c->leftJoin('modResource', 'Resource', 'Resource.id = linguaSiteContent.resource_id');
-        $c->where(array(
-            'uri:LIKE' => $search,
-        ));
-        if (!$modx->user->get('sudo') || !$modx->hasPermission('view_offline')) {
-            $c->where(array(
-                'Resource.deleted:!=' => 1,
-            ));
-            if (!$modx->hasPermission('view_unpublished')) {
-                $c->where(array(
-                    'Resource.published:=' => 1,
-                ));
-            }
-        }
-        $c->leftJoin('linguaLangs', 'Lang', 'Lang.id = linguaSiteContent.lang_id');
-        $cultureKey = $lingua->getCultureKey();
-        $c->where(array(
-            'Lang.lang_code:=' => $cultureKey,
-        ));
-
-        $clone = $modx->getObject('linguaSiteContent', $c);
-        if (!empty($clone)) {
-            $resource = $modx->getObject('modResource', $clone->get('resource_id'));
-            if ($resource) {
-                $lingua->setCultureKey($cultureKey);
-                $modx->sendForward($resource->get('id'));
-            }
-            return;
-        }
-        // try the other clone
-        $clone = $modx->getObject('linguaSiteContent', array(
-            'uri:LIKE' => $search,
-        ));
-        if (!empty($clone)) {
-            $lang = $clone->getOne('Lang')->get('lang_code');
-            $lingua->setCultureKey($lang);
-            $modx->sendForward($clone->get('resource_id'));
-        }
-
-        break;
-
     case 'OnHandleRequest': // for global
         break;
 
@@ -166,43 +108,6 @@ switch ($event) {
         $modx->setPlaceholder('lingua.cultureKey', $modx->cultureKey);
         $modx->setPlaceholder('lingua.language', $modx->cultureKey);
         
-        break;
-
-    case 'OnLoadWebDocument':
-        if (!$modx->getOption('friendly_urls')) {
-            return;
-        }
-        $lang = $modx->getObject('linguaLangs', array(
-            'lang_code:LIKE' => $modx->cultureKey,
-            'OR:lcid_string:LIKE' => $modx->cultureKey,
-        ));
-        if (!$lang) {
-            return;
-        }
-        $linguaSiteContent = $modx->getObject('linguaSiteContent', array(
-            'resource_id' => $modx->resource->get('id'),
-            'lang_id' => $lang->get('id'),
-        ));
-        if (!$linguaSiteContent) {
-            return;
-        }
-        $cloneUri = $linguaSiteContent->get('uri');
-        if (empty($cloneUri)) {
-            return;
-        }
-        $parseUrl = parse_url($_SERVER['REQUEST_URI']);
-        $search = $parseUrl['path'];
-        $baseUrl = $modx->getOption('base_url', null, MODX_BASE_URL);
-        if (empty($baseUrl)) {
-            $baseUrl = MODX_BASE_URL;
-        }
-        $search = str_replace($baseUrl, '', $search);
-        if (empty($search)) {
-            return;
-        }
-        if ($search !== $cloneUri) {
-            $modx->sendRedirect($cloneUri);
-        }
         break;
 
     /**

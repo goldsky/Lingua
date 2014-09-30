@@ -5,6 +5,7 @@ Lingua 2.0.0-dev
 - add baseUrl on language selector
 - slightly redefining schema
 - refactor cultureKey overrides
+- capture clone's URI to get resource
 
 Lingua 2.0.0-rc3 (September 16, 2014)
 =================================

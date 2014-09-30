@@ -30,6 +30,84 @@ header('Content-Type: text/html; charset=utf-8');
 require_once MODX_CORE_PATH . 'model/modx/modrequest.class.php';
 
 class LinguaRequest extends modRequest {
+    /**
+     *
+     * @var object $lingua A reference to the Lingua object 
+     */
+    public $lingua;
+    
+    /**
+     * @param modX $modx A reference to the modX object
+     */
+    function __construct(modX &$modx) {
+        parent::__construct($modx);
+        $this->lingua = $this->modx->getService('lingua', 'Lingua', MODX_CORE_PATH . 'components/lingua/model/lingua/');
+    }
+
+
+    /**
+     * The primary MODX request handler (a.k.a. controller).
+     *
+     * @return boolean True if a request is handled without interruption.
+     */
+    public function handleRequest() {
+        $this->loadErrorHandler();
+
+        $this->sanitizeRequest();
+        $this->modx->invokeEvent('OnHandleRequest');
+        if (!$this->modx->checkSiteStatus()) {
+            header('HTTP/1.1 503 Service Unavailable');
+            if (!$this->modx->getOption('site_unavailable_page',null,1)) {
+                $this->modx->resource = $this->modx->newObject('modDocument');
+                $this->modx->resource->template = 0;
+                $this->modx->resource->content = $this->modx->getOption('site_unavailable_message');
+            } else {
+                $this->modx->resourceMethod = "id";
+                $this->modx->resourceIdentifier = $this->modx->getOption('site_unavailable_page',null,1);
+            }
+        } else {
+            $this->checkPublishStatus();
+            $this->modx->resourceMethod = $this->getResourceMethod();
+            $this->modx->resourceIdentifier = $this->getResourceIdentifier($this->modx->resourceMethod);
+            if ($this->modx->resourceMethod == 'id' && $this->modx->getOption('friendly_urls', null, false) && !$this->modx->getOption('request_method_strict', null, false)) {
+                $uri = $this->modx->context->getResourceURI($this->modx->resourceIdentifier);
+                if (!empty($uri)) {
+                    if ((integer) $this->modx->resourceIdentifier === (integer) $this->modx->getOption('site_start', null, 1)) {
+                        $url = $this->modx->getOption('site_url', null, MODX_SITE_URL);
+                    } else {
+                        $url = $this->modx->getOption('site_url', null, MODX_SITE_URL) . $uri;
+                    }
+                    $this->modx->sendRedirect($url, array('responseCode' => 'HTTP/1.1 301 Moved Permanently'));
+                }
+            }
+        }
+        if (empty ($this->modx->resourceMethod)) {
+            $this->modx->resourceMethod = "id";
+        }
+        if ($this->modx->resourceMethod == "alias") {
+            $this->modx->resourceIdentifier = $this->_cleanResourceIdentifier($this->modx->resourceIdentifier);
+        }
+        if ($this->modx->resourceMethod == "alias") {
+            $found = $this->findResource($this->modx->resourceIdentifier);
+            if ($found) {
+                $this->modx->resourceIdentifier = $found;
+                $this->modx->resourceMethod = 'id';
+            } else {
+                $this->modx->sendErrorPage();
+            }
+        }
+        $this->modx->beforeRequest();
+        $this->modx->invokeEvent("OnWebPageInit");
+
+        if (!is_object($this->modx->resource)) {
+            if (!$this->modx->resource = $this->getResource($this->modx->resourceMethod, $this->modx->resourceIdentifier)) {
+                $this->modx->sendErrorPage();
+                return true;
+            }
+        }
+
+        return $this->prepareResponse();
+    }
 
     /**
      * Gets a requested resource and all required data.
@@ -44,7 +122,7 @@ class LinguaRequest extends modRequest {
     public function getResource($method, $identifier, array $options = array()) {
         $resource = null;
         if ($method == 'alias') {
-            $resourceId = $this->modx->findResource($identifier);
+            $resourceId = $this->findResource($identifier);
         } else {
             $resourceId = $identifier;
         }
@@ -131,9 +209,8 @@ class LinguaRequest extends modRequest {
                     }
                     
                     // hack the resource's content in here -------------------->
-                    $lingua = $this->modx->getService('lingua', 'Lingua', MODX_CORE_PATH . 'components/lingua/model/lingua/');
                     $linguaLangs = $this->modx->getObject('linguaLangs', array('lang_code' => $cultureKey));
-                    if (($lingua instanceof Lingua) && $linguaLangs) {
+                    if (($this->lingua instanceof Lingua) && $linguaLangs) {
                         $linguaSiteContent = $this->modx->getObject('linguaSiteContent', array(
                             'resource_id' => $resource->get('id'),
                             'lang_id' => $linguaLangs->get('id'),
@@ -159,7 +236,7 @@ class LinguaRequest extends modRequest {
                         foreach ($tvs as $tv) {
                             $value = $tv->getValue($resource->get('id'));
                             // hack the tv's content in here ------------------>
-                            if (($lingua instanceof Lingua) && $linguaLangs) {
+                            if (($this->lingua instanceof Lingua) && $linguaLangs) {
                                 $linguaTVContent = $this->modx->getObject('linguaSiteTmplvarContentvalues', array(
                                     'tmplvarid' => $tv->get('id'),
                                     'contentid' => $resourceId,
@@ -211,4 +288,95 @@ class LinguaRequest extends modRequest {
         return $resource;
     }
 
+    /**
+     * Cleans the resource identifier from the request params.
+     *
+     * @param string $identifier The raw identifier.
+     * @return string|integer The cleansed identifier.
+     */
+    public function _cleanResourceIdentifier($identifier) {
+        if (empty ($identifier)) {
+            if ($this->modx->getOption('base_url', null, MODX_BASE_URL) !== strtok($_SERVER["REQUEST_URI"],'?')) {
+                $this->modx->sendRedirect($this->modx->getOption('site_url', null, MODX_SITE_URL), array('responseCode' => 'HTTP/1.1 301 Moved Permanently'));
+            }
+            $identifier = $this->modx->getOption('site_start', null, 1);
+            $this->modx->resourceMethod = 'id';
+        }
+        elseif ($this->modx->getOption('friendly_urls', null, false) && $this->modx->resourceMethod = 'alias') {
+            $containerSuffix = trim($this->modx->getOption('container_suffix', null, ''));
+            $found = $this->findResource($identifier);
+            if ($found === false && !empty ($containerSuffix)) {
+                $suffixLen = strlen($containerSuffix);
+                $identifierLen = strlen($identifier);
+                if (substr($identifier, $identifierLen - $suffixLen) === $containerSuffix) {
+                    $identifier = substr($identifier, 0, $identifierLen - $suffixLen);
+                    $found = $this->findResource($identifier);
+                } else {
+                    $identifier = "{$identifier}{$containerSuffix}";
+                    $found = $this->findResource("{$identifier}{$containerSuffix}");
+                }
+                if ($found) {
+                    $parameters = $this->getParameters();
+                    unset($parameters[$this->modx->getOption('request_param_alias')]);
+                    $url = $this->modx->makeUrl($found, $this->modx->context->get('key'), $parameters, 'full');
+                    $this->modx->sendRedirect($url, array('responseCode' => 'HTTP/1.1 301 Moved Permanently'));
+                }
+                $this->modx->resourceMethod = 'alias';
+            } elseif ((integer) $this->modx->getOption('site_start', null, 1) === $found) {
+                $parameters = $this->getParameters();
+                unset($parameters[$this->modx->getOption('request_param_alias')]);
+                $url = $this->modx->makeUrl($this->modx->getOption('site_start', null, 1), $this->modx->context->get('key'), $parameters, 'full');
+                $this->modx->sendRedirect($url, array('responseCode' => 'HTTP/1.1 301 Moved Permanently'));
+            } else {
+                if ($this->modx->getOption('friendly_urls_strict', null, false)) {
+                    $requestUri = $_SERVER['REQUEST_URI'];
+                    $qsPos = strpos($requestUri, '?');
+                    if ($qsPos !== false) $requestUri = substr($requestUri, 0, $qsPos);
+                    $fullId = $this->modx->getOption('base_url', null, MODX_BASE_URL) . $identifier;
+                    $requestUri = urldecode($requestUri);
+                    if ($fullId !== $requestUri && strpos($requestUri, $fullId) !== 0) {
+                        $parameters = $this->getParameters();
+                        unset($parameters[$this->modx->getOption('request_param_alias')]);
+                        $url = $this->modx->makeUrl($found, $this->modx->context->get('key'), $parameters, 'full');
+                        $this->modx->sendRedirect($url, array('responseCode' => 'HTTP/1.1 301 Moved Permanently'));
+                    }
+                }
+                $this->modx->resourceMethod = 'alias';
+            }
+        } else {
+            $this->modx->resourceMethod = 'id';
+        }
+        return $identifier;
+    }
+
+    public function findResource($uri, $context = '') {
+        $resourceId = $this->modx->findResource($uri, $context);
+        if (!is_numeric($resourceId)) {
+            $resourceId = $this->findCloneResource($uri, $context);
+        }
+        return $resourceId;
+    }
+    
+    public function findCloneResource($uri, $context = '') {
+        $resourceId = false;
+        if (empty($context) && isset($this->modx->context)) $context = $this->modx->context->get('key');
+        if (!empty($context) && (!empty($uri) || $uri === '0')) {
+            $query = $this->modx->newQuery('linguaSiteContent');
+            $query->leftJoin('modResource', 'Resource', 'Resource.id = linguaSiteContent.resource_id');
+            $query->where(array(
+                'context_key' => $context, 
+                'uri' => $uri,
+                'Resource.deleted' => false
+            ));
+            $query->select($this->modx->getSelectColumns('linguaSiteContent', '', '', array('resource_id')));
+            $stmt = $query->prepare();
+            if ($stmt) {
+                $value = $this->modx->getValue($stmt);
+                if ($value) {
+                    $resourceId = $value;
+                }
+            }
+        }
+        return $resourceId;
+    }
 }
