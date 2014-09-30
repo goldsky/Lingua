@@ -215,16 +215,19 @@ foreach ($collection as $item) {
         'lang_id' => $item->get('id'),
     ));
     if ($modx->getOption('friendly_urls')) {
+        $itemUri = '';
         if ($itemArray[$phsPrefix . 'lang_code'] === $cultureKey) {
             $itemUri = $originResource->get('uri');
-            if (!empty($itemUri)) {
-                $pageURL = str_replace($requestUri, (!empty($baseUrl) ? $baseUrl . '/' : '') . $itemUri, $originPageUrl);
-            }
         } elseif ($cloneSite) {
             $itemUri = $cloneSite->get('uri');
-            if (!empty($itemUri)) {
-                $pageURL = str_replace($requestUri, (!empty($baseUrl) ? $baseUrl . '/' : '') . $itemUri, $originPageUrl);
-            }
+        }
+        
+        if (!empty($itemUri)) {
+            $matches = null;
+            preg_match('/(\/)*$/', $itemUri, $matches);
+            $search = $requestUri . (!empty($matches[0]) ? $matches[1] : '');
+            $replace = (!empty($baseUrl) ? $baseUrl . '/' : '') . $itemUri;
+            $pageURL = str_replace($search, $replace, $originPageUrl);
         }
     }
 

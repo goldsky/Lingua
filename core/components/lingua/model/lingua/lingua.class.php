@@ -614,7 +614,7 @@ class Lingua {
             return strtolower($langCookieValue);
         }
         
-        $langSessionValue = filter_input(INPUT_SESSION, 'cultureKey', FILTER_SANITIZE_STRING);
+        $langSessionValue = $_SESSION['cultureKey'];
         if (!empty($langSessionValue)) {
             return strtolower($langSessionValue);
         }
