@@ -7,5 +7,6 @@ $xpdo_meta_map = array (
     1 => 'linguaSiteContent',
     2 => 'linguaSiteTmplvarContentvalues',
     3 => 'linguaSiteTmplvars',
+    4 => 'linguaSiteTmplvarsPatterns',
   ),
 );

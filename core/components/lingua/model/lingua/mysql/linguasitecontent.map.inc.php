@@ -100,7 +100,7 @@ $xpdo_meta_map['linguaSiteContent']= array (
       'dbtype' => 'tinyint',
       'precision' => '1',
       'attributes' => 'unsigned',
-      'phptype' => 'boolean',
+      'phptype' => 'integer',
       'null' => false,
       'default' => 0,
       'index' => 'index',
@@ -225,6 +225,60 @@ $xpdo_meta_map['linguaSiteContent']= array (
       'columns' => 
       array (
         'id' => 
+        array (
+          'length' => '',
+          'collation' => 'A',
+          'null' => false,
+        ),
+        'parent' => 
+        array (
+          'length' => '',
+          'collation' => 'A',
+          'null' => false,
+        ),
+      ),
+    ),
+    'parent' => 
+    array (
+      'alias' => 'parent',
+      'primary' => false,
+      'unique' => false,
+      'type' => 'BTREE',
+      'columns' => 
+      array (
+        'parent' => 
+        array (
+          'length' => '',
+          'collation' => 'A',
+          'null' => false,
+        ),
+      ),
+    ),
+    'context_key' => 
+    array (
+      'alias' => 'context_key',
+      'primary' => false,
+      'unique' => false,
+      'type' => 'BTREE',
+      'columns' => 
+      array (
+        'context_key' => 
+        array (
+          'length' => '',
+          'collation' => 'A',
+          'null' => false,
+        ),
+      ),
+    ),
+    'isfolder' => 
+    array (
+      'alias' => 'isfolder',
+      'primary' => false,
+      'unique' => false,
+      'type' => 'BTREE',
+      'columns' => 
+      array (
+        'isfolder' => 
         array (
           'length' => '',
           'collation' => 'A',

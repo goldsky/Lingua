@@ -27,7 +27,7 @@
         <field key="alias" dbtype="varchar" precision="255" phptype="string" null="true" default="" index="index" />
         <field key="link_attributes" dbtype="varchar" precision="255" phptype="string" null="false" default="" />
         <field key="parent" dbtype="int" precision="10" phptype="integer" null="false" default="0" index="index" />
-        <field key="isfolder" dbtype="tinyint" precision="1" attributes="unsigned" phptype="boolean" null="false" default="0" index="index" />
+        <field key="isfolder" dbtype="tinyint" precision="1" attributes="unsigned" phptype="integer" null="false" default="0" index="index" />
         <field key="introtext" dbtype="text" phptype="string" null="true" />
         <field key="content" dbtype="mediumtext" phptype="string" null="true" />
         <field key="menutitle" dbtype="varchar" precision="255" phptype="string" null="false" default="" />
@@ -48,6 +48,16 @@
         </index>
         <index alias="cache_refresh_idx" name="cache_refresh_idx" primary="false" unique="false" type="BTREE" >
             <column key="id" length="" collation="A" null="false" />
+            <column key="parent" length="" collation="A" null="false" />
+        </index>
+        <index alias="parent" name="parent" primary="false" unique="false" type="BTREE" >
+            <column key="parent" length="" collation="A" null="false" />
+        </index>
+        <index alias="context_key" name="context_key" primary="false" unique="false" type="BTREE" >
+            <column key="context_key" length="" collation="A" null="false" />
+        </index>
+        <index alias="isfolder" name="isfolder" primary="false" unique="false" type="BTREE" >
+            <column key="isfolder" length="" collation="A" null="false" />
         </index>
         <index alias="content_ft_idx" name="content_ft_idx" primary="false" unique="false" type="FULLTEXT" >
             <column key="pagetitle" length="" collation="" null="false" />
@@ -55,7 +65,7 @@
             <column key="description" length="" collation="" null="false" />
             <column key="introtext" length="" collation="" null="true" />
             <column key="content" length="" collation="" null="true" />
-        </index>   
+        </index>
 
         <aggregate alias="Lang" class="linguaLangs" local="lang_id" foreign="id" cardinality="one" owner="foreign" />
 
@@ -93,5 +103,10 @@
         
         <composite alias="TmplvarContentvalues" class="linguaSiteTmplvarContentvalues" local="tmplvarid" foreign="tmplvarid" cardinality="many" owner="local" />
         
+    </object>
+    <object class="linguaSiteTmplvarsPatterns" table="site_tmplvars_patterns" extends="xPDOSimpleObject">
+        <field key="type" dbtype="varchar" precision="255" phptype="string" null="true" />
+        <field key="search" dbtype="varchar" precision="255" phptype="string" null="true" />
+        <field key="replacement" dbtype="varchar" precision="255" phptype="string" null="true" />
     </object>
 </model>

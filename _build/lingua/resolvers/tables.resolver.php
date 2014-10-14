@@ -72,6 +72,12 @@ if ($modx = & $object->xpdo) {
                 $manager->addField('linguaSiteContent', 'context_key', array('after' => 'menutitle'));
                 $manager->addField('linguaSiteContent', 'content_type', array('after' => 'context_key'));
             }
+            if ($manager->createObjectContainer('linguaSiteTmplvarsPatterns')) {
+                $defaults = include $modx->getOption('core_path') . 'components/lingua/defaults/default.patterns.php';
+                foreach ($defaults as $default) {
+                    $default->save();
+                }
+            }
             break;
         case xPDOTransport::ACTION_UNINSTALL:
             $modx->removeExtensionPackage('lingua');

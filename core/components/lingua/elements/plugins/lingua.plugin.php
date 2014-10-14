@@ -405,43 +405,18 @@ Ext.onReady(function() {
                 $cloneInputForm = $inputForm;
                 $cloneInputForm = preg_replace('/("|\'){1}tv' . $tvId . '("|\'){1}/', '${1}tv' . $tvCloneId . '${2}', $cloneInputForm);
                 $cloneInputForm = preg_replace('/("|\'){1}tv' . $tvId . '\[\]("|\'){1}/', '${1}tv' . $tvCloneId . '[]${2}', $cloneInputForm);
-                switch ($tv->get('type')) {
-                    case 'tag':
-                    case 'autotag':
-                        $cloneInputForm = preg_replace('/("|\'){1}tv\-tags\-' . $tvId . '("|\'){1}/', '${1}tv-tags-' . $tvCloneId . '${2}', $cloneInputForm);
-                        $cloneInputForm = preg_replace('/fld' . $tvId . '/', 'fld' . $tvCloneId, $cloneInputForm);
-                        $cloneInputForm = preg_replace('/tv\-' . $tvId . '\-tag\-list/', 'tv-' . $tvCloneId . '-tag-list', $cloneInputForm);
-                        $cloneInputForm = preg_replace('/o.id != \'' . $tvId . '\'/', 'o.id != \'' . $tvCloneId . '\'', $cloneInputForm);
-                        $cloneInputForm = preg_replace('/("|\'){1}tvdef' . $tvId . '("|\'){1}/', '${1}tvdef' . $tvCloneId . '${2}', $cloneInputForm);
-                        break;
-                    case 'radio':
-                    case 'option':
-                        $cloneInputForm = preg_replace('/("|\'){1}tv' . $tvId . '\-/', '${1}tv' . $tvCloneId . '-', $cloneInputForm);
-                        break;
-                    case 'checkbox':
-                        $cloneInputForm = preg_replace('/("|\'){1}tv' . $tvId . '\-/', '${1}tv' . $tvCloneId . '-', $cloneInputForm);
-                        $cloneInputForm = preg_replace('/("|\'){1}tv\-' . $tvId . '("|\'){1}/', '${1}tv-' . $tvCloneId . '${2}', $cloneInputForm);
-                        $cloneInputForm = preg_replace('/("|\'){1}tvdef' . $tvId . '("|\'){1}/', '${1}tvdef' . $tvCloneId . '${2}', $cloneInputForm);
-                        break;
-                    case 'file':
-                        $cloneInputForm = preg_replace('/("|\'){1}tvbrowser' . $tvId . '("|\'){1}/', '${1}tvbrowser' . $tvCloneId . '${2}', $cloneInputForm);
-                        $cloneInputForm = preg_replace('/("|\'){1}tvpanel' . $tvId . '("|\'){1}/', '${1}tvpanel' . $tvCloneId . '${2}', $cloneInputForm);
-                        $cloneInputForm = preg_replace('/fld' . $tvId . '/', 'fld' . $tvCloneId, $cloneInputForm);
-                        $cloneInputForm = preg_replace('/tv: ("|\'){1}' . $tvId . '("|\'){1}/', 'tv: ${1}' . $tvCloneId . '${2}', $cloneInputForm);
-                        break;
-                    case 'image':
-                        $cloneInputForm = preg_replace('/("|\'){1}tvbrowser' . $tvId . '("|\'){1}/', '${1}tvbrowser' . $tvCloneId . '${2}', $cloneInputForm);
-                        $cloneInputForm = preg_replace('/("|\'){1}tv\-image\-' . $tvId . '("|\'){1}/', '${1}tv-image-' . $tvCloneId . '${2}', $cloneInputForm);
-                        $cloneInputForm = preg_replace('/("|\'){1}tv\-image\-preview\-' . $tvId . '("|\'){1}/', '${1}tv-image-preview-' . $tvCloneId . '${2}', $cloneInputForm);
-                        $cloneInputForm = preg_replace('/fld' . $tvId . '/', 'fld' . $tvCloneId, $cloneInputForm);
-                        $cloneInputForm = preg_replace('/tv: ("|\'){1}' . $tvId . '("|\'){1}/', 'tv: ${1}' . $tvCloneId . '${2}', $cloneInputForm);
-                        break;
-                    case 'url':
-                        $cloneInputForm = preg_replace('/("|\'){1}tv' . $tvId . '_prefix("|\'){1}/', '${1}tv' . $tvId . '_prefix' . '_' . $language['lang_code'] . '_lingua_tv${2}', $cloneInputForm);
-
-                        break;
-                    default:
-                        break;
+                // advanced replacements
+                $linguaSiteTmplvarsPatterns = $modx->getCollection('linguaSiteTmplvarsPatterns', array(
+                    'type' => $tv->get('type')
+                ));
+                if ($linguaSiteTmplvarsPatterns) {
+                    foreach ($linguaSiteTmplvarsPatterns as $pattern) {
+                        $search = $pattern->get('search');
+                        $search = str_replace('{{tvId}}', $tvId, $search);
+                        $replacement = $pattern->get('replacement');
+                        $replacement = str_replace('{{tvCloneId}}', $tvCloneId, $replacement);
+                        $cloneInputForm = preg_replace($search, $replacement, $cloneInputForm);
+                    }
                 }
                 $count++;
                 $phs = $tvArray;

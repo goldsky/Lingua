@@ -1,4 +1,4 @@
-Lingua.panel.Home = function(config) {
+Lingua.panel.Home = function (config) {
     config = config || {};
     Ext.applyIf(config, {
         border: false,
@@ -39,23 +39,59 @@ Lingua.panel.Home = function(config) {
                                 border: false,
                                 bodyCssClass: 'panel-desc'
                             }, {
-                                xtype: 'lingua-grid-tvs',
-                                cls: 'main-wrapper',
-                                preventRender: true
+                                xtype: 'modx-tabs',
+                                defaults: {
+                                    border: false,
+                                    autoHeight: true
+                                },
+                                border: true,
+                                items: [
+                                    {
+                                        title: _('lingua.list'),
+                                        defaults: {
+                                            autoHeight: true
+                                        },
+                                        items: [
+                                            {
+                                                xtype: 'lingua-grid-tvs',
+                                                cls: 'main-wrapper',
+                                                preventRender: true
+                                            }
+                                        ]
+                                    }, {
+                                        title: _('lingua.cloningpatterns'),
+                                        defaults: {
+                                            autoHeight: true
+                                        },
+                                        items: [
+                                            {
+                                                xtype: 'panel',
+                                                html: _('lingua.cloningpatterns_desc'),
+                                                bodyCssClass: 'panel-desc',
+                                                anchor: '100%',
+                                                border: false
+                                            }, {
+                                                xtype: 'lingua-grid-tvspatterns',
+                                                cls: 'main-wrapper',
+                                                preventRender: true
+                                            }
+                                        ]
+                                    }
+                                ]
                             }]
                     }],
                 listeners: {
-                    'afterrender': function(tabPanel) {
+                    'afterrender': function (tabPanel) {
                         tabPanel.doLayout();
                     }
                 }
             }, {
                 html: '<a href="javascript:void(0);" style="color: #bbbbbb;" id="lingua_about">' + _('lingua.about') + '</a>',
                 border: false,
-                bodyStyle: 'font-size: 10px; text-align: right; margin: 5px;',
+                bodyStyle: 'font-size: 10px; text-align: right; margin: 5px; background-color: transparent;',
                 listeners: {
-                    afterrender: function() {
-                        Ext.get('lingua_about').on('click', function() {
+                    afterrender: function () {
+                        Ext.get('lingua_about').on('click', function () {
                             var msg = '&copy; 2013-2014, ';
                             msg += '<a href="http://www.virtudraft.com" target="_blank">';
                             msg += 'www.virtudraft.com';
