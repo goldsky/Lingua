@@ -1,4 +1,4 @@
-Lingua 2.0.0-dev
+Lingua 2.0.0-rc5 (October 15, 2014)
 =================================
 - add cloning patterns database
 
