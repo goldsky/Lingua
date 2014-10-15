@@ -28,3 +28,4 @@ $_lang['lingua.cloningpatterns'] = 'Cloning Patterns';
 $_lang['lingua.cloningpatterns_desc'] = 'When cloning Template Variables, Lingua needs to replace any IDs in TV\'s input form to avoid Javascript\'s confliction.  Please use <code>{{tvId}}</code> as the "search" pattern, and <code>{{tvCloneId}}</code> as its "replacement".';
 $_lang['lingua.add_pattern'] = 'Add Pattern';
 $_lang['lingua.replacement'] = 'Replacement';
+$_lang['lingua.pattern_exists'] = 'Search and Pattern exist for "[[+type]]" type.';
