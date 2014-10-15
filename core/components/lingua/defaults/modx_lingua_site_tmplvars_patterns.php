@@ -4,12 +4,7 @@
  * @version 0.2b
  */
 
-//
-// Database `modx_revo_lingua`
-//
-
-// `modx_revo_lingua`.`modx_lingua_site_tmplvars_patterns`
-$modx_lingua_site_tmplvars_patterns = array(
+return array(
   array('id' => '1','type' => 'tag','search' => '/("|\'){1}tv-tags-{{tvId}}("|\'){1}/','replacement' => '${1}tv-tags-{{tvCloneId}}${2}'),
   array('id' => '2','type' => 'tag','search' => '/fld{{tvId}}/','replacement' => 'fld{{tvCloneId}}'),
   array('id' => '3','type' => 'tag','search' => '/tv-{{tvId}}-tag-list/','replacement' => 'tv-{{tvCloneId}}-tag-list'),
