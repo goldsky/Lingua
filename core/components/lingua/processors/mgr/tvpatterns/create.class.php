@@ -28,6 +28,23 @@ class TVPatternCreateProcessor extends modObjectCreateProcessor {
     public $languageTopics = array('lingua:cmp');
     public $objectType = 'lingua.TVPatternCreate';
 
+    /**
+     * {@inheritDoc}
+     * @return boolean
+     */
+    public function initialize() {
+        $check = $this->doesAlreadyExist(array(
+            'type' => $this->getProperty('type'),
+            'search' => $this->getProperty('search'),
+            'replacement' => $this->getProperty('replacement'),
+        ));
+        if ($check) {
+            return $this->modx->lexicon('lingua.pattern_exists', array('type' => $this->getProperty('type')));
+        }
+        $this->object = $this->modx->newObject($this->classKey);
+        return true;
+    }
+
 }
 
 return 'TVPatternCreateProcessor';

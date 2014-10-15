@@ -28,6 +28,27 @@ class TVPatternUpdateProcessor extends modObjectUpdateProcessor {
     public $languageTopics = array('lingua:cmp');
     public $objectType = 'lingua.TVPatternUpdate';
 
+    public function initialize() {
+        $primaryKey = $this->getProperty($this->primaryKeyField,false);
+        if (empty($primaryKey)) return $this->modx->lexicon($this->objectType.'_err_ns');
+        $this->object = $this->modx->getObject($this->classKey,$primaryKey);
+        if (empty($this->object)) return $this->modx->lexicon($this->objectType.'_err_nfs',array($this->primaryKeyField => $primaryKey));
+
+        $check = $this->modx->getCount($this->classKey, array(
+            'type' => $this->getProperty('type'),
+            'search' => $this->getProperty('search'),
+            'replacement' => $this->getProperty('replacement'),
+        ));
+        if ($check) {
+            return $this->modx->lexicon('lingua.pattern_exists', array('type' => $this->getProperty('type')));
+        }
+
+        if ($this->checkSavePermission && $this->object instanceof modAccessibleObject && !$this->object->checkPolicy('save')) {
+            return $this->modx->lexicon('access_denied');
+        }
+        return true;
+    }
+
 }
 
 return 'TVPatternUpdateProcessor';
