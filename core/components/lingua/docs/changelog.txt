@@ -1,3 +1,7 @@
+Lingua 2.0.0-pl (October 15, 2014)
+=================================
+- fix left out outputs after rendering TV forms
+
 Lingua 2.0.0-rc5 (October 15, 2014)
 =================================
 - add cloning patterns database

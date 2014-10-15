@@ -426,6 +426,11 @@ Ext.onReady(function() {
                 $cloneTVFields[] = $lingua->processElementTags($lingua->parseTpl('lingua.resourcetv.row', $phs));
             }
         }
+        
+        // reset any left out output after rendering TV forms above
+        if ($modx->event->name === 'OnTVInputRenderList') {
+            $modx->event->_output = '';
+        }
 
         $jsHTML = "<script>\nExt.onReady(function() {\n";
         $jsHTML .= '    lingua.config.tmplvars = ' . json_encode($tmplvars) . ';' . "\n";
