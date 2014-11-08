@@ -164,18 +164,17 @@ switch ($event) {
         // $modx->getOption('cultureKey') doesn't work!
         $modCultureKey = $modx->getObject('modSystemSetting', array('key' => 'cultureKey'));
         $cultureKey = $modCultureKey->get('value');
-        //------------------------------------------------------------------
-        $jsHTML = '
-    window.lingua = new Lingua({
-        defaultLang: "' . $cultureKey . '"
-    });';
-
-        //------------------------------------------------------------------
         $storeData = array();
         $storeDefaultData = array();
+        $configLang = array();
         $linguaSiteContentArray = array();
         $createHiddenFields = array();
         foreach ($languages as $language) {
+            $configLang[$language['lang_code']] = array(
+                'lang_code' => $language['lang_code'],
+                'local_name' => $language['local_name'],
+                'flag' => $language['flag'],
+            );
             if ($language['lang_code'] === $cultureKey) {
                 $storeDefaultData[] = array(
                     $language['lang_code'],
@@ -206,8 +205,13 @@ switch ($event) {
             $createHiddenFields[] = $language;
         } // foreach ($languages as $language)
         //------------------------------------------------------------------
-        $jsHTML .= '
+        $jsHTML = '
+    window.lingua = new Lingua({
+        defaultLang: "' . $cultureKey . '",
+        langs: ' . json_encode($configLang) . '
+    });
     lingua.config.siteContent = ' . json_encode($linguaSiteContentArray) . ';
+    lingua.flagDefaultFields();
     lingua.createHiddenFields(' . json_encode($createHiddenFields) . ');
     var actionButtons = Ext.getCmp("modx-action-buttons");
     if (actionButtons) {
@@ -432,12 +436,16 @@ Ext.onReady(function() {
             $modx->event->_output = '';
         }
 
-        $jsHTML = "<script>\nExt.onReady(function() {\n";
-        $jsHTML .= '    lingua.config.tmplvars = ' . json_encode($tmplvars) . ';' . "\n";
-        $jsHTML .= '    lingua.initAllClonedTVFields(' . json_encode($initAllClonedTVFields) . ');' . "\n";
-        $jsHTML .= "});\n</script>";
+        $modx->event->output(@implode("\n", $cloneTVFields));    
+        $jsHTML = "
+<script>
+    Ext.onReady(function() {
+        lingua.config.tmplvars = " . json_encode($tmplvars) . ";
+        lingua.initAllClonedTVFields(" . json_encode($initAllClonedTVFields) . ");
+        lingua.flagDefaultTVFields();
+    });
+</script>";
         $modx->event->output($jsHTML);
-        $modx->event->output(@implode("\n", $cloneTVFields));
 
         break;
 
