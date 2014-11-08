@@ -1,3 +1,7 @@
+Lingua 2.0.0-dev
+=================================
+- [#18] fix lingua.getValue on retrieving default TV's value
+
 Lingua 2.0.0-pl (October 15, 2014)
 =================================
 - fix left out outputs after rendering TV forms
