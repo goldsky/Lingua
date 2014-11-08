@@ -1,5 +1,6 @@
 Lingua 2.0.0-dev
 =================================
+- [#17] richtext-editor shows up for content, when resource-setting richtext is off
 - [#11] Include country flag next to default fields that require translations
 - [#18] fix lingua.getValue on retrieving default TV's value
 

@@ -89,6 +89,25 @@ Lingua.prototype.createHiddenFields = function (langs) {
     });
 };
 
+Lingua.prototype.rteToggle = function (lang) {
+    // textarea content
+    var ta = Ext.getCmp('ta');
+    if (ta) {
+        var rteToggle = Ext.get('tiny-toggle-rte');
+        if (rteToggle) {
+            rteToggle.on('click', function (a, b) {
+                var cb = Ext.get(b);
+                var id = 'ta-' + lang['lang_code'];
+                if (cb.dom.checked) {
+                    tinyMCE.execCommand('mceAddControl', false, id);
+                } else {
+                    tinyMCE.execCommand('mceRemoveControl', false, id);
+                }
+            }, Ext.getCmp('modx-panel-resource'));
+        }
+    }
+};
+
 Lingua.prototype.createHiddenField = function (lang) {
     var record = this.config.siteContent[lang['lang_code']];
     var flag = lang['flag'];
@@ -188,6 +207,12 @@ Lingua.prototype.createHiddenField = function (lang) {
             triggerDirtyField(Ext.getCmp('ta-' + lang['lang_code']));
         };
 
+        var _this = this;
+        _this.rteToggle(lang);
+        modxPanelResource.on('load', function(){
+            _this.rteToggle(lang);
+        });
+        
         var usingRTE = Ext.getCmp('modx-resource-richtext');
         if (MODx.config.use_editor && MODx.loadRTE && usingRTE.checked) {
             hiddenCmp.on('afterrender', function () {
