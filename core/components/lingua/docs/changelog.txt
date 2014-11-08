@@ -1,4 +1,4 @@
-Lingua 2.0.0-dev
+Lingua 2.0.1-pl (November 9, 2014)
 =================================
 - [#17] richtext-editor shows up for content, when resource-setting richtext is off
 - [#11] Include country flag next to default fields that require translations
