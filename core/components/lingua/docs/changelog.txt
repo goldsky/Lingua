@@ -1,6 +1,7 @@
 Lingua 2.0.1-pl (November 9, 2014)
 =================================
 - [#17] richtext-editor shows up for content, when resource-setting richtext is off
+- [#13][#15] fix custom TVs parsing on categories
 - [#11] Include country flag next to default fields that require translations
 - [#18] fix lingua.getValue on retrieving default TV's value
 
