@@ -48,6 +48,7 @@ Lingua.panel.Home = function (config) {
                                 items: [
                                     {
                                         title: _('lingua.list'),
+                                        layout: 'fit',
                                         defaults: {
                                             autoHeight: true
                                         },
@@ -60,6 +61,7 @@ Lingua.panel.Home = function (config) {
                                         ]
                                     }, {
                                         title: _('lingua.cloningpatterns'),
+                                        layout: 'fit',
                                         defaults: {
                                             autoHeight: true
                                         },
