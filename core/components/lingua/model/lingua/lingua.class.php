@@ -24,7 +24,7 @@
  */
 class Lingua {
 
-    const VERSION = '2.0.0';
+    const VERSION = '2.0.1';
     const RELEASE = 'pl';
 
     /**
@@ -57,6 +57,11 @@ class Lingua {
      */
     private $_placeholders = array();
 
+    /**
+     * store the chunk's HTML to property to save memory of loop rendering
+     * @var array
+     */
+    private $_chunks = array();
 
     /**
      * constructor

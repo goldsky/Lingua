@@ -80,7 +80,7 @@ Ext.extend(Lingua.grid.TVs, MODx.grid.Grid, {
     removeTV: function() {
         MODx.msg.confirm({
             title: _('lingua.delete'),
-            text: _('lingua.delete_lang_confirm'),
+            text: _('lingua.delete_tv_confirm'),
             url: this.config.url,
             params: {
                 action: 'mgr/tv/remove',

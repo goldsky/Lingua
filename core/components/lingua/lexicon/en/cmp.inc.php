@@ -20,6 +20,7 @@ $_lang['lingua.update'] = 'Update';
 $_lang['lingua.delete'] = 'Delete';
 $_lang['lingua.lang_create'] = 'Add new language data';
 $_lang['lingua.delete_lang_confirm'] = 'Are you sure you want to delete this language from the Lingua\'s database?';
+$_lang['lingua.delete_tv_confirm'] = 'Are you sure you want to remove the translation this TV?';
 $_lang['lingua.search...'] = 'Search...';
 $_lang['lingua.tmplvars_desc'] = 'Define which Template Variable that needs to be translated';
 $_lang['lingua.add_tv'] = 'Add Template Variable';
