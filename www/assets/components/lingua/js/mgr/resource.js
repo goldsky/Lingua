@@ -5,7 +5,7 @@ function Lingua(config) {
 
 Lingua.prototype.flagDefaultFields = function () {
     var pagetitle = Ext.getCmp('modx-resource-pagetitle');
-    if (typeof(pagetitle)!="undefined"&&typeof(pagetitle.label)!="undefined") {
+    if (typeof(pagetitle) != "undefined" && typeof(pagetitle.label) != "undefined") {
         pagetitle.label.update(_('resource_pagetitle') + '<span class="required">*</span>' + '&nbsp;<img src="../' + this.config.langs[this.config.defaultLang]['flag'] + '">');
     }
 
