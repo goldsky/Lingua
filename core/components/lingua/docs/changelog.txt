@@ -1,3 +1,7 @@
+Lingua 2.0.1-dev
+=================================
+- set clones' aliases from their own pagetitles instead of from original's alias
+
 Lingua 2.0.1-pl (November 9, 2014)
 =================================
 - [#17] richtext-editor shows up for content, when resource-setting richtext is off

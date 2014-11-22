@@ -23,7 +23,7 @@
  * @subpackage lingua_site_content
  */
 class linguaSiteContent extends xPDOSimpleObject {
-    
+
     /**
      * Refresh Resource URI fields for children of the specified parent.
      *
@@ -103,7 +103,7 @@ class linguaSiteContent extends xPDOSimpleObject {
                 $this->set('uri', $this->getAliasPath($this->get('alias')));
             }
         }
-        
+
         $rt = parent :: save($cacheFlag);
         if ($rt && $refreshChildURIs) {
             $this->xpdo->call('linguaSiteContent', 'refreshURIs', array(
@@ -165,7 +165,7 @@ class linguaSiteContent extends xPDOSimpleObject {
                 $queryLingua->prepare();
                 $queryLingua->stmt->execute(array($pathParentId));
                 $currResource = $queryLingua->stmt->fetch(PDO::FETCH_ASSOC);
-                
+
                 // if empty, try default resource
                 $query = $this->xpdo->newQuery('modResource');
                 $query->select($this->xpdo->getSelectColumns('modResource', '', '', array('parent', 'alias')));
@@ -175,7 +175,7 @@ class linguaSiteContent extends xPDOSimpleObject {
                     $query->stmt->execute(array($pathParentId));
                     $currResource = $query->stmt->fetch(PDO::FETCH_ASSOC);
                 }
-                
+
                 while ($currResource) {
                     $parentAlias = $currResource['alias'];
                     if (empty($parentAlias)) {
@@ -188,7 +188,7 @@ class linguaSiteContent extends xPDOSimpleObject {
                     $pathParentId = $currResource['parent'];
                     $queryLingua->stmt->execute(array($pathParentId));
                     $currResource = $queryLingua->stmt->fetch(PDO::FETCH_ASSOC);
-                    
+
                     if (empty($currResource)) {
                         $query->stmt->execute(array($pathParentId));
                         $currResource = $query->stmt->fetch(PDO::FETCH_ASSOC);
@@ -199,7 +199,7 @@ class linguaSiteContent extends xPDOSimpleObject {
                     $aliasPath .= '/';
                 }
             }
-            
+
             $fullAlias = $aliasPath . $fullAlias . $extension;
         } else {
             $fullAlias = $fields['uri'];
@@ -211,4 +211,5 @@ class linguaSiteContent extends xPDOSimpleObject {
         $resource = $this->xpdo->getService('modResource');
         return $resource->cleanAlias($alias, $options);
     }
+
 }

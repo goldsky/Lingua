@@ -512,15 +512,18 @@ Ext.onReady(function() {
                 $linguaSiteContent->fromArray($params);
                 $linguaSiteContent->save();
             }
+            if (empty($v['pagetitle'])) {
+                $v['pagetitle'] = $resource->get('pagetitle');
+            }
             $linguaSiteContent->set('pagetitle', $v['pagetitle']);
             $linguaSiteContent->set('longtitle', $v['longtitle']);
             $linguaSiteContent->set('description', $v['description']);
             $linguaSiteContent->set('content', (isset($v['content']) && !empty($v['content']) ? $v['content'] : $v['ta']));
+            $linguaSiteContent->set('introtext', $v['introtext']);
             if (empty($v['alias'])) {
-                $v['alias'] = $resource->get('alias');
+                $v['alias'] = $v['pagetitle'];
                 $linguaSiteContent->setDirty('alias');
             }
-            $linguaSiteContent->set('introtext', $v['introtext']);
             $linguaSiteContent->set('alias', $v['alias']);
             $linguaSiteContent->set('menutitle', $v['menutitle']);
             $linguaSiteContent->set('link_attributes', $v['link_attributes']);
@@ -604,7 +607,7 @@ Ext.onReady(function() {
         /**
          * json seems to have number of characters limit;
          * that makes saving success report truncated and output modal hangs,
-         * TV's procces does this outside of reverting's loops
+         * TV's proccessing does this outside of reverting's loops
          */
         if (!empty($clearKeys)) {
             foreach ($clearKeys as $k) {
