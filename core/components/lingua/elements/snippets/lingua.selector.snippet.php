@@ -195,14 +195,14 @@ $hasQuery = strstr($pageURL, '?');
 
 $languages = array();
 $originPageUrl = $pageURL;
-$requestUri = str_replace(MODX_BASE_URL, '', $parseUrl['path']);
+$requestUri = preg_replace('/^'. preg_quote(MODX_BASE_URL, '/') . '/i', '', $parseUrl['path']);
+
 // $modx->getOption('cultureKey') is overriden by plugin!
 $modCultureKey = $modx->getObject('modSystemSetting', array('key' => 'cultureKey'));
 $cultureKey = $modCultureKey->get('value');
 
 $baseUrl = $modx->getOption('base_url', $scriptProperties);
-$baseUrl = str_replace(MODX_BASE_URL, '', $baseUrl);
-$baseUrl = trim($baseUrl, '/');
+$baseUrl = preg_replace('/^'. preg_quote(MODX_BASE_URL, '/') . '/i', '', $baseUrl);
 $originResource = $modx->getObject('modResource', $modx->resource->get('id'));
 
 foreach ($collection as $item) {
@@ -223,11 +223,9 @@ foreach ($collection as $item) {
         }
         
         if (!empty($itemUri)) {
-            $matches = null;
-            preg_match('/(\/)*$/', $itemUri, $matches);
-            $search = $requestUri . (!empty($matches[0]) ? $matches[1] : '');
-            $replace = (!empty($baseUrl) ? $baseUrl . '/' : '') . $itemUri;
-            $pageURL = str_replace($search, $replace, $originPageUrl);
+            $pageURL = preg_replace('/^' . preg_quote($parseUrl['scheme'] . '://' . $parseUrl['host'] . '/' . $requestUri, '/') . '/i'
+                    , $parseUrl['scheme'] . '://' . $parseUrl['host'] . '/' . $baseUrl . $itemUri
+                    , $originPageUrl);
         }
     }
 

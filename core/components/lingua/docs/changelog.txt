@@ -1,5 +1,6 @@
 Lingua 2.0.1-dev
 =================================
+- fix clones' URIs on language selector drop down menu
 - set clones' aliases from their own pagetitles instead of from original's alias
 
 Lingua 2.0.1-pl (November 9, 2014)
