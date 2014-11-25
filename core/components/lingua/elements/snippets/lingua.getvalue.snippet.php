@@ -83,7 +83,8 @@ else {
         ));
         if ($linguaSiteTmplvarContentvalues) {
             $value = $linguaSiteTmplvarContentvalues->get('value');
-            $tv->setValue($tv->get('id'), $value);
+            $tv->set('resourceId', $id);
+            $tv->set('value', $value);
         }
         $output = $tv->renderOutput($resource->get('id'));
     }
