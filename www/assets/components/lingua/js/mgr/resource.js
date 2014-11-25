@@ -99,9 +99,13 @@ Lingua.prototype.rteToggle = function (lang) {
                 var cb = Ext.get(b);
                 var id = 'ta-' + lang['lang_code'];
                 if (cb.dom.checked) {
-                    tinyMCE.execCommand('mceAddControl', false, id);
+                    if (typeof(tinyMCE) !== 'undefined') {
+                        tinyMCE.execCommand('mceAddControl', false, id);
+                    }
                 } else {
-                    tinyMCE.execCommand('mceRemoveControl', false, id);
+                    if (typeof(tinyMCE) !== 'undefined') {
+                        tinyMCE.execCommand('mceRemoveControl', false, id);
+                    }
                 }
             }, Ext.getCmp('modx-panel-resource'));
         }
