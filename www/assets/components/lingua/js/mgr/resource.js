@@ -94,10 +94,10 @@ Lingua.prototype.rteToggle = function (lang) {
     var ta = Ext.getCmp('ta');
     if (ta) {
         var rteToggle = Ext.get('tiny-toggle-rte');
+        var id = 'ta-' + lang['lang_code'];
         if (rteToggle) {
             rteToggle.on('click', function (a, b) {
                 var cb = Ext.get(b);
-                var id = 'ta-' + lang['lang_code'];
                 if (cb.dom.checked) {
                     if (typeof(tinyMCE) !== 'undefined') {
                         tinyMCE.execCommand('mceAddControl', false, id);
@@ -218,12 +218,17 @@ Lingua.prototype.createHiddenField = function (lang) {
         });
 
         var usingRTE = Ext.getCmp('modx-resource-richtext');
-        if (MODx.config.use_editor && MODx.loadRTE && typeof (usingRTE) !== "undefined" && usingRTE.checked) {
+        if (MODx.config.use_editor && typeof (usingRTE) !== "undefined" && usingRTE.checked) {
             hiddenCmp.on('afterrender', function () {
                 var f = modxPanelResource.getForm().findField('richtext');
                 modxPanelResource.rteLoaded = false;
                 if (f && f.getValue() == 1 && !modxPanelResource.rteLoaded) {
-                    MODx.loadRTE(this.getId());
+                    if (MODx.loadRTE) {
+                        MODx.loadRTE(this.getId());
+                    }
+                    if (typeof(MODx.ux.CKEditor) !== 'undefined') {
+                        MODx.ux.CKEditor.replaceComponent(this.getId());
+                    }
                     modxPanelResource.rteLoaded = true;
                 } else if (f && f.getValue() == 0 && modxPanelResource.rteLoaded) {
                     if (MODx.unloadRTE) {
