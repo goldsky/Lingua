@@ -5,52 +5,52 @@ function Lingua(config) {
 
 Lingua.prototype.flagDefaultFields = function () {
     var pagetitle = Ext.getCmp('modx-resource-pagetitle');
-    if (pagetitle) {
+    if (typeof(pagetitle) != "undefined" && typeof(pagetitle.label) != "undefined") {
         pagetitle.label.update(_('resource_pagetitle') + '<span class="required">*</span>' + '&nbsp;<img src="../' + this.config.langs[this.config.defaultLang]['flag'] + '">');
     }
 
     var longtitle = Ext.getCmp('modx-resource-longtitle');
-    if (longtitle) {
+    if (typeof(longtitle) != "undefined" && typeof(longtitle.label) != "undefined") {
         longtitle.label.update(_('resource_longtitle') + '&nbsp;<img src="../' + this.config.langs[this.config.defaultLang]['flag'] + '">');
     }
 
     var description = Ext.getCmp('modx-resource-description');
-    if (description) {
+    if (typeof(description) != "undefined" && typeof(description.label) != "undefined") {
         description.label.update(_('resource_description') + '&nbsp;<img src="../' + this.config.langs[this.config.defaultLang]['flag'] + '">');
     }
 
     var introtext = Ext.getCmp('modx-resource-introtext');
-    if (introtext) {
+    if (typeof(introtext) != "undefined" && typeof(introtext.label) != "undefined") {
         introtext.label.update(_('resource_summary') + '&nbsp;<img src="../' + this.config.langs[this.config.defaultLang]['flag'] + '">');
     }
 
     var content = Ext.getCmp('modx-resource-content');
-    if (content) {
+    if (typeof(content) != "undefined" && typeof(content.label) != "undefined") {
         content.setTitle(_('resource_content') + '&nbsp;<img src="../' + this.config.langs[this.config.defaultLang]['flag'] + '">');
     }
 
     var alias = Ext.getCmp('modx-resource-alias');
-    if (alias) {
+    if (typeof(alias) != "undefined" && typeof(alias.label) = "undefined") {
         alias.label.update(_('resource_alias') + '&nbsp;<img src="../' + this.config.langs[this.config.defaultLang]['flag'] + '">');
     }
 
     var menutitle = Ext.getCmp('modx-resource-menutitle');
-    if (menutitle) {
+    if (typeof(menutitle) != "undefined" && typeof(menutitle.label) != "undefined") {
         menutitle.label.update(_('resource_menutitle') + '&nbsp;<img src="../' + this.config.langs[this.config.defaultLang]['flag'] + '">');
     }
 
     var linkAttributes = Ext.getCmp('modx-resource-link-attributes');
-    if (linkAttributes) {
+    if (typeof(linkAttributes) != "undefined" && typeof(linkAttributes.label) != "undefined") {
         linkAttributes.label.update(_('resource_link_attributes') + '&nbsp;<img src="../' + this.config.langs[this.config.defaultLang]['flag'] + '">');
     }
 
     var uriOverride = Ext.getCmp('modx-resource-uri-override');
-    if (uriOverride) {
+    if (typeof(uriOverride) != "undefined" && typeof(uriOverride.label) != "undefined") {
         uriOverride.wrap.child('.x-form-cb-label').update(_('resource_uri_override') + '&nbsp;<img src="../' + this.config.langs[this.config.defaultLang]['flag'] + '">');
     }
 
     var uri = Ext.getCmp('modx-resource-uri');
-    if (uri) {
+    if (typeof(uri) != "undefined" && typeof(uri.label) != "undefined") {
         uri.label.update(_('resource_uri') + '&nbsp;<img src="../' + this.config.langs[this.config.defaultLang]['flag'] + '">');
     }
 };
@@ -214,7 +214,7 @@ Lingua.prototype.createHiddenField = function (lang) {
         });
         
         var usingRTE = Ext.getCmp('modx-resource-richtext');
-        if (MODx.config.use_editor && MODx.loadRTE && usingRTE.checked) {
+        if (MODx.config.use_editor && MODx.loadRTE && typeof(usingRTE)!="undefined" && usingRTE.checked) {
             hiddenCmp.on('afterrender', function () {
                 var f = modxPanelResource.getForm().findField('richtext');
                 modxPanelResource.rteLoaded = false;
