@@ -1,4 +1,4 @@
-Lingua 2.0.1-dev
+Lingua 2.0.2-pl (November 26, 2014)
 =================================
 - [#22] refactor getValue for TV, TV value does not switch with getResources
 - integrate CKEditor
