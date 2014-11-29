@@ -1,3 +1,7 @@
+Lingua 2.0.3-dev
+=================================
+- add JS's getMenu to generate menu
+
 Lingua 2.0.2-pl (November 26, 2014)
 =================================
 - [#22] refactor getValue for TV, TV value does not switch with getResources

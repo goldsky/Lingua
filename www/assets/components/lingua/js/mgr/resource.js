@@ -3,6 +3,59 @@ function Lingua(config) {
     this.element = [];
 }
 
+Lingua.prototype.getMenu = function(params) {
+    var actionButtons = Ext.getCmp("modx-action-buttons");
+    if (actionButtons) {
+        var languageBtn = new Ext.form.ComboBox({
+            id: "lingua-languageBtn",
+            tpl: '<tpl for="."><div class="x-combo-list-item"><img src="../{flag}" class="icon"/> {local_name}</div></tpl>',
+            store: new Ext.data.ArrayStore({
+                id: 0,
+                fields: [
+                    "lang_code",
+                    "local_name",
+                    "flag"
+                ],
+                data: params['storeData']
+            }),
+            valueField: "lang_code",
+            displayField: "local_name",
+            typeAhead: false,
+            forceSelection: true,
+            editable: false,
+            mode: "local",
+            triggerAction: "all",
+            selectOnFocus: true,
+            width: 150,
+            listeners: {
+                select: {
+                    fn: function(combo, record, index) {
+                        this.switchLanguage(record.get("lang_code"));
+                    },
+                    scope: this
+                },
+                render: {
+                    fn: function(comboBox) {
+                        var store = comboBox.store;
+                        var valueField = comboBox.valueField;
+                        var displayField = comboBox.displayField;
+                        var recordNumber = store.findExact(valueField, this.config.defaultLang, 0);
+                        if (recordNumber !== -1) {
+                            var displayValue = store.getAt(recordNumber).data[displayField];
+                            comboBox.setValue(this.config.defaultLang);
+                            comboBox.setRawValue(displayValue);
+                            comboBox.selectedIndex = recordNumber;
+                        }
+                    },
+                    scope: this
+                }
+            }
+        });
+        actionButtons.insertButton(0, [languageBtn, "-"]);
+        actionButtons.doLayout();
+    }
+};
+
 Lingua.prototype.flagDefaultFields = function () {
     var pagetitle = Ext.getCmp('modx-resource-pagetitle');
     if (typeof (pagetitle) !== "undefined" && typeof (pagetitle.label) !== "undefined") {
@@ -222,7 +275,7 @@ Lingua.prototype.createHiddenField = function (lang) {
             hiddenCmp.on('afterrender', function () {
                 var f = modxPanelResource.getForm().findField('richtext');
                 modxPanelResource.rteLoaded = false;
-                if (f && f.getValue() == 1 && !modxPanelResource.rteLoaded) {
+                if (f && !!f.getValue() && !modxPanelResource.rteLoaded) {
                     if (MODx.loadRTE) {
                         MODx.loadRTE(this.getId());
                     }
@@ -230,7 +283,7 @@ Lingua.prototype.createHiddenField = function (lang) {
                         MODx.ux.CKEditor.replaceComponent(this.getId());
                     }
                     modxPanelResource.rteLoaded = true;
-                } else if (f && f.getValue() == 0 && modxPanelResource.rteLoaded) {
+                } else if (f && !f.getValue() && modxPanelResource.rteLoaded) {
                     if (MODx.unloadRTE) {
                         MODx.unloadRTE(this.getId());
                     }

@@ -205,69 +205,19 @@ switch ($event) {
             $createHiddenFields[] = $language;
         } // foreach ($languages as $language)
         //------------------------------------------------------------------
-        $jsHTML = '
-    window.lingua = new Lingua({
-        defaultLang: "' . $cultureKey . '",
-        langs: ' . json_encode($configLang) . '
-    });
-    lingua.config.siteContent = ' . json_encode($linguaSiteContentArray) . ';
-    lingua.flagDefaultFields();
-    lingua.createHiddenFields(' . json_encode($createHiddenFields) . ');
-    var actionButtons = Ext.getCmp("modx-action-buttons");
-    if (actionButtons) {
-        var languageBtn = new Ext.form.ComboBox({
-            id: "lingua-languageBtn",
-            tpl: \'<tpl for="."><div class="x-combo-list-item"><img src="../{flag}" class="icon"/> {local_name}</div></tpl>\',
-            store: new Ext.data.ArrayStore({
-                id: 0,
-                fields: [
-                    "lang_code",
-                    "local_name",
-                    "flag"
-                ],
-                data: ' . json_encode(array_merge($storeDefaultData, $storeData)) . '
-            }),
-            valueField: "lang_code",
-            displayField: "local_name",
-            typeAhead: false,
-            forceSelection: true,
-            editable: false,
-            mode: "local",
-            triggerAction: "all",
-            //emptyText: "' . $languages[$cultureKey]['local_name'] . '",
-            selectOnFocus: true,
-            width: 150,
-            listeners: {
-                select: {
-                    fn: function(combo, record, index) {
-                        lingua.switchLanguage(record.get("lang_code"));
-                    },
-                    scope: this
-                },
-                render: {
-                    fn: function(comboBox) {
-                        var store = comboBox.store;
-                        var valueField = comboBox.valueField;
-                        var displayField = comboBox.displayField;
-                        var recordNumber = store.findExact(valueField, "' . $cultureKey . '", 0);
-                        if (recordNumber !== -1) {
-                            var displayValue = store.getAt(recordNumber).data[displayField];
-                            comboBox.setValue("' . $cultureKey . '");
-                            comboBox.setRawValue(displayValue);
-                            comboBox.selectedIndex = recordNumber;
-                        }
-                    },
-                    scope: this
-                }
-            }
-        });
-        actionButtons.insertButton(0, [languageBtn, "-"]);
-        actionButtons.doLayout();
-    }';
         $modx->controller->addHtml('
 <script type="text/javascript">
 Ext.onReady(function() {
-    ' . $jsHTML . '
+    window.lingua = new Lingua({
+        defaultLang: "' . $cultureKey . '",
+        langs: ' . json_encode($configLang) . ',
+        siteContent: ' . json_encode($linguaSiteContentArray) . '
+    });
+    lingua.flagDefaultFields();
+    lingua.createHiddenFields(' . json_encode($createHiddenFields) . ');
+    lingua.getMenu({
+        storeData: ' . json_encode(array_merge($storeDefaultData, $storeData)) . '
+    });
 });
 </script>');
         //------------------------------------------------------------------
