@@ -107,7 +107,7 @@ switch ($event) {
         }
         $modx->setPlaceholder('lingua.cultureKey', $modx->cultureKey);
         $modx->setPlaceholder('lingua.language', $modx->cultureKey);
-        
+
         break;
 
     /**
@@ -153,7 +153,7 @@ switch ($event) {
         if (!($lingua instanceof Lingua)) {
             return;
         }
-        
+
         $modx->lexicon->load('lingua:default');
         $languages = $lingua->getLanguages();
         if (empty($languages)) {
@@ -267,7 +267,7 @@ Ext.onReady(function() {
         if (!($lingua instanceof Lingua)) {
             return;
         }
-        $languages = $lingua->getLanguages(1, false);
+        $languages = $lingua->getLanguages(true, false);
         if (empty($languages)) {
             return;
         }
@@ -333,27 +333,24 @@ Ext.onReady(function() {
                 if ($language['lang_code'] === $cultureKey) {
                     continue;
                 }
-
                 $linguaTVContent = $modx->getObject('linguaSiteTmplvarContentvalues', array(
                     'tmplvarid' => $tvId,
                     'contentid' => $resourceId,
                     'lang_id' => $language['id']
                 ));
-
-                /**
-                 * Start to manipulate the ID to parse hidden TVs
-                 */
+                // Start to manipulate the ID to parse hidden TVs
                 $content = '';
                 if ($linguaTVContent) {
                     $content = $linguaTVContent->get('value');
                 }
+                // Hack TV's value because renderInput ignores empty value
+                $tv->setValue($resourceId, $content);
                 $inputForm = $tv->renderInput($resource, array(
                     'value' => $content
                 ));
                 if (empty($inputForm)) {
                     continue;
                 }
-
                 $tvCloneId = $tvId . '_' . $language['lang_code'] . '_lingua_tv';
                 // basic replacements
                 $cloneInputForm = $inputForm;
@@ -380,13 +377,12 @@ Ext.onReady(function() {
                 $cloneTVFields[] = $lingua->processElementTags($lingua->parseTpl('lingua.resourcetv.row', $phs));
             }
         }
-        
+
         // reset any left out output after rendering TV forms above
         if ($modx->event->name === 'OnTVInputRenderList') {
             $modx->event->_output = '';
         }
-
-        $modx->event->output(@implode("\n", $cloneTVFields));    
+        $modx->event->output(@implode("\n", $cloneTVFields));
         $jsHTML = "
 <script>
     Ext.onReady(function() {
@@ -569,9 +565,6 @@ Ext.onReady(function() {
             $linguaLangs = $modx->getObject('linguaLangs', array('lang_code' => $k));
             $langId = $linguaLangs->get('id');
             foreach ($tmplvars as $key => $val) {
-                if (empty($val)) {
-                    continue;
-                }
                 $params = array(
                     'lang_id' => $langId,
                     'tmplvarid' => $key,
