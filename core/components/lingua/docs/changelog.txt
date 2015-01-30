@@ -1,5 +1,6 @@
 Lingua 2.0.3-dev
 =================================
+- [#34] Fix translated Static Resource
 - [#23][#35] revert CKEditor's integration, since it's been updated to use MODx.loadRTE()
 - add JS's getMenu to generate menu
 

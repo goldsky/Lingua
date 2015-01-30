@@ -24,7 +24,7 @@
  */
 class Lingua {
 
-    const VERSION = '2.0.2';
+    const VERSION = '2.0.3';
     const RELEASE = 'pl';
 
     /**
@@ -485,7 +485,7 @@ class Lingua {
         }
         return $output;
     }
-    
+
     /**
      * Get list of the languages. Default cultureKey comes first.
      * @param   boolean $activeOnly only return active languages (default: true)
@@ -518,7 +518,7 @@ class Lingua {
             }
         }
         $c = $this->modx->newQuery('linguaLangs');
-        
+
         $definedLanguages = $this->getOption('lingua.langs');
         if (!empty($definedLanguages)) {
             $definedLanguages = array_map('trim', @explode(',', $definedLanguages));
@@ -532,7 +532,7 @@ class Lingua {
                 ));
             }
         }
-        
+
         if ($defaultLang) {
             $c->where(array(
                 'id:!=' => $defaultLang->get('id')
@@ -554,7 +554,7 @@ class Lingua {
             return $this->_placeholders['languages_array'];
         }
     }
-    
+
     /**
      * Get system's option
      * @param   string  $key    option's key
@@ -599,10 +599,10 @@ class Lingua {
         }
         // element's properties
         $config = array_merge($config, $this->config);
-        
+
         return $this->modx->getOption($key, $config);
     }
-    
+
     /**
      * Get culture key down the stream from all overridings probabilities
      * @return string   cultureKey
@@ -613,20 +613,20 @@ class Lingua {
         if (!empty($langGetKeyValue)) {
             return strtolower($langGetKeyValue);
         }
-        
+
         $langCookieValue = filter_input(INPUT_COOKIE, 'modx_lingua_switcher', FILTER_SANITIZE_STRING);
         if (!empty($langCookieValue)) {
             return strtolower($langCookieValue);
         }
-        
+
         $langSessionValue = $_SESSION['cultureKey'];
         if (!empty($langSessionValue)) {
             return strtolower($langSessionValue);
         }
-        
+
         return $this->modx->cultureKey;
     }
-    
+
     /**
      * Override cultureKeys
      * @param void all environments

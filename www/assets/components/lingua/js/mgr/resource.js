@@ -82,6 +82,11 @@ Lingua.prototype.flagDefaultFields = function () {
         content.setTitle(_('resource_content') + '&nbsp;<img src="../' + this.config.langs[this.config.defaultLang]['flag'] + '">');
     }
 
+    var staticContent = Ext.getCmp('modx-resource-content-static');
+    if (typeof (staticContent) !== "undefined" && typeof (staticContent.label) !== "undefined") {
+        staticContent.label.update(_('static_resource') + '&nbsp;<img src="../' + this.config.langs[this.config.defaultLang]['flag'] + '">');
+    }
+
     var alias = Ext.getCmp('modx-resource-alias');
     if (typeof (alias) !== "undefined" && typeof (alias.label) !== "undefined") {
         alias.label.update(_('resource_alias') + '&nbsp;<img src="../' + this.config.langs[this.config.defaultLang]['flag'] + '">');
@@ -313,6 +318,51 @@ Lingua.prototype.createHiddenField = function (lang) {
         }
     });
 
+    // static resource
+    var staticContent = Ext.getCmp('modx-resource-content-static');
+    if (typeof (staticContent) !== "undefined") {
+        var hiddenCmp = new MODx.combo.Browser({
+            browserEl: 'modx-browser'
+            , prependPath: false
+            , prependUrl: false
+            , hideFiles: true
+            , fieldLabel: _('static_resource') + '&nbsp;<img src="../' + flag + '">'
+            , description: '<b>[[*content]]</b>'
+            , name: 'content_lingua[' + lang['lang_code'] + ']'
+            , id: 'modx-resource-content-static-' + lang['lang_code']
+            , cls: 'lingua-hidden-fields'
+//            , hidden: true
+            , maxLength: 255
+            , anchor: '100%'
+            , value: (record.content || record.ta) || ''
+            , openTo: record.openTo
+            , listeners: {
+                'select': {
+                    fn: function (data) {
+                        var str = data.fullRelativeUrl;
+                        if (MODx.config.base_url != '/') {
+                            str = str.replace(MODx.config.base_url, '');
+                        }
+                        if (str.substring(0, 1) == '/') {
+                            str = str.substring(1);
+                        }
+                        Ext.getCmp('modx-resource-content-static-' + lang['lang_code']).setValue(str);
+                        modxPanelResource.markDirty();
+                    }
+                    , scope: this
+                }
+            }
+        });
+        Ext.getCmp(staticContent.ownerCt.id).insert(staticContent.ownerCt.items.indexOf(staticContent) + 1, hiddenCmp);
+        
+        // lazy hiding
+        hiddenCmp.on('afterrender', function(cmp){
+            setTimeout(function () {
+                cmp.hide();
+            }, 0);
+        });
+    }
+
     var alias = Ext.getCmp('modx-resource-alias');
     if (alias) {
         var hiddenCmp = new Ext.form.TextField({
@@ -460,6 +510,16 @@ Lingua.prototype.switchMainFields = function (selectedLang) {
     var content = Ext.getCmp('modx-resource-content');
     if (content) {
         content.setTitle(_('resource_content') + '&nbsp;<img src="../' + this.config.langs[selectedLang]['flag'] + '">');
+    }
+
+    var staticContent = Ext.getCmp('modx-resource-content-static');
+    if (typeof (staticContent) !== "undefined") {
+        if (selectedLang !== this.config.defaultLang) {
+            staticContent.hide();
+            Ext.getCmp('modx-resource-content-static-' + selectedLang).show();
+        } else {
+            staticContent.show();
+        }
     }
 
     // textarea content
