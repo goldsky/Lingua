@@ -279,9 +279,6 @@ Lingua.prototype.createHiddenField = function (lang) {
                     if (MODx.loadRTE) {
                         MODx.loadRTE(this.getId());
                     }
-                    if (typeof(MODx.ux.CKEditor) !== 'undefined') {
-                        MODx.ux.CKEditor.replaceComponent(this.getId());
-                    }
                     modxPanelResource.rteLoaded = true;
                 } else if (f && !f.getValue() && modxPanelResource.rteLoaded) {
                     if (MODx.unloadRTE) {

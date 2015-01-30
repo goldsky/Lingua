@@ -1,5 +1,6 @@
 Lingua 2.0.3-dev
 =================================
+- [#23][#35] revert CKEditor's integration, since it's been updated to use MODx.loadRTE()
 - add JS's getMenu to generate menu
 
 Lingua 2.0.2-pl (November 26, 2014)
