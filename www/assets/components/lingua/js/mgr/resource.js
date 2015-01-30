@@ -87,6 +87,16 @@ Lingua.prototype.flagDefaultFields = function () {
         staticContent.label.update(_('static_resource') + '&nbsp;<img src="../' + this.config.langs[this.config.defaultLang]['flag'] + '">');
     }
 
+    var symLinkContent = Ext.getCmp('modx-symlink-content');
+    if (typeof (symLinkContent) !== "undefined" && typeof (symLinkContent.label) !== "undefined") {
+        symLinkContent.label.update(_('symlink') + '&nbsp;<img src="../' + this.config.langs[this.config.defaultLang]['flag'] + '">');
+    }
+
+    var webLinkContent = Ext.getCmp('modx-weblink-content');
+    if (typeof (webLinkContent) !== "undefined" && typeof (webLinkContent.label) !== "undefined") {
+        webLinkContent.label.update(_('weblink') + '&nbsp;<img src="../' + this.config.langs[this.config.defaultLang]['flag'] + '">');
+    }
+
     var alias = Ext.getCmp('modx-resource-alias');
     if (typeof (alias) !== "undefined" && typeof (alias.label) !== "undefined") {
         alias.label.update(_('resource_alias') + '&nbsp;<img src="../' + this.config.langs[this.config.defaultLang]['flag'] + '">');
@@ -354,13 +364,44 @@ Lingua.prototype.createHiddenField = function (lang) {
             }
         });
         Ext.getCmp(staticContent.ownerCt.id).insert(staticContent.ownerCt.items.indexOf(staticContent) + 1, hiddenCmp);
-        
         // lazy hiding
         hiddenCmp.on('afterrender', function(cmp){
             setTimeout(function () {
                 cmp.hide();
             }, 0);
         });
+    }
+
+    var symLinkContent = Ext.getCmp('modx-symlink-content');
+    if (symLinkContent) {
+        var hiddenCmp = new Ext.form.TextField({
+            fieldLabel: _('symlink') + '&nbsp;<img src="../' + flag + '">'
+            , description: '<b>[[*content]]</b><br />'+_('symlink_help')
+            , name: 'content_lingua[' + lang['lang_code'] + ']'
+            , id: 'modx-symlink-content-' + lang['lang_code']
+            , cls: 'lingua-hidden-fields'
+            , hidden: true
+            , maxLength: 255
+            , anchor: '100%'
+            , value: (record.content || record.ta) || ''
+        });
+        Ext.getCmp(symLinkContent.ownerCt.id).insert(symLinkContent.ownerCt.items.indexOf(symLinkContent) + 1, hiddenCmp);
+    }
+
+    var webLinkContent = Ext.getCmp('modx-weblink-content');
+    if (webLinkContent) {
+        var hiddenCmp = new Ext.form.TextField({
+            fieldLabel: _('weblink') + '&nbsp;<img src="../' + flag + '">'
+            , description: '<b>[[*content]]</b><br />'+_('weblink_help')
+            , name: 'content_lingua[' + lang['lang_code'] + ']'
+            , id: 'modx-weblink-content-' + lang['lang_code']
+            , cls: 'lingua-hidden-fields'
+            , hidden: true
+            , maxLength: 255
+            , anchor: '100%'
+            , value: (record.content || record.ta) || 'http://'
+        });
+        Ext.getCmp(webLinkContent.ownerCt.id).insert(webLinkContent.ownerCt.items.indexOf(webLinkContent) + 1, hiddenCmp);
     }
 
     var alias = Ext.getCmp('modx-resource-alias');
@@ -512,6 +553,17 @@ Lingua.prototype.switchMainFields = function (selectedLang) {
         content.setTitle(_('resource_content') + '&nbsp;<img src="../' + this.config.langs[selectedLang]['flag'] + '">');
     }
 
+    // textarea content
+    var ta = Ext.getCmp('ta');
+    if (ta) {
+        if (selectedLang !== this.config.defaultLang) {
+            ta.hide();
+            Ext.getCmp('ta-' + selectedLang).show();
+        } else {
+            ta.show();
+        }
+    }
+
     var staticContent = Ext.getCmp('modx-resource-content-static');
     if (typeof (staticContent) !== "undefined") {
         if (selectedLang !== this.config.defaultLang) {
@@ -522,14 +574,23 @@ Lingua.prototype.switchMainFields = function (selectedLang) {
         }
     }
 
-    // textarea content
-    var ta = Ext.getCmp('ta');
-    if (ta) {
+    var symLinkContent = Ext.getCmp('modx-symlink-content');
+    if (symLinkContent) {
         if (selectedLang !== this.config.defaultLang) {
-            ta.hide();
-            Ext.getCmp('ta-' + selectedLang).show();
+            symLinkContent.hide();
+            Ext.getCmp('modx-symlink-content-' + selectedLang).show();
         } else {
-            ta.show();
+            symLinkContent.show();
+        }
+    }
+
+    var webLinkContent = Ext.getCmp('modx-weblink-content');
+    if (webLinkContent) {
+        if (selectedLang !== this.config.defaultLang) {
+            webLinkContent.hide();
+            Ext.getCmp('modx-weblink-content-' + selectedLang).show();
+        } else {
+            webLinkContent.show();
         }
     }
 
