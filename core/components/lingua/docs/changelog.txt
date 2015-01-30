@@ -1,5 +1,6 @@
 Lingua 2.0.3-dev
 =================================
+- Fix returning value of translated TV
 - [#32] Fix empty value of translated TV
 - [#28] Fix translated SymLink and WebLink
 - [#34] Fix translated Static Resource

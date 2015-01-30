@@ -344,7 +344,7 @@ Ext.onReady(function() {
                     $content = $linguaTVContent->get('value');
                 }
                 // Hack TV's value because renderInput ignores empty value
-                $tv->setValue($resourceId, $content);
+                $tv->set('value', $content);
                 $inputForm = $tv->renderInput($resource, array(
                     'value' => $content
                 ));

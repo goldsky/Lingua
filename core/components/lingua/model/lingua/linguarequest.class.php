@@ -23,7 +23,7 @@ header('Content-Type: text/html; charset=utf-8');
  * Encapsulates the interaction of MODX manager with an HTTP request.
  *
  * {@inheritdoc}
- * 
+ *
  * @package lingua
  * @subpackage linguarequest
  */
@@ -32,10 +32,10 @@ require_once MODX_CORE_PATH . 'model/modx/modrequest.class.php';
 class LinguaRequest extends modRequest {
     /**
      *
-     * @var object $lingua A reference to the Lingua object 
+     * @var object $lingua A reference to the Lingua object
      */
     public $lingua;
-    
+
     /**
      * @param modX $modx A reference to the modX object
      */
@@ -130,7 +130,7 @@ class LinguaRequest extends modRequest {
         if (!is_numeric($resourceId)) {
             $this->modx->sendErrorPage();
         }
-        
+
         $resource = parent::getResource($method, $identifier, $options);
         if ($resource) {
             $context = $resource->get('context_key');
@@ -141,7 +141,7 @@ class LinguaRequest extends modRequest {
             }
         }
         $this->modx->setOption('cache_resource_key', 'lingua/resource/' . $this->modx->cultureKey);
-        
+
         $isForward = array_key_exists('forward', $options) && !empty($options['forward']);
         $fromCache = false;
         $cacheKey = $this->modx->context->get('key') . "/resources/{$resourceId}";
@@ -207,7 +207,7 @@ class LinguaRequest extends modRequest {
                     if (!$resource->checkPolicy('view')) {
                         $this->modx->sendUnauthorizedPage();
                     }
-                    
+
                     // hack the resource's content in here -------------------->
                     $linguaLangs = $this->modx->getObject('linguaLangs', array('lang_code' => $cultureKey));
                     if (($this->lingua instanceof Lingua) && $linguaLangs) {
@@ -243,14 +243,11 @@ class LinguaRequest extends modRequest {
                                     'lang_id' => $linguaLangs->get('id')
                                 ));
                                 if ($linguaTVContent) {
-                                    $linguaTVContentValue = $linguaTVContent->get('value');
-                                    if (!empty($linguaTVContentValue)) {
-                                        $value = $linguaTVContentValue;
-                                    }
+                                    $value = $linguaTVContent->get('value');
                                 }
                             }
                             // hacking ends ----------------------------------->
-                            
+
                             $resource->set($tv->get('name'), array(
                                 $tv->get('name'),
                                 $value,
@@ -356,7 +353,7 @@ class LinguaRequest extends modRequest {
         }
         return $resourceId;
     }
-    
+
     public function findCloneResource($uri, $context = '') {
         $resourceId = false;
         if (empty($context) && isset($this->modx->context)) $context = $this->modx->context->get('key');
@@ -364,7 +361,7 @@ class LinguaRequest extends modRequest {
             $query = $this->modx->newQuery('linguaSiteContent');
             $query->leftJoin('modResource', 'Resource', 'Resource.id = linguaSiteContent.resource_id');
             $query->where(array(
-                'context_key' => $context, 
+                'context_key' => $context,
                 'uri' => $uri,
                 'Resource.deleted' => false
             ));

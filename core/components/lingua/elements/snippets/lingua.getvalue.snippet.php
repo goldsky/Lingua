@@ -60,7 +60,7 @@ if (!$resource) {
     }
     return;
 }
-     
+
 $tableFields = array('pagetitle', 'longtitle', 'description', 'alias',
     'link_attributes', 'introtext', 'content', 'menutitle', 'uri', 'uri_override',
     'properties');
