@@ -1,4 +1,4 @@
-Lingua.grid.Langs = function(config) {
+Lingua.grid.Langs = function (config) {
     config = config || {};
 
     Ext.applyIf(config, {
@@ -26,35 +26,13 @@ Lingua.grid.Langs = function(config) {
                 dataIndex: 'active',
                 sortable: false,
                 width: 40,
-                processEvent: function(name, e, grid, rowIndex, colIndex) {
-                    if (name === 'mousedown') {
-                        var record = grid.store.getAt(rowIndex);
-                        record.set(this.dataIndex, !record.data[this.dataIndex]);
-                        MODx.Ajax.request({
-                            url: Lingua.config.connectorUrl,
-                            params: {
-                                action: 'mgr/langs/updateFromGrid',
-                                data: JSON.stringify(record.data)
-                            },
-                            listeners: {
-                                'success': {
-                                    fn: function() {
-                                        Ext.getCmp('lingua-grid-langs').refresh();
-                                    }
-                                }
-                            }
-                        });
-                        return false;
-                    } else {
-                        return Ext.grid.ActionColumn.superclass.processEvent.apply(this, arguments);
-                    }
-                }
+                processEvent: this.processCheckColumn
             }, {
                 header: _('lingua.flag'),
                 dataIndex: 'flag',
                 sortable: false,
                 width: 40,
-                renderer: function(value, metaData, record, rowIndex, colIndex, store) {
+                renderer: function (value, metaData, record, rowIndex, colIndex, store) {
                     if (value) {
                         return '<div style="text-align:center;">' +
                                 '<img src="../' + value + '" style="max-width:40px; max-height:40px">' +
@@ -70,7 +48,7 @@ Lingua.grid.Langs = function(config) {
                     hideMode: 'offsets',
                     listeners: {
                         'select': {
-                            fn: function(value) {
+                            fn: function (value) {
                                 var selectedRow = this.getSelectionModel().getSelected();
                                 selectedRow.data.flag = value.url;
                                 MODx.Ajax.request({
@@ -126,29 +104,7 @@ Lingua.grid.Langs = function(config) {
                 dataIndex: 'is_rtl',
                 width: 40,
                 sortable: false,
-                processEvent: function(name, e, grid, rowIndex, colIndex) {
-                    if (name === 'mousedown') {
-                        var record = grid.store.getAt(rowIndex);
-                        record.set(this.dataIndex, !record.data[this.dataIndex]);
-                        MODx.Ajax.request({
-                            url: Lingua.config.connectorUrl,
-                            params: {
-                                action: 'mgr/langs/updateFromGrid',
-                                data: JSON.stringify(record.data)
-                            },
-                            listeners: {
-                                'success': {
-                                    fn: function() {
-                                        Ext.getCmp('lingua-grid-langs').refresh();
-                                    }
-                                }
-                            }
-                        });
-                        return false;
-                    } else {
-                        return Ext.grid.ActionColumn.superclass.processEvent.apply(this, arguments);
-                    }
-                }
+                processEvent: this.processCheckColumn
             }],
         tbar: [{
                 text: _('lingua.lang_create'),
@@ -170,10 +126,10 @@ Lingua.grid.Langs = function(config) {
                         scope: this
                     },
                     'render': {
-                        fn: function(cmp) {
+                        fn: function (cmp) {
                             new Ext.KeyMap(cmp.getEl(), {
                                 key: Ext.EventObject.ENTER,
-                                fn: function() {
+                                fn: function () {
                                     this.fireEvent('change', this);
                                     this.blur();
                                     return true;
@@ -185,18 +141,17 @@ Lingua.grid.Langs = function(config) {
                 }
             }]
     });
-
     Lingua.grid.Langs.superclass.constructor.call(this, config);
 };
 
 Ext.extend(Lingua.grid.Langs, MODx.grid.Grid, {
-    search: function(tf, nv, ov) {
+    search: function (tf, nv, ov) {
         var s = this.getStore();
         s.baseParams.query = tf.getValue();
         this.getBottomToolbar().changePage(1);
         this.refresh();
     },
-    getMenu: function() {
+    getMenu: function () {
         return [{
                 text: _('lingua.update'),
                 handler: this.updateLang
@@ -205,14 +160,36 @@ Ext.extend(Lingua.grid.Langs, MODx.grid.Grid, {
                 handler: this.removeLang
             }];
     },
-    updateLang: function(btn, e) {
+    processCheckColumn: function (name, e, grid, rowIndex, colIndex) {
+        if (name === 'mousedown') {
+            var record = grid.store.getAt(rowIndex);
+            record.set(this.dataIndex, !record.data[this.dataIndex]);
+            MODx.Ajax.request({
+                url: Lingua.config.connectorUrl,
+                params: {
+                    action: 'mgr/langs/updateFromGrid',
+                    data: JSON.stringify(record.data)
+                },
+                listeners: {
+                    'success': {
+                        fn: function () {
+                            Ext.getCmp('lingua-grid-langs').refresh();
+                        }
+                    }
+                }
+            });
+            return false;
+        } else {
+            return Ext.grid.ActionColumn.superclass.processEvent.apply(this, arguments);
+        }
+    },
+    updateLang: function (btn, e) {
         if (!this.updateLangWindow) {
             this.updateLangWindow = MODx.load({
                 xtype: 'lingua-window-lang',
                 title: _('lingua.update'),
                 baseParams: {
-                    action: 'mgr/langs/update',
-                    id: this.menu.record.id
+                    action: 'mgr/langs/update'
                 },
                 listeners: {
                     'success': {
@@ -222,10 +199,11 @@ Ext.extend(Lingua.grid.Langs, MODx.grid.Grid, {
                 }
             });
         }
+        this.updateLangWindow.baseParams['id'] = this.menu.record.id;
         this.updateLangWindow.setValues(this.menu.record);
         this.updateLangWindow.show(e.target);
     },
-    removeLang: function() {
+    removeLang: function () {
         MODx.msg.confirm({
             title: _('lingua.delete'),
             text: _('lingua.delete_lang_confirm'),

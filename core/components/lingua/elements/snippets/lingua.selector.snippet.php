@@ -22,6 +22,7 @@
  * @package lingua
  * @subpackage lingua_selector
  */
+$activeOnly = $modx->getOption('activeOnly', $scriptProperties, '1');
 $tplWrapper = $modx->getOption('tplWrapper', $scriptProperties, 'lingua.selector.wrapper');
 $tplItem = $modx->getOption('tplItem', $scriptProperties, 'lingua.selector.item');
 $langKey = $modx->getOption('getKey', $scriptProperties, $modx->getOption('lingua.get_key', null, 'lang'));
@@ -45,28 +46,6 @@ if (!in_array($currentContext, $allowedContexts)) {
     return;
 }
 
-$c = $modx->newQuery('linguaLangs');
-$c->where('active=1');
-$linguaLangs = $modx->context->config['lingua.langs'];
-if (!empty($linguaLangs)) {
-    $linguaLangs = array_map('trim', @explode(',', $linguaLangs));
-    $c->where(array(
-        'lang_code:IN' => $linguaLangs
-    ));
-}
-$linguaLcids = $modx->context->config['lingua.lcids'];
-if (!empty($linguaLcids)) {
-    $linguaLcids = array_map('trim', @explode(',', $linguaLcids));
-    $c->where(array(
-        'lcid_string:IN' => $linguaLcids
-    ));
-}
-$c->sortby($sortby, $sortdir);
-$collection = $modx->getCollection('linguaLangs', $c);
-$output = '';
-if (!$collection) {
-    return;
-}
 $pageURL = 'http';
 if (isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] == "on") {
     $pageURL .= "s";
@@ -193,7 +172,6 @@ if (!empty($parseUrl['query'])) {
 $pageURL = rtrim($pageURL, '?');
 $hasQuery = strstr($pageURL, '?');
 
-$languages = array();
 $originPageUrl = $pageURL;
 $requestUri = preg_replace('/^'. preg_quote(MODX_BASE_URL, '/') . '/i', '', $parseUrl['path']);
 
@@ -205,47 +183,48 @@ $baseUrl = $modx->getOption('base_url', $scriptProperties);
 $baseUrl = preg_replace('/^'. preg_quote(MODX_BASE_URL, '/') . '/i', '', $baseUrl);
 $originResource = $modx->getObject('modResource', $modx->resource->get('id'));
 
-foreach ($collection as $item) {
-    if ($item->get('lang_code') === $modx->cultureKey) {
+$languages = $lingua->getLanguages($activeOnly);
+$selections = array();
+foreach ($languages as $language) {
+    if ($language['lang_code'] === $modx->cultureKey) {
         continue;
     }
-    $itemArray = $item->toArray($phsPrefix);
+
     $cloneSite = $modx->getObject('linguaSiteContent', array(
         'resource_id' => $modx->resource->get('id'),
-        'lang_id' => $item->get('id'),
+        'lang_id' => $language['id'],
     ));
     if ($modx->getOption('friendly_urls')) {
         $itemUri = '';
-        if ($itemArray[$phsPrefix . 'lang_code'] === $cultureKey) {
+        if ($language['lang_code'] === $cultureKey) {
             $itemUri = $originResource->get('uri');
         } elseif ($cloneSite) {
             $itemUri = $cloneSite->get('uri');
         }
-        
+
         if (!empty($itemUri)) {
             $pageURL = preg_replace('/^' . preg_quote($parseUrl['scheme'] . '://' . $parseUrl['host'] . '/' . $requestUri, '/') . '/i'
                     , $parseUrl['scheme'] . '://' . $parseUrl['host'] . '/' . $baseUrl . $itemUri
                     , $originPageUrl);
         }
     }
-
-    $itemArray[$phsPrefix . 'url'] = $pageURL . (!empty($hasQuery) ? '&' : '?') . $langKey . '=' . $itemArray[$phsPrefix . $codeField];
-//    $itemArray[$phsPrefix . 'url'] = $pageURL;
+    $language['url'] = $pageURL . (!empty($hasQuery) ? '&' : '?') . $langKey . '=' . $language[$codeField];
+    $phs = $lingua->setPlaceholders($language, $phsPrefix, false);
 
     if (!empty($toArray)) {
-        $languages[] = $itemArray;
+        $selections[] = $phs;
     } else {
-        $languages[] = $lingua->parseTpl($tplItem, $itemArray);
+        $selections[] = $lingua->parseTpl($tplItem, $phs);
     }
 }
 
 if (!empty($toArray)) {
     $wrapper = array(
-        $phsPrefix . 'languages' => $languages
+        $phsPrefix . 'languages' => $selections
     );
     $output = '<pre>' . print_r($wrapper, TRUE) . '</pre>';
 } else {
-    $selection = @implode("\n", $languages);
+    $selection = @implode("\n", $selections);
     $wrapper = array($phsPrefix . 'languages' => $selection);
     $output = $lingua->parseTpl($tplWrapper, $wrapper);
 }

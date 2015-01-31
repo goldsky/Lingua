@@ -30,6 +30,47 @@ Lingua.panel.Home = function (config) {
                                 preventRender: true
                             }]
                     }, {
+                        title: _('lingua.scopes'),
+                        defaults: {
+                            autoHeight: true
+                        },
+                        items: [{
+                                html: '<p>' + _('lingua.scopes_desc') + '</p>',
+                                border: false,
+                                bodyCssClass: 'panel-desc'
+                            }, {
+                                xtype: 'modx-tabs',
+                                defaults: {
+                                    border: false,
+                                    autoHeight: true
+                                },
+                                border: true,
+                                items: [{
+                                        title: _('contexts'),
+                                        items: [
+                                            {
+                                                html: '<p>' + _('lingua.context_scope_desc') + '</p>',
+                                                border: false,
+                                                bodyCssClass: 'panel-desc'
+                                            }
+                                        ]
+                                    }, {
+                                        title: _('resources'),
+                                        items: [
+                                            {
+                                                html: '<p>' + _('lingua.resource_scope_desc') + '</p>',
+                                                border: false,
+                                                bodyCssClass: 'panel-desc'
+                                            }, {
+                                                xtype: 'lingua-grid-resourcescopes',
+                                                cls: 'main-wrapper',
+                                                preventRender: true
+                                            }
+                                        ]
+                                    }]
+                            }
+                        ]
+                    }, {
                         title: _('tmplvars'),
                         defaults: {
                             autoHeight: true

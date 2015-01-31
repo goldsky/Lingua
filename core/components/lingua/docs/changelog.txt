@@ -1,5 +1,6 @@
 Lingua 2.0.3-dev
 =================================
+- [#31] Add optional different language settings based on Resource
 - Improve finding resource by translated URI
 - Improve default value selection
 - [#27] Add option to choose whether Lingua returns default value or not, if translated field is empty

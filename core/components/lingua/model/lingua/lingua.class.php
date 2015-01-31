@@ -64,6 +64,12 @@ class Lingua {
     private $_chunks = array();
 
     /**
+     * store array of ancestors
+     * @var array
+     */
+    private $_ancestors = array();
+
+    /**
      * constructor
      * @param   modX    $modx
      * @param   array   $config     parameters
@@ -583,7 +589,63 @@ class Lingua {
                     }
                 }
             }
+            /**
+             * resource scopes
+             */
+            $propKey = preg_replace('/^lingua\./', '', $key);
+            // check resource's ancestors scope
+            $anchestors = $this->getAncestors($this->modx->resource->get('id'));
+            $countResourceAnchestorsScopes = $this->modx->getCount('linguaResourceScopes', array(
+                'resource_id:IN' => $anchestors,
+                'as_ancestor' => 1,
+            ));
+            if ($countResourceAnchestorsScopes > 0) {
+                /**
+                 * loop the anchestors array instead, because anchestors are
+                 * sorted from the closest ones, and we want to get the config
+                 * from the closest anchestor
+                 */
+                foreach ($anchestors as $anchestor) {
+                    $scope = $this->modx->getObject('linguaResourceScopes', array(
+                        'resource_id' => $anchestor,
+                        'as_ancestor' => 1,
+                    ));
+                    if ($scope) {
+                        $props = $scope->get('properties');
+                        $props = json_decode($props, true);
+                        if (isset($props[$propKey]) && !empty($props[$propKey])) {
+                            $config[$key] = $props[$propKey];
+                            break;
+                        }
+                    }
+                }
+            }
+            // check resource's parent scope
+            $linguaResourceParentScope = $this->modx->getObject('linguaResourceScopes', array(
+                'resource_id' => $this->modx->resource->get('parent'),
+                'as_parent' => 1,
+            ));
+            if ($linguaResourceParentScope) {
+                $props = $linguaResourceScope->get('properties');
+                $props = json_decode($props, true);
+                if (isset($props[$propKey]) && !empty($props[$propKey])) {
+                    $config[$key] = $props[$propKey];
+                }
+            }
+            // check resource's scope
+            $linguaResourceScope = $this->modx->getObject('linguaResourceScopes', array('resource_id' => $this->modx->resource->get('id')));
+            if ($linguaResourceScope) {
+                $excludeSelf = $linguaResourceScope->get('exclude_self');
+                if (empty($excludeSelf)) {
+                    $props = $linguaResourceScope->get('properties');
+                    $props = json_decode($props, true);
+                    if (isset($props[$propKey]) && !empty($props[$propKey])) {
+                        $config[$key] = $props[$propKey];
+                    }
+                }
+            }
         }
+
         // user's defined properties
         if ($this->modx->context->get('key') !== 'mgr') {
             if ($this->modx->user->get('id') !== 0) {
@@ -601,6 +663,25 @@ class Lingua {
         $config = array_merge($config, $this->config);
 
         return $this->modx->getOption($key, $config);
+    }
+
+    /**
+     * Get sorted array of ancestors from a resource
+     * @param int $id   resource's ID
+     * @return array list of ancestors
+     */
+    public function getAncestors($id) {
+        $self = $this->modx->getObject('modResource', $id);
+        if ($self) {
+            $parent = $self->get('parent');
+            if ($parent > 0) {
+                if (!in_array($parent, $this->_ancestors)) {
+                    $this->_ancestors = array_merge($this->_ancestors, (array) $parent);
+                }
+                return $this->getAncestors($parent);
+            }
+        }
+        return $this->_ancestors;
     }
 
     /**

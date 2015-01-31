@@ -4,9 +4,10 @@ $xpdo_meta_map = array (
   'xPDOSimpleObject' => 
   array (
     0 => 'linguaLangs',
-    1 => 'linguaSiteContent',
-    2 => 'linguaSiteTmplvarContentvalues',
-    3 => 'linguaSiteTmplvars',
-    4 => 'linguaSiteTmplvarsPatterns',
+    1 => 'linguaResourceScopes',
+    2 => 'linguaSiteContent',
+    3 => 'linguaSiteTmplvarContentvalues',
+    4 => 'linguaSiteTmplvars',
+    5 => 'linguaSiteTmplvarsPatterns',
   ),
 );
