@@ -243,7 +243,14 @@ class LinguaRequest extends modRequest {
                                     'lang_id' => $linguaLangs->get('id')
                                 ));
                                 if ($linguaTVContent) {
-                                    $value = $linguaTVContent->get('value');
+                                    $linguaTVContentValue = $linguaTVContent->get('value');
+                                    if (empty($linguaTVContentValue)) {
+                                        if (!$this->modx->getOption('lingua.empty_returns_default', null, false)) {
+                                            $value = $linguaTVContentValue;
+                                        }
+                                    } else {
+                                        $value = $linguaTVContentValue;
+                                    }
                                 }
                             }
                             // hacking ends ----------------------------------->

@@ -1,5 +1,6 @@
 Lingua 2.0.3-dev
 =================================
+- [#27] Add option to choose whether Lingua returns default value or not, if translated field is empty
 - Fix returning value of translated TV
 - [#32] Fix empty value of translated TV
 - [#28] Fix translated SymLink and WebLink

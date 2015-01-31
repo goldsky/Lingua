@@ -41,8 +41,8 @@ if (!function_exists('getSnippetContent')) {
 
 $snippets = array();
 
-$snippets[0] = $modx->newObject('modSnippet');
-$snippets[0]->fromArray(array(
+$snippets['lingua.selector'] = $modx->newObject('modSnippet');
+$snippets['lingua.selector']->fromArray(array(
     'id' => 0,
     'property_preprocess' => 1,
     'name' => 'lingua.selector',
@@ -50,34 +50,37 @@ $snippets[0]->fromArray(array(
     'snippet' => getSnippetContent($sources['source_core'] . '/elements/snippets/lingua.selector.snippet.php'),
         ), '', true, true);
 $properties = include $sources['properties'] . 'lingua.selector.snippet.properties.php';
-$snippets[0]->setProperties($properties);
+$snippets['lingua.selector']->setProperties($properties);
 unset($properties);
 
-$snippets[1] = $modx->newObject('modSnippet');
-$snippets[1]->fromArray(array(
+$snippets['lingua.cultureKey'] = $modx->newObject('modSnippet');
+$snippets['lingua.cultureKey']->fromArray(array(
     'id' => 0,
-    'property_preprocess' => 0,
+    'property_preprocess' => 1,
     'name' => 'lingua.cultureKey',
     'description' => 'Helper snippet to get the run time cultureKey, which is set by lingua\'s plugin.',
     'snippet' => getSnippetContent($sources['source_core'] . '/elements/snippets/lingua.culturekey.snippet.php'),
         ), '', true, true);
 
-$snippets[2] = $modx->newObject('modSnippet');
-$snippets[2]->fromArray(array(
+$snippets['lingua.getField'] = $modx->newObject('modSnippet');
+$snippets['lingua.getField']->fromArray(array(
     'id' => 0,
-    'property_preprocess' => 0,
+    'property_preprocess' => 1,
     'name' => 'lingua.getField',
     'description' => 'Get the value of the given field for the run time culture key.',
     'snippet' => getSnippetContent($sources['source_core'] . '/elements/snippets/lingua.getfield.snippet.php'),
         ), '', true, true);
 
-$snippets[3] = $modx->newObject('modSnippet');
-$snippets[3]->fromArray(array(
+$snippets['lingua.getValue'] = $modx->newObject('modSnippet');
+$snippets['lingua.getValue']->fromArray(array(
     'id' => 0,
-    'property_preprocess' => 0,
+    'property_preprocess' => 1,
     'name' => 'lingua.getValue',
     'description' => 'Get the value of the clone\'s field for the run time culture key.',
     'snippet' => getSnippetContent($sources['source_core'] . '/elements/snippets/lingua.getvalue.snippet.php'),
         ), '', true, true);
+$properties = include $sources['properties'] . 'lingua.selector.snippet.properties.php';
+$snippets['lingua.getValue']->setProperties($properties);
+unset($properties);
 
 return $snippets;

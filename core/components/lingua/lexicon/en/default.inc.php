@@ -20,3 +20,5 @@ $_lang['setting_lingua.debug'] = 'Lingua\'s debug mode';
 $_lang['setting_lingua.debug_desc'] = 'Set this to Yes to get dump outputs to MODX\'s error log';
 $_lang['setting_lingua.detect_browser'] = 'Detect browser\'s language';
 $_lang['setting_lingua.detect_browser_desc'] = 'Set this to Yes to detect browser\'s language of the visitor on their first visit.';
+$_lang['setting_lingua.empty_returns_default'] = 'Empty value returns default?';
+$_lang['setting_lingua.empty_returns_default_desc'] = 'If translated field has empty value, should Lingue return value from default language or not?';

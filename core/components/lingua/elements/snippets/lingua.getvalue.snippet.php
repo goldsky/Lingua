@@ -29,6 +29,8 @@ if (empty($field)) {
 }
 
 $id = $modx->getOption('id', $scriptProperties, $modx->resource->get('id'));
+$emptyReturnsDefault = $modx->getOption('emptyReturnsDefault', $scriptProperties, $modx->getOption('lingua.empty_returns_default', null, false));
+
 $defaultLinguaCorePath = $modx->getOption('core_path') . 'components/lingua/';
 $linguaCorePath = $modx->getOption('lingua.core_path', null, $defaultLinguaCorePath);
 $lingua = $modx->getService('lingua', 'Lingua', $linguaCorePath . 'model/lingua/', $scriptProperties);
@@ -68,6 +70,9 @@ $output = '';
 if (in_array($field, $tableFields)) {
     if ($linguaSiteContent) {
         $output = $linguaSiteContent->get($field);
+        if (empty($value)) {
+
+        }
     }
 }
 // try TV
@@ -84,7 +89,13 @@ else {
         if ($linguaSiteTmplvarContentvalues) {
             $value = $linguaSiteTmplvarContentvalues->get('value');
             $tv->set('resourceId', $id);
-            $tv->set('value', $value);
+            if (empty($value)) {
+                if (!$emptyReturnsDefault) {
+                    $tv->set('value', $value);
+                }
+            } else {
+                $tv->set('value', $value);
+            }
         }
         $output = $tv->renderOutput($resource->get('id'));
     }

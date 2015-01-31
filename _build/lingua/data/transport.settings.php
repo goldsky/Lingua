@@ -88,4 +88,13 @@ $settings['lingua.detect_browser']->fromArray(array(
     'area' => 'general',
         ), '', true, true);
 
+$settings['lingua.empty_returns_default'] = $modx->newObject('modSystemSetting');
+$settings['lingua.empty_returns_default']->fromArray(array(
+    'key' => 'lingua.empty_returns_default',
+    'value' => '0',
+    'xtype' => 'combo-boolean',
+    'namespace' => 'lingua',
+    'area' => 'general',
+        ), '', true, true);
+
 return $settings;
