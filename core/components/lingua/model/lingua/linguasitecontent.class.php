@@ -67,7 +67,7 @@ class linguaSiteContent extends xPDOSimpleObject {
      * Set a field value by the field key or name.
      *
      * {@inheritdoc}
-     * 
+     *
      * Additional logic added for the following fields:
      * 	-alias: Applies {@link modResource::cleanAlias()}
      *  -contentType: Calls {@link modResource::addOne()} to sync contentType

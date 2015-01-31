@@ -363,8 +363,13 @@ class LinguaRequest extends modRequest {
 
     public function findResource($uri, $context = '') {
         $resourceId = $this->modx->findResource($uri, $context);
-        if (!is_numeric($resourceId)) {
-            $resourceId = $this->findCloneResource($uri, $context);
+        if (is_numeric($resourceId)) {
+            // reset the culture key
+            $modCultureKey = $this->modx->getObject('modSystemSetting', array('key' => 'cultureKey'));
+            $cultureKey = $modCultureKey->get('value');
+            $this->lingua->setCultureKey($cultureKey);
+        } else {
+            $resourceId = (int) $this->findCloneResource($uri, $context);
         }
         return $resourceId;
     }
@@ -380,12 +385,16 @@ class LinguaRequest extends modRequest {
                 'uri' => $uri,
                 'Resource.deleted' => false
             ));
-            $query->select($this->modx->getSelectColumns('linguaSiteContent', '', '', array('resource_id')));
-            $stmt = $query->prepare();
-            if ($stmt) {
-                $value = $this->modx->getValue($stmt);
-                if ($value) {
-                    $resourceId = $value;
+            $linguaContent = $this->modx->getObject('linguaSiteContent', $query);
+            if ($linguaContent) {
+                $resourceId = $linguaContent->get('resource_id');
+                // reset the culture key
+                $lang = $linguaContent->getOne('Lang');
+                if ($lang) {
+                    $cultureKey = $lang->get('lang_code');
+                    $this->lingua->setCultureKey($cultureKey);
+                    $this->modx->setOption('cultureKey', $cultureKey);
+                    $this->modx->context->config['cultureKey'] = $cultureKey;
                 }
             }
         }
