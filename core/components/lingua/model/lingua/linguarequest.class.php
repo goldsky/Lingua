@@ -210,6 +210,7 @@ class LinguaRequest extends modRequest {
 
                     // hack the resource's content in here -------------------->
                     $linguaLangs = $this->modx->getObject('linguaLangs', array('lang_code' => $cultureKey));
+                    $emptyReturnsDefault = $this->modx->getOption('lingua.empty_returns_default', null, false);
                     if (($this->lingua instanceof Lingua) && $linguaLangs) {
                         $linguaSiteContent = $this->modx->getObject('linguaSiteContent', array(
                             'resource_id' => $resource->get('id'),
@@ -220,7 +221,14 @@ class LinguaRequest extends modRequest {
                             unset($linguaSiteContentArray['id']);
                             foreach ($linguaSiteContentArray as $k => $v) {
                                 // exclude URI to reveal back the original URI later
-                                if (!empty($v) && $k !== 'uri') {
+                                if ($k === 'uri') {
+                                    continue;
+                                }
+                                if (empty($v)) {
+                                    if (!$emptyReturnsDefault) {
+                                        $resource->set($k, $v); // return empty value
+                                    }
+                                } else {
                                     $resource->set($k, $v);
                                 }
                             }
@@ -245,8 +253,8 @@ class LinguaRequest extends modRequest {
                                 if ($linguaTVContent) {
                                     $linguaTVContentValue = $linguaTVContent->get('value');
                                     if (empty($linguaTVContentValue)) {
-                                        if (!$this->modx->getOption('lingua.empty_returns_default', null, false)) {
-                                            $value = $linguaTVContentValue;
+                                        if (!$emptyReturnsDefault) {
+                                            $value = $linguaTVContentValue; // return empty value
                                         }
                                     } else {
                                         $value = $linguaTVContentValue;

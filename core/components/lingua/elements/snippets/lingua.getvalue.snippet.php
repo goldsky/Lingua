@@ -70,9 +70,13 @@ $output = '';
 if (in_array($field, $tableFields)) {
     if ($linguaSiteContent) {
         $output = $linguaSiteContent->get($field);
-        if (empty($value)) {
-
+        if (empty($output)) {
+            if ($emptyReturnsDefault) {
+                $output = $resource->get($field); // return default language's value
+            }
         }
+    } else {
+        $output = $resource->get($field); // return default language's value
     }
 }
 // try TV
@@ -89,10 +93,8 @@ else {
         if ($linguaSiteTmplvarContentvalues) {
             $value = $linguaSiteTmplvarContentvalues->get('value');
             $tv->set('resourceId', $id);
-            if (empty($value)) {
-                if (!$emptyReturnsDefault) {
-                    $tv->set('value', $value);
-                }
+            if (empty($value) && !$emptyReturnsDefault) {
+                $tv->set('value', $value); // return empty value
             } else {
                 $tv->set('value', $value);
             }
