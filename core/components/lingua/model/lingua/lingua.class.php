@@ -594,20 +594,20 @@ class Lingua {
              */
             $propKey = preg_replace('/^lingua\./', '', $key);
             // check resource's ancestors scope
-            $anchestors = $this->getAncestors($this->modx->resource->get('id'));
+            $ancestors = $this->getAncestors($this->modx->resource->get('id'));
             $countResourceAnchestorsScopes = $this->modx->getCount('linguaResourceScopes', array(
-                'resource_id:IN' => $anchestors,
+                'resource_id:IN' => $ancestors,
                 'as_ancestor' => 1,
             ));
             if ($countResourceAnchestorsScopes > 0) {
                 /**
-                 * loop the anchestors array instead, because anchestors are
+                 * loop the ancestors array instead, because ancestors are
                  * sorted from the closest ones, and we want to get the config
-                 * from the closest anchestor
+                 * from the closest ancestor
                  */
-                foreach ($anchestors as $anchestor) {
+                foreach ($ancestors as $ancestor) {
                     $scope = $this->modx->getObject('linguaResourceScopes', array(
-                        'resource_id' => $anchestor,
+                        'resource_id' => $ancestor,
                         'as_ancestor' => 1,
                     ));
                     if ($scope) {
@@ -615,7 +615,7 @@ class Lingua {
                         $props = json_decode($props, true);
                         if (isset($props[$propKey]) && !empty($props[$propKey])) {
                             $config[$key] = $props[$propKey];
-                            break;
+                            break; // quit, bring up the value from the closest ancestor
                         }
                     }
                 }
@@ -635,15 +635,13 @@ class Lingua {
             // check resource's scope
             $linguaResourceScope = $this->modx->getObject('linguaResourceScopes', array('resource_id' => $this->modx->resource->get('id')));
             if ($linguaResourceScope) {
-                $excludeSelf = $linguaResourceScope->get('exclude_self');
-                if (empty($excludeSelf)) {
-                    $props = $linguaResourceScope->get('properties');
-                    $props = json_decode($props, true);
-                    if (isset($props[$propKey]) && !empty($props[$propKey])) {
+                $props = $linguaResourceScope->get('properties');
+                $props = json_decode($props, true);
+                if (isset($props[$propKey])) {
+                    $excludeSelf = $linguaResourceScope->get('exclude_self');
+                    if (empty($excludeSelf)) {
                         $config[$key] = $props[$propKey];
                     }
-                } else {
-                    unset($config[$key]);
                 }
             }
         }
