@@ -642,6 +642,8 @@ class Lingua {
                     if (isset($props[$propKey]) && !empty($props[$propKey])) {
                         $config[$key] = $props[$propKey];
                     }
+                } else {
+                    unset($config[$key]);
                 }
             }
         }
