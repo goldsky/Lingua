@@ -595,11 +595,11 @@ class Lingua {
             $propKey = preg_replace('/^lingua\./', '', $key);
             // check resource's ancestors scope
             $ancestors = $this->getAncestors($this->modx->resource->get('id'));
-            $countResourceAnchestorsScopes = $this->modx->getCount('linguaResourceScopes', array(
+            $countResourceAncestorsScopes = $this->modx->getCount('linguaResourceScopes', array(
                 'resource_id:IN' => $ancestors,
                 'as_ancestor' => 1,
             ));
-            if ($countResourceAnchestorsScopes > 0) {
+            if ($countResourceAncestorsScopes > 0) {
                 /**
                  * loop the ancestors array instead, because ancestors are
                  * sorted from the closest ones, and we want to get the config
