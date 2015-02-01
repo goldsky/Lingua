@@ -595,41 +595,46 @@ class Lingua {
             $propKey = preg_replace('/^lingua\./', '', $key);
             // check resource's ancestors scope
             $ancestors = $this->getAncestors($this->modx->resource->get('id'));
-            $countResourceAncestorsScopes = $this->modx->getCount('linguaResourceScopes', array(
-                'resource_id:IN' => $ancestors,
-                'as_ancestor' => 1,
-            ));
-            if ($countResourceAncestorsScopes > 0) {
-                /**
-                 * loop the ancestors array instead, because ancestors are
-                 * sorted from the closest ones, and we want to get the config
-                 * from the closest ancestor
-                 */
-                foreach ($ancestors as $ancestor) {
-                    $scope = $this->modx->getObject('linguaResourceScopes', array(
-                        'resource_id' => $ancestor,
-                        'as_ancestor' => 1,
-                    ));
-                    if ($scope) {
-                        $props = $scope->get('properties');
-                        $props = json_decode($props, true);
-                        if (isset($props[$propKey]) && !empty($props[$propKey])) {
-                            $config[$key] = $props[$propKey];
-                            break; // quit, bring up the value from the closest ancestor
+            if (!empty($ancestors)) {
+                $countResourceAncestorsScopes = $this->modx->getCount('linguaResourceScopes', array(
+                    'resource_id:IN' => $ancestors,
+                    'as_ancestor' => 1,
+                ));
+                if ($countResourceAncestorsScopes > 0) {
+                    /**
+                     * loop the ancestors array instead, because ancestors are
+                     * sorted from the closest ones, and we want to get the config
+                     * from the closest ancestor
+                     */
+                    foreach ($ancestors as $ancestor) {
+                        $scope = $this->modx->getObject('linguaResourceScopes', array(
+                            'resource_id' => $ancestor,
+                            'as_ancestor' => 1,
+                        ));
+                        if ($scope) {
+                            $props = $scope->get('properties');
+                            $props = json_decode($props, true);
+                            if (isset($props[$propKey]) && !empty($props[$propKey])) {
+                                $config[$key] = $props[$propKey];
+                                break; // quit, bring up the value from the closest ancestor
+                            }
                         }
                     }
                 }
             }
             // check resource's parent scope
-            $linguaResourceParentScope = $this->modx->getObject('linguaResourceScopes', array(
-                'resource_id' => $this->modx->resource->get('parent'),
-                'as_parent' => 1,
-            ));
-            if ($linguaResourceParentScope) {
-                $props = $linguaResourceScope->get('properties');
-                $props = json_decode($props, true);
-                if (isset($props[$propKey]) && !empty($props[$propKey])) {
-                    $config[$key] = $props[$propKey];
+            $parentId = $this->modx->resource->get('parent');
+            if ($parentId > 0) {
+                $linguaResourceParentScope = $this->modx->getObject('linguaResourceScopes', array(
+                    'resource_id' => $parentId,
+                    'as_parent' => 1,
+                ));
+                if ($linguaResourceParentScope) {
+                    $props = $linguaResourceScope->get('properties');
+                    $props = json_decode($props, true);
+                    if (isset($props[$propKey]) && !empty($props[$propKey])) {
+                        $config[$key] = $props[$propKey];
+                    }
                 }
             }
             // check resource's scope
