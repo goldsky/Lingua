@@ -41,3 +41,4 @@ $_lang['lingua.as_ancestor_desc'] = 'Apply properties to all descendants of this
 $_lang['lingua.exclude_self'] = 'Exclude Self' ;
 $_lang['lingua.exclude_self_desc'] = 'Exclude the properties to this resource, revert to Global/Context\'s Settings' ;
 $_lang['lingua.resourcescope_create'] = 'Add new setting for a resource';
+$_lang['lingua.delete_resourcescope_confirm'] = 'Are you sure you want to delete this resource scope?';
