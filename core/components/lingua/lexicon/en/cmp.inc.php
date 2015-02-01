@@ -42,3 +42,4 @@ $_lang['lingua.exclude_self'] = 'Exclude Self' ;
 $_lang['lingua.exclude_self_desc'] = 'Exclude the properties to this resource, revert to Global/Context\'s Settings' ;
 $_lang['lingua.resourcescope_create'] = 'Add new setting for a resource';
 $_lang['lingua.delete_resourcescope_confirm'] = 'Are you sure you want to delete this resource scope?';
+$_lang['lingua.languages_field_desc'] = 'Fill languages with (comma delimited if many) 2-letters ISO code(s), eg: en,de,es.';

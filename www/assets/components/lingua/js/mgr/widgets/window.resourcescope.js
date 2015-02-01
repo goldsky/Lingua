@@ -25,6 +25,7 @@ Lingua.window.ResourceScope = function (config) {
     fields.push({
         xtype: 'textfield',
         fieldLabel: _('lingua.languages'),
+        description: _('lingua.languages_field_desc'),
         name: 'property_langs',
         anchor: '100%'
     });
