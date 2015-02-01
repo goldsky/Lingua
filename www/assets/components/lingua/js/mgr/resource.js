@@ -1,7 +1,31 @@
 function Lingua(config) {
     this.config = config;
+    this.config['fcRules'] = {};
     this.element = [];
 }
+
+Lingua.prototype.initFCRule = function(id, name) {
+    var cmp = Ext.getCmp(id);
+    if (typeof (cmp) !== "undefined") {
+        this.config.fcRules[name] = {visible: cmp.isVisible()};
+    }
+};
+
+Lingua.prototype.initFCRules = function() {
+    this.initFCRule('modx-resource-pagetitle', 'pagetitle');
+    this.initFCRule('modx-resource-longtitle', 'longtitle');
+    this.initFCRule('modx-resource-description', 'description');
+    this.initFCRule('modx-resource-introtext', 'introtext');
+    this.initFCRule('modx-resource-content', 'content');
+    this.initFCRule('modx-resource-content-static', 'staticContent');
+    this.initFCRule('modx-symlink-content', 'symLinkContent');
+    this.initFCRule('modx-weblink-content', 'webLinkContent');
+    this.initFCRule('modx-resource-alias', 'alias');
+    this.initFCRule('modx-resource-menutitle', 'menutitle');
+    this.initFCRule('modx-resource-link-attributes', 'linkAttributes');
+    this.initFCRule('modx-resource-uri-override', 'uriOverride');
+    this.initFCRule('modx-resource-uri', 'uri');
+};
 
 Lingua.prototype.getMenu = function(params) {
     var actionButtons = Ext.getCmp("modx-action-buttons");
@@ -56,42 +80,22 @@ Lingua.prototype.getMenu = function(params) {
     }
 };
 
+Lingua.prototype.flagField = function (id) {
+    var cmp = Ext.getCmp(id);
+    if (typeof (cmp) !== "undefined" && typeof (cmp.label) !== "undefined") {
+        Ext.DomHelper.insertAfter(cmp.label, {
+            tag: 'img',
+            src: '../' + this.config.langs[this.config.defaultLang]['flag'],
+            class: 'icon-lingua-insert-flag'
+        });
+    }
+};
+
 Lingua.prototype.flagDefaultFields = function () {
-    var pagetitle = Ext.getCmp('modx-resource-pagetitle');
-    if (typeof (pagetitle) !== "undefined" && typeof (pagetitle.label) !== "undefined") {
-        Ext.DomHelper.insertAfter(pagetitle.label, {
-            tag: 'img',
-            src: '../' + this.config.langs[this.config.defaultLang]['flag'],
-            class: 'icon-lingua-insert-flag'
-        });
-    }
-
-    var longtitle = Ext.getCmp('modx-resource-longtitle');
-    if (typeof (longtitle) !== "undefined" && typeof (longtitle.label) !== "undefined") {
-        Ext.DomHelper.insertAfter(longtitle.label, {
-            tag: 'img',
-            src: '../' + this.config.langs[this.config.defaultLang]['flag'],
-            class: 'icon-lingua-insert-flag'
-        });
-    }
-
-    var description = Ext.getCmp('modx-resource-description');
-    if (typeof (description) !== "undefined" && typeof (description.label) !== "undefined") {
-        Ext.DomHelper.insertAfter(description.label, {
-            tag: 'img',
-            src: '../' + this.config.langs[this.config.defaultLang]['flag'],
-            class: 'icon-lingua-insert-flag'
-        });
-    }
-
-    var introtext = Ext.getCmp('modx-resource-introtext');
-    if (typeof (introtext) !== "undefined" && typeof (introtext.label) !== "undefined") {
-        Ext.DomHelper.insertAfter(introtext.label, {
-            tag: 'img',
-            src: '../' + this.config.langs[this.config.defaultLang]['flag'],
-            class: 'icon-lingua-insert-flag'
-        });
-    }
+    this.flagField('modx-resource-pagetitle');
+    this.flagField('modx-resource-longtitle');
+    this.flagField('modx-resource-description');
+    this.flagField('modx-resource-introtext');
 
     var content = Ext.getCmp('modx-resource-content');
     if (typeof (content) !== "undefined") {
@@ -106,73 +110,19 @@ Lingua.prototype.flagDefaultFields = function () {
         }
     }
 
-    var staticContent = Ext.getCmp('modx-resource-content-static');
-    if (typeof (staticContent) !== "undefined" && typeof (staticContent.label) !== "undefined") {
-        Ext.DomHelper.insertAfter(staticContent.label, {
-            tag: 'img',
-            src: '../' + this.config.langs[this.config.defaultLang]['flag'],
-            class: 'icon-lingua-insert-flag'
-        });
-    }
-
-    var symLinkContent = Ext.getCmp('modx-symlink-content');
-    if (typeof (symLinkContent) !== "undefined" && typeof (symLinkContent.label) !== "undefined") {
-        Ext.DomHelper.insertAfter(symLinkContent.label, {
-            tag: 'img',
-            src: '../' + this.config.langs[this.config.defaultLang]['flag'],
-            class: 'icon-lingua-insert-flag'
-        });
-    }
-
-    var webLinkContent = Ext.getCmp('modx-weblink-content');
-    if (typeof (webLinkContent) !== "undefined" && typeof (webLinkContent.label) !== "undefined") {
-        Ext.DomHelper.insertAfter(webLinkContent.label, {
-            tag: 'img',
-            src: '../' + this.config.langs[this.config.defaultLang]['flag'],
-            class: 'icon-lingua-insert-flag'
-        });
-    }
-
-    var alias = Ext.getCmp('modx-resource-alias');
-    if (typeof (alias) !== "undefined" && typeof (alias.label) !== "undefined") {
-        Ext.DomHelper.insertAfter(alias.label, {
-            tag: 'img',
-            src: '../' + this.config.langs[this.config.defaultLang]['flag'],
-            class: 'icon-lingua-insert-flag'
-        });
-    }
-
-    var menutitle = Ext.getCmp('modx-resource-menutitle');
-    if (typeof (menutitle) !== "undefined" && typeof (menutitle.label) !== "undefined") {
-        Ext.DomHelper.insertAfter(menutitle.label, {
-            tag: 'img',
-            src: '../' + this.config.langs[this.config.defaultLang]['flag'],
-            class: 'icon-lingua-insert-flag'
-        });
-    }
-
-    var linkAttributes = Ext.getCmp('modx-resource-link-attributes');
-    if (typeof (linkAttributes) !== "undefined" && typeof (linkAttributes.label) !== "undefined") {
-        Ext.DomHelper.insertAfter(linkAttributes.label, {
-            tag: 'img',
-            src: '../' + this.config.langs[this.config.defaultLang]['flag'],
-            class: 'icon-lingua-insert-flag'
-        });
-    }
+    this.flagField('modx-resource-content-static');
+    this.flagField('modx-symlink-content');
+    this.flagField('modx-weblink-content');
+    this.flagField('modx-resource-alias');
+    this.flagField('modx-resource-menutitle');
+    this.flagField('modx-resource-link-attributes');
 
     var uriOverride = Ext.getCmp('modx-resource-uri-override');
     if (typeof (uriOverride) !== "undefined" && typeof (uriOverride.label) !== "undefined") {
         uriOverride.wrap.child('.x-form-cb-label').update(_('resource_uri_override') + '&nbsp;<img src="../' + this.config.langs[this.config.defaultLang]['flag'] + '">');
     }
 
-    var uri = Ext.getCmp('modx-resource-uri');
-    if (typeof (uri) !== "undefined" && typeof (uri.label) !== "undefined") {
-        Ext.DomHelper.insertAfter(uri.label, {
-            tag: 'img',
-            src: '../' + this.config.langs[this.config.defaultLang]['flag'],
-            class: 'icon-lingua-insert-flag'
-        });
-    }
+    this.flagField('modx-resource-uri');
 };
 
 Lingua.prototype.flagDefaultTVFields = function () {
@@ -548,6 +498,30 @@ Lingua.prototype.createHiddenField = function (lang) {
 
 };
 
+Lingua.prototype.switchMainField = function (id, name, selectedLang) {
+    var cmp = Ext.getCmp(id);
+    if (cmp) {
+        if (selectedLang !== this.config.defaultLang) {
+            cmp.hide();
+            if (this.config.formCustomized) {
+                if (this.config.fcRules[name].visible) {
+                    Ext.getCmp(id + '-' + selectedLang).show();
+                }
+            } else {
+                Ext.getCmp(id + '-' + selectedLang).show();
+            }
+        } else {
+            if (this.config.formCustomized) {
+                if (this.config.fcRules[name].visible) {
+                    cmp.show();
+                }
+            } else {
+                cmp.show();
+            }
+        }
+    }
+};
+
 Lingua.prototype.switchMainFields = function (selectedLang) {
     var title;
     if (selectedLang !== this.config.defaultLang) {
@@ -560,50 +534,10 @@ Lingua.prototype.switchMainFields = function (selectedLang) {
     }
     Ext.getCmp('modx-resource-header').getEl().update('<h2>' + title + '</h2>');
 
-    var pagetitle = Ext.getCmp('modx-resource-pagetitle');
-    if (pagetitle) {
-        if (selectedLang !== this.config.defaultLang) {
-            pagetitle.hide();
-            Ext.getCmp('modx-resource-pagetitle-' + selectedLang).show();
-        } else {
-            pagetitle.show();
-        }
-    }
-
-    var longtitle = Ext.getCmp('modx-resource-longtitle');
-    if (longtitle) {
-        if (selectedLang !== this.config.defaultLang) {
-            longtitle.hide();
-            Ext.getCmp('modx-resource-longtitle-' + selectedLang).show();
-        } else {
-            longtitle.show();
-        }
-    }
-
-    var description = Ext.getCmp('modx-resource-description');
-    if (description) {
-        if (selectedLang !== this.config.defaultLang) {
-            description.hide();
-            Ext.getCmp('modx-resource-description-' + selectedLang).show();
-        } else {
-            description.show();
-        }
-    }
-
-    var introtext = Ext.getCmp('modx-resource-introtext');
-    if (introtext) {
-        if (selectedLang !== this.config.defaultLang) {
-            introtext.hide();
-            Ext.getCmp('modx-resource-introtext-' + selectedLang).show();
-        } else {
-            introtext.show();
-        }
-    }
-
-    var content = Ext.getCmp('modx-resource-content');
-    if (content) {
-        content.setTitle(_('resource_content') + '&nbsp;<img src="../' + this.config.langs[selectedLang]['flag'] + '">');
-    }
+    this.switchMainField('modx-resource-pagetitle', 'pagetitle', selectedLang);
+    this.switchMainField('modx-resource-longtitle', 'longtitle', selectedLang);
+    this.switchMainField('modx-resource-description', 'description', selectedLang);
+    this.switchMainField('modx-resource-introtext', 'introtext', selectedLang);
 
     // textarea content
     var ta = Ext.getCmp('ta');
@@ -616,75 +550,13 @@ Lingua.prototype.switchMainFields = function (selectedLang) {
         }
     }
 
-    var staticContent = Ext.getCmp('modx-resource-content-static');
-    if (typeof (staticContent) !== "undefined") {
-        if (selectedLang !== this.config.defaultLang) {
-            staticContent.hide();
-            Ext.getCmp('modx-resource-content-static-' + selectedLang).show();
-        } else {
-            staticContent.show();
-        }
-    }
-
-    var symLinkContent = Ext.getCmp('modx-symlink-content');
-    if (symLinkContent) {
-        if (selectedLang !== this.config.defaultLang) {
-            symLinkContent.hide();
-            Ext.getCmp('modx-symlink-content-' + selectedLang).show();
-        } else {
-            symLinkContent.show();
-        }
-    }
-
-    var webLinkContent = Ext.getCmp('modx-weblink-content');
-    if (webLinkContent) {
-        if (selectedLang !== this.config.defaultLang) {
-            webLinkContent.hide();
-            Ext.getCmp('modx-weblink-content-' + selectedLang).show();
-        } else {
-            webLinkContent.show();
-        }
-    }
-
-    var alias = Ext.getCmp('modx-resource-alias');
-    if (alias) {
-        if (selectedLang !== this.config.defaultLang) {
-            alias.hide();
-            Ext.getCmp('modx-resource-alias-' + selectedLang).show();
-        } else {
-            alias.show();
-        }
-    }
-
-    var menutitle = Ext.getCmp('modx-resource-menutitle');
-    if (menutitle) {
-        if (selectedLang !== this.config.defaultLang) {
-            menutitle.hide();
-            Ext.getCmp('modx-resource-menutitle-' + selectedLang).show();
-        } else {
-            menutitle.show();
-        }
-    }
-
-    var linkAttributes = Ext.getCmp('modx-resource-link-attributes');
-    if (linkAttributes) {
-        if (selectedLang !== this.config.defaultLang) {
-            linkAttributes.hide();
-            Ext.getCmp('modx-resource-link-attributes-' + selectedLang).show();
-        } else {
-            linkAttributes.show();
-        }
-    }
-
-    var uriOverride = Ext.getCmp('modx-resource-uri-override');
-    if (uriOverride) {
-        if (selectedLang !== this.config.defaultLang) {
-            uriOverride.hide();
-            Ext.getCmp('modx-resource-uri-override-' + selectedLang).show();
-        } else {
-            uriOverride.show();
-        }
-    }
+    this.switchMainField('modx-resource-content-static', 'staticContent', selectedLang);
+    this.switchMainField('modx-symlink-content', 'symLinkContent', selectedLang);
+    this.switchMainField('modx-weblink-content', 'webLinkContent', selectedLang);
+    this.switchMainField('modx-resource-alias', 'alias', selectedLang);
+    this.switchMainField('modx-resource-menutitle', 'menutitle', selectedLang);
+    this.switchMainField('modx-resource-link-attributes', 'linkAttributes', selectedLang);
+    this.switchMainField('modx-resource-uri-override', 'uriOverride', selectedLang);
 
     var uri = Ext.getCmp('modx-resource-uri');
     if (uri) {
@@ -753,7 +625,7 @@ Lingua.prototype.initCloneTVField = function (lang, tv) {
          * DO NOT HIDE IT IN HERE, use "lazy hiding" above!
          * Otherwise the component under this element won't be rendered
          * correctly inside the container.
-         * 
+         *
          * cloneTVEl.setVisibilityMode(Ext.Element.DISPLAY);
          * cloneTVEl.hide();
          */

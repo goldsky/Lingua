@@ -222,6 +222,9 @@ Ext.onReady(function() {
     });
 });
 </script>');
+        if ($formCustomized) {
+            $modx->controller->addLastJavascript(MODX_BASE_URL . 'assets/components/lingua/js/mgr/fcinit.js');
+        }
         //------------------------------------------------------------------
         break;
 
