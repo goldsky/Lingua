@@ -59,57 +59,105 @@ Lingua.prototype.getMenu = function(params) {
 Lingua.prototype.flagDefaultFields = function () {
     var pagetitle = Ext.getCmp('modx-resource-pagetitle');
     if (typeof (pagetitle) !== "undefined" && typeof (pagetitle.label) !== "undefined") {
-        pagetitle.label.update(_('resource_pagetitle') + '<span class="required">*</span>' + '&nbsp;<img src="../' + this.config.langs[this.config.defaultLang]['flag'] + '">');
+        Ext.DomHelper.insertAfter(pagetitle.label, {
+            tag: 'img',
+            src: '../' + this.config.langs[this.config.defaultLang]['flag'],
+            class: 'icon-lingua-insert-flag'
+        });
     }
 
     var longtitle = Ext.getCmp('modx-resource-longtitle');
     if (typeof (longtitle) !== "undefined" && typeof (longtitle.label) !== "undefined") {
-        longtitle.label.update(_('resource_longtitle') + '&nbsp;<img src="../' + this.config.langs[this.config.defaultLang]['flag'] + '">');
+        Ext.DomHelper.insertAfter(longtitle.label, {
+            tag: 'img',
+            src: '../' + this.config.langs[this.config.defaultLang]['flag'],
+            class: 'icon-lingua-insert-flag'
+        });
     }
 
     var description = Ext.getCmp('modx-resource-description');
     if (typeof (description) !== "undefined" && typeof (description.label) !== "undefined") {
-        description.label.update(_('resource_description') + '&nbsp;<img src="../' + this.config.langs[this.config.defaultLang]['flag'] + '">');
+        Ext.DomHelper.insertAfter(description.label, {
+            tag: 'img',
+            src: '../' + this.config.langs[this.config.defaultLang]['flag'],
+            class: 'icon-lingua-insert-flag'
+        });
     }
 
     var introtext = Ext.getCmp('modx-resource-introtext');
     if (typeof (introtext) !== "undefined" && typeof (introtext.label) !== "undefined") {
-        introtext.label.update(_('resource_summary') + '&nbsp;<img src="../' + this.config.langs[this.config.defaultLang]['flag'] + '">');
+        Ext.DomHelper.insertAfter(introtext.label, {
+            tag: 'img',
+            src: '../' + this.config.langs[this.config.defaultLang]['flag'],
+            class: 'icon-lingua-insert-flag'
+        });
     }
 
     var content = Ext.getCmp('modx-resource-content');
-    if (typeof (content) !== "undefined" && typeof (content.label) !== "undefined") {
-        content.setTitle(_('resource_content') + '&nbsp;<img src="../' + this.config.langs[this.config.defaultLang]['flag'] + '">');
+    if (typeof (content) !== "undefined") {
+        if (typeof (content.label) !== "undefined") {
+            Ext.DomHelper.insertAfter(content.label, {
+                tag: 'img',
+                src: '../' + this.config.langs[this.config.defaultLang]['flag'],
+                class: 'icon-lingua-insert-flag'
+            });
+        } else {
+            content.setTitle(_('resource_content') + '&nbsp;<img src="../' + this.config.langs[this.config.defaultLang]['flag'] + '">');
+        }
     }
 
     var staticContent = Ext.getCmp('modx-resource-content-static');
     if (typeof (staticContent) !== "undefined" && typeof (staticContent.label) !== "undefined") {
-        staticContent.label.update(_('static_resource') + '&nbsp;<img src="../' + this.config.langs[this.config.defaultLang]['flag'] + '">');
+        Ext.DomHelper.insertAfter(staticContent.label, {
+            tag: 'img',
+            src: '../' + this.config.langs[this.config.defaultLang]['flag'],
+            class: 'icon-lingua-insert-flag'
+        });
     }
 
     var symLinkContent = Ext.getCmp('modx-symlink-content');
     if (typeof (symLinkContent) !== "undefined" && typeof (symLinkContent.label) !== "undefined") {
-        symLinkContent.label.update(_('symlink') + '&nbsp;<img src="../' + this.config.langs[this.config.defaultLang]['flag'] + '">');
+        Ext.DomHelper.insertAfter(symLinkContent.label, {
+            tag: 'img',
+            src: '../' + this.config.langs[this.config.defaultLang]['flag'],
+            class: 'icon-lingua-insert-flag'
+        });
     }
 
     var webLinkContent = Ext.getCmp('modx-weblink-content');
     if (typeof (webLinkContent) !== "undefined" && typeof (webLinkContent.label) !== "undefined") {
-        webLinkContent.label.update(_('weblink') + '&nbsp;<img src="../' + this.config.langs[this.config.defaultLang]['flag'] + '">');
+        Ext.DomHelper.insertAfter(webLinkContent.label, {
+            tag: 'img',
+            src: '../' + this.config.langs[this.config.defaultLang]['flag'],
+            class: 'icon-lingua-insert-flag'
+        });
     }
 
     var alias = Ext.getCmp('modx-resource-alias');
     if (typeof (alias) !== "undefined" && typeof (alias.label) !== "undefined") {
-        alias.label.update(_('resource_alias') + '&nbsp;<img src="../' + this.config.langs[this.config.defaultLang]['flag'] + '">');
+        Ext.DomHelper.insertAfter(alias.label, {
+            tag: 'img',
+            src: '../' + this.config.langs[this.config.defaultLang]['flag'],
+            class: 'icon-lingua-insert-flag'
+        });
     }
 
     var menutitle = Ext.getCmp('modx-resource-menutitle');
     if (typeof (menutitle) !== "undefined" && typeof (menutitle.label) !== "undefined") {
-        menutitle.label.update(_('resource_menutitle') + '&nbsp;<img src="../' + this.config.langs[this.config.defaultLang]['flag'] + '">');
+        Ext.DomHelper.insertAfter(menutitle.label, {
+            tag: 'img',
+            src: '../' + this.config.langs[this.config.defaultLang]['flag'],
+            class: 'icon-lingua-insert-flag'
+        });
     }
 
     var linkAttributes = Ext.getCmp('modx-resource-link-attributes');
     if (typeof (linkAttributes) !== "undefined" && typeof (linkAttributes.label) !== "undefined") {
-        linkAttributes.label.update(_('resource_link_attributes') + '&nbsp;<img src="../' + this.config.langs[this.config.defaultLang]['flag'] + '">');
+        Ext.DomHelper.insertAfter(linkAttributes.label, {
+            tag: 'img',
+            src: '../' + this.config.langs[this.config.defaultLang]['flag'],
+            class: 'icon-lingua-insert-flag'
+        });
     }
 
     var uriOverride = Ext.getCmp('modx-resource-uri-override');
@@ -119,7 +167,11 @@ Lingua.prototype.flagDefaultFields = function () {
 
     var uri = Ext.getCmp('modx-resource-uri');
     if (typeof (uri) !== "undefined" && typeof (uri.label) !== "undefined") {
-        uri.label.update(_('resource_uri') + '&nbsp;<img src="../' + this.config.langs[this.config.defaultLang]['flag'] + '">');
+        Ext.DomHelper.insertAfter(uri.label, {
+            tag: 'img',
+            src: '../' + this.config.langs[this.config.defaultLang]['flag'],
+            class: 'icon-lingua-insert-flag'
+        });
     }
 };
 

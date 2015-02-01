@@ -97,4 +97,13 @@ $settings['lingua.empty_returns_default']->fromArray(array(
     'area' => 'general',
         ), '', true, true);
 
+$settings['lingua.form_customization'] = $modx->newObject('modSystemSetting');
+$settings['lingua.form_customization']->fromArray(array(
+    'key' => 'lingua.form_customization',
+    'value' => '0',
+    'xtype' => 'combo-boolean',
+    'namespace' => 'lingua',
+    'area' => 'manager',
+        ), '', true, true);
+
 return $settings;

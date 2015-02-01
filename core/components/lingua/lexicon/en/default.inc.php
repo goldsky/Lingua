@@ -22,3 +22,5 @@ $_lang['setting_lingua.detect_browser'] = 'Detect browser\'s language';
 $_lang['setting_lingua.detect_browser_desc'] = 'Set this to Yes to detect browser\'s language of the visitor on their first visit.';
 $_lang['setting_lingua.empty_returns_default'] = 'Empty value returns default?';
 $_lang['setting_lingua.empty_returns_default_desc'] = 'If translated field has empty value, should Lingue return value from default language or not?';
+$_lang['setting_lingua.form_customization'] = 'Check Form Customization?';
+$_lang['setting_lingua.form_customization_desc'] = 'If Lingua needs to check Form Customization, it will parse the whole document page again after FC is initiated.';

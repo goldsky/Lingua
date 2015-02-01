@@ -1,5 +1,6 @@
 Lingua 2.0.3-dev
 =================================
+- [#33] change how flag is appended to the original fields, to overcome Form Customization's rule on changing the field's name
 - [#31] Add optional different language settings based on Resource
 - Improve finding resource by translated URI
 - Improve default value selection

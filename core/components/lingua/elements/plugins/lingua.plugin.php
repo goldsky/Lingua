@@ -160,7 +160,7 @@ switch ($event) {
             return;
         }
         $modx->regClientCSS(MODX_BASE_URL . 'assets/components/lingua/css/mgr.css');
-        $modx->controller->addJavascript(MODX_BASE_URL . 'assets/components/lingua/js/mgr/resource.js');
+        $modx->controller->addLastJavascript(MODX_BASE_URL . 'assets/components/lingua/js/mgr/resource.js');
         // $modx->getOption('cultureKey') doesn't work!
         $modCultureKey = $modx->getObject('modSystemSetting', array('key' => 'cultureKey'));
         $cultureKey = $modCultureKey->get('value');
@@ -205,13 +205,15 @@ switch ($event) {
             $createHiddenFields[] = $language;
         } // foreach ($languages as $language)
         //------------------------------------------------------------------
+        $formCustomized = $modx->getOption('lingua.form_customization');
         $modx->controller->addHtml('
 <script type="text/javascript">
 Ext.onReady(function() {
     window.lingua = new Lingua({
         defaultLang: "' . $cultureKey . '",
         langs: ' . json_encode($configLang) . ',
-        siteContent: ' . json_encode($linguaSiteContentArray) . '
+        siteContent: ' . json_encode($linguaSiteContentArray) . ',
+        formCustomized: ' . $formCustomized . '
     });
     lingua.flagDefaultFields();
     lingua.createHiddenFields(' . json_encode($createHiddenFields) . ');
