@@ -498,14 +498,16 @@ class Lingua {
      * @param   boolean $assoc      returned as associative array
      * @return  array   languages
      */
-    public function getLanguages($activeOnly = true, $assoc = true) {
-        if ($assoc) {
-            if (isset($this->_placeholders['languages_assoc_array']) && !empty($this->_placeholders['languages_assoc_array'])) {
-                return $this->_placeholders['languages_assoc_array'];
-            }
-        } else {
-            if (isset($this->_placeholders['languages_array']) && !empty($this->_placeholders['languages_array'])) {
-                return $this->_placeholders['languages_array'];
+    public function getLanguages($activeOnly = true, $assoc = true, $persist = true) {
+        if ($persist) {
+            if ($assoc) {
+                if (isset($this->_placeholders['languages_assoc_array']) && !empty($this->_placeholders['languages_assoc_array'])) {
+                    return $this->_placeholders['languages_assoc_array'];
+                }
+            } else {
+                if (isset($this->_placeholders['languages_array']) && !empty($this->_placeholders['languages_array'])) {
+                    return $this->_placeholders['languages_array'];
+                }
             }
         }
         $this->_placeholders['languages_assoc_array'] = array();
@@ -722,5 +724,127 @@ class Lingua {
         $this->modx->cultureKey = $cultureKey;
         $this->modx->setOption('cultureKey', $cultureKey);
         setcookie('modx_lingua_switcher', $cultureKey, time() + (1 * 24 * 60 * 60), '/');
+    }
+
+    /**
+     * Create/Update translation of a resource
+     * @param int       $id         resource's ID
+     * @param string    $langCode   language's 2-letters ISO code
+     * @param array     $values     array of values
+     * @param boolean   $update     allow update or not?
+     * @return boolean
+     */
+    public function setContentTranslation($id, $langCode, array $values = array(), $update = true) {
+        $resource = $this->modx->getObject('modResource', $id);
+        if (!$resource) {
+            return false;
+        }
+        $this->modx->context = $this->modx->getObject('modContext', array('key' => $resource->get('context_key')));
+        $defaultCultureKey = $this->modx->context->getOption('cultureKey');
+        if ($langCode === $defaultCultureKey) {
+            return false;
+        }
+        $linguaLangs = $this->modx->getObject('linguaLangs', array('lang_code' => $langCode));
+        if (!$linguaLangs) {
+            return false;
+        }
+        $params = array(
+            'resource_id' => $id,
+            'lang_id' => $linguaLangs->get('id'),
+        );
+        $linguaSiteContent = $this->modx->getObject('linguaSiteContent', $params);
+        if (!$linguaSiteContent) {
+            $linguaSiteContent = $this->modx->newObject('linguaSiteContent');
+            $linguaSiteContent->fromArray($params);
+            $linguaSiteContent->save();
+        } else {
+            if (!$update) {
+                return false;
+            }
+        }
+        if (!isset($values['pagetitle']) || empty($values['pagetitle'])) {
+            $values['pagetitle'] = $resource->get('pagetitle');
+        }
+        $linguaSiteContent->set('pagetitle', $values['pagetitle']);
+        if (isset($values['longtitle'])) {
+            $linguaSiteContent->set('longtitle', $values['longtitle']);
+        }
+        if (isset($values['description'])) {
+            $linguaSiteContent->set('description', $values['description']);
+        }
+        if (isset($values['content']) || isset($values['ta'])) {
+            $linguaSiteContent->set('content', (isset($values['content']) && !empty($values['content']) ? $values['content'] : $values['ta']));
+        }
+        if (isset($values['introtext'])) {
+            $linguaSiteContent->set('introtext', $values['introtext']);
+        }
+        if (empty($values['alias'])) {
+            $values['alias'] = $values['pagetitle'];
+            $linguaSiteContent->setDirty('alias');
+        }
+        $linguaSiteContent->set('alias', $values['alias']);
+        if (isset($values['menutitle'])) {
+            $linguaSiteContent->set('menutitle', $values['menutitle']);
+        }
+        if (isset($values['link_attributes'])) {
+            $linguaSiteContent->set('link_attributes', $values['link_attributes']);
+        }
+        if (isset($values['uri_override'])) {
+            $linguaSiteContent->set('uri_override', $values['uri_override']);
+        }
+        if (isset($values['uri'])) {
+            $linguaSiteContent->set('uri', $values['uri']);
+        }
+        $linguaSiteContent->set('parent', $resource->get('parent'));
+        $linguaSiteContent->set('isfolder', $resource->get('isfolder'));
+        $linguaSiteContent->set('context_key', $resource->get('context_key'));
+        $linguaSiteContent->set('content_type', $resource->get('content_type'));
+        if ($resource->get('refreshURIs')) {
+            $linguaSiteContent->set('refreshURIs', true);
+        }
+        return $linguaSiteContent->save();
+    }
+
+    /**
+     * Create/Update translation of a Template Variable
+     * @param int       $resourceId resource's ID
+     * @param string    $langCode   language's 2-letters ISO code
+     * @param int       $tvId       TV's ID
+     * @param string    $val        TV's value
+     * @param boolean   $update     allow update or not?
+     * @return boolean
+     */
+    public function setTVTranslation($resourceId, $langCode, $tvId, $val = '', $update = true) {
+        $resource = $this->modx->getObject('modResource', $resourceId);
+        if (!$resource) {
+            return false;
+        }
+        $this->modx->context = $this->modx->getObject('modContext', array('key' => $resource->get('context_key')));
+        $defaultCultureKey = $this->modx->context->getOption('cultureKey');
+        if ($langCode === $defaultCultureKey) {
+            return false;
+        }
+        $linguaLangs = $this->modx->getObject('linguaLangs', array('lang_code' => $langCode));
+        if (!$linguaLangs) {
+            return false;
+        }
+        $params = array(
+            'lang_id' => $linguaLangs->get('id'),
+            'tmplvarid' => $tvId,
+            'contentid' => $resourceId,
+        );
+        $linguaSiteTmplvarContentvalues = $this->modx->getObject('linguaSiteTmplvarContentvalues', $params);
+        if (!$linguaSiteTmplvarContentvalues) {
+            $linguaSiteTmplvarContentvalues = $this->modx->newObject('linguaSiteTmplvarContentvalues');
+            $linguaSiteTmplvarContentvalues->set('lang_id', $linguaLangs->get('id'));
+            $linguaSiteTmplvarContentvalues->set('tmplvarid', $tvId);
+            $linguaSiteTmplvarContentvalues->set('contentid', $resourceId);
+        } else {
+            if (!$update) {
+                return false;
+            }
+        }
+        $linguaSiteTmplvarContentvalues->set('value', $val);
+        return $linguaSiteTmplvarContentvalues->save();
     }
 }

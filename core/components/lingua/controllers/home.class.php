@@ -34,6 +34,10 @@ class LinguaHomeManagerController extends LinguaManagerController {
 	}
 
 	public function loadCustomCssJs() {
+		$this->addJavascript($this->lingua->config['jsUrl'] . 'mgr/widgets/window.autosync.js');
+		$this->addJavascript($this->lingua->config['jsUrl'] . 'mgr/widgets/window.manualsync.js');
+		$this->addJavascript($this->lingua->config['jsUrl'] . 'mgr/widgets/grid.sync.js');
+		$this->addJavascript($this->lingua->config['jsUrl'] . 'mgr/widgets/combo.resource.js');
 		$this->addJavascript($this->lingua->config['jsUrl'] . 'mgr/widgets/window.resourcescope.js');
 		$this->addJavascript($this->lingua->config['jsUrl'] . 'mgr/widgets/grid.resourcescopes.js');
 		$this->addJavascript($this->lingua->config['jsUrl'] . 'ux/CheckColumn.js');

@@ -1,5 +1,6 @@
 Lingua 2.0.3-dev
 =================================
+- [#30] batch synchronize translation for (eg.) imported resources
 - [#33] add option in System Settings to detect Form Customization's renderings
 - [#33] change how flag is appended to the original fields, to overcome Form Customization's rule on changing the field's name
 - [#31] Add optional different language settings based on Resource

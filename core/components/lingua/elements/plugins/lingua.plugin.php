@@ -452,42 +452,7 @@ Ext.onReady(function() {
 
         $resourceId = $resource->get('id');
         foreach ($reverting as $k => $v) {
-            $linguaLangs = $modx->getObject('linguaLangs', array('lang_code' => $k));
-            $params = array(
-                'resource_id' => $resourceId,
-                'lang_id' => $linguaLangs->get('id'),
-            );
-            $linguaSiteContent = $modx->getObject('linguaSiteContent', $params);
-            if (!$linguaSiteContent) {
-                $linguaSiteContent = $modx->newObject('linguaSiteContent');
-                $linguaSiteContent->fromArray($params);
-                $linguaSiteContent->save();
-            }
-            if (empty($v['pagetitle'])) {
-                $v['pagetitle'] = $resource->get('pagetitle');
-            }
-            $linguaSiteContent->set('pagetitle', $v['pagetitle']);
-            $linguaSiteContent->set('longtitle', $v['longtitle']);
-            $linguaSiteContent->set('description', $v['description']);
-            $linguaSiteContent->set('content', (isset($v['content']) && !empty($v['content']) ? $v['content'] : $v['ta']));
-            $linguaSiteContent->set('introtext', $v['introtext']);
-            if (empty($v['alias'])) {
-                $v['alias'] = $v['pagetitle'];
-                $linguaSiteContent->setDirty('alias');
-            }
-            $linguaSiteContent->set('alias', $v['alias']);
-            $linguaSiteContent->set('menutitle', $v['menutitle']);
-            $linguaSiteContent->set('link_attributes', $v['link_attributes']);
-            $linguaSiteContent->set('uri_override', $v['uri_override']);
-            $linguaSiteContent->set('uri', $v['uri']);
-            $linguaSiteContent->set('parent', $resource->get('parent'));
-            $linguaSiteContent->set('isfolder', $resource->get('isfolder'));
-            $linguaSiteContent->set('context_key', $resource->get('context_key'));
-            $linguaSiteContent->set('content_type', $resource->get('content_type'));
-            if ($resource->get('refreshURIs')) {
-                $linguaSiteContent->set('refreshURIs', true);
-            }
-            $linguaSiteContent->save();
+            $lingua->setContentTranslation($resourceId, $k, $v);
         }
 
         // update linguaSiteTmplvarContentvalues
@@ -567,23 +532,8 @@ Ext.onReady(function() {
         }
 
         foreach ($reverting as $k => $tmplvars) {
-            $linguaLangs = $modx->getObject('linguaLangs', array('lang_code' => $k));
-            $langId = $linguaLangs->get('id');
             foreach ($tmplvars as $key => $val) {
-                $params = array(
-                    'lang_id' => $langId,
-                    'tmplvarid' => $key,
-                    'contentid' => $resourceId,
-                );
-                $linguaSiteTmplvarContentvalues = $modx->getObject('linguaSiteTmplvarContentvalues', $params);
-                if (!$linguaSiteTmplvarContentvalues) {
-                    $linguaSiteTmplvarContentvalues = $modx->newObject('linguaSiteTmplvarContentvalues');
-                }
-                $linguaSiteTmplvarContentvalues->set('lang_id', $langId);
-                $linguaSiteTmplvarContentvalues->set('tmplvarid', $key);
-                $linguaSiteTmplvarContentvalues->set('contentid', $resourceId);
-                $linguaSiteTmplvarContentvalues->set('value', $val);
-                $linguaSiteTmplvarContentvalues->save();
+                $lingua->setTVTranslation($resourceId, $k, $key, $val);
             }
         }
 

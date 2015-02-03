@@ -122,6 +122,26 @@ Lingua.panel.Home = function (config) {
                                     }
                                 ]
                             }]
+                    }, {
+                        title: _('lingua.tools'),
+                        defaults: {
+                            autoHeight: true,
+                            border: true
+                        },
+                        padding: 10,
+                        items: [{
+                                xtype: 'panel',
+                                title: _('lingua.sync'),
+                                anchor: '100%',
+                                items: [
+                                    {
+                                        html: _('lingua.sync_desc'),
+                                        bodyCssClass: 'panel-desc'
+                                    }, {
+                                        xtype: 'lingua-grid-sync'
+                                    }
+                                ]
+                            }]
                     }],
                 listeners: {
                     'afterrender': function (tabPanel) {
@@ -135,7 +155,7 @@ Lingua.panel.Home = function (config) {
                 listeners: {
                     afterrender: function () {
                         Ext.get('lingua_about').on('click', function () {
-                            var msg = '&copy; 2013-2014, ';
+                            var msg = '&copy; 2013-2015, ';
                             msg += '<a href="http://www.virtudraft.com" target="_blank">';
                             msg += 'www.virtudraft.com';
                             msg += '</a><br/>';

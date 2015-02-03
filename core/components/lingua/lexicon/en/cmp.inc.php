@@ -43,3 +43,14 @@ $_lang['lingua.exclude_self_desc'] = 'Exclude the properties to this resource, r
 $_lang['lingua.resourcescope_create'] = 'Add new setting for a resource';
 $_lang['lingua.delete_resourcescope_confirm'] = 'Are you sure you want to delete this resource scope?';
 $_lang['lingua.languages_field_desc'] = 'Fill languages with (comma delimited if many) 2-letters ISO code(s), eg: en,de,es.';
+$_lang['lingua.tools'] = 'Tools';
+$_lang['lingua.sync'] = 'Synchronize';
+$_lang['lingua.sync_desc'] = 'Synchronize resources to their translations according to the given language codes in General Settings, System Settings, and resource scope.<br>'
+        . '<b>Inexisting translation will be added, unused translation will be deleted, but existing one will not be overriden.</b><br>'
+        . '<ol><li>Auto Synchronize will check all resources.</li>'
+        . '<li>Manual Synchronize will only check defined resources below.</li></ol>';
+$_lang['lingua.auto_sync'] = 'Auto Synchronize';
+$_lang['lingua.select_context'] = 'Select Context';
+$_lang['lingua.auto_sync_confirm'] = 'Are you sure you want to run Auto Synchronize?';
+$_lang['lingua.manual_sync'] = 'Manual Synchronize';
+$_lang['lingua.please_wait'] = 'Please wait...';
