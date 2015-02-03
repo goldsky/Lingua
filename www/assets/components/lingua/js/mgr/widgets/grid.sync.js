@@ -168,7 +168,7 @@ Ext.extend(Lingua.grid.Sync, MODx.grid.LocalGrid, {
             res.push(record.data.id);
         });
         if (res.length === 0) {
-            alert('Add the resources to be synchronized!');
+            MODx.msg.alert(_('error'), _('lingua.manual_sync_err_ns'), Ext.emptyFn);
             return false;
         }
         this._loadMask();

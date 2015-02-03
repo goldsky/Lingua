@@ -54,3 +54,4 @@ $_lang['lingua.select_context'] = 'Select Context';
 $_lang['lingua.auto_sync_confirm'] = 'Are you sure you want to run Auto Synchronize?';
 $_lang['lingua.manual_sync'] = 'Manual Synchronize';
 $_lang['lingua.please_wait'] = 'Please wait...';
+$_lang['lingua.manual_sync_err_ns'] = 'Please add resource(s) to be synchronized!';
