@@ -1,4 +1,4 @@
-Lingua 2.1.0-beta1
+Lingua 2.1.0-beta1 (February 4, 2015)
 =================================
 - [#30] batch synchronize translation for (eg.) imported resources
 - [#33] add option in System Settings to detect Form Customization's renderings
