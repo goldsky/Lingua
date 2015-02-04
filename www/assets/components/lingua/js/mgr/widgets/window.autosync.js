@@ -4,7 +4,7 @@ Lingua.window.AutoSync = function (config) {
     if (typeof(config.contexts) !== 'undefined' && config.contexts.length > 0) {
         Ext.each(config.contexts, function(item) {
             items.push({
-                boxLabel: item.name,
+                boxLabel: item.name || item.key,
                 name: 'contexts[]',
                 inputValue: item.key
             });

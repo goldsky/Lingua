@@ -74,47 +74,8 @@ class ToolManualSyncProcessor extends modObjectGetListProcessor {
      * @return array
      */
     public function prepareRow(xPDOObject $object) {
-        $objectArray = $object->toArray();
-        $this->modx->resource = $object;
-        $languages = $this->modx->lingua->getLanguages(true, true, false);
-        if ($languages) {
-            $where = array();
-            foreach ($languages as $language) {
-                $where[] = $language['lang_code'];
-            }
-            // first, delete unused translation
-            $c = $this->modx->newQuery('linguaSiteContent');
-            $c->innerJoin('linguaLangs', 'Lang');
-            $c->where(array(
-                'linguaSiteContent.resource_id:=' => $objectArray['id'],
-                'Lang.lang_code:NOT IN' => $where,
-            ));
-            $unusedContents = $this->modx->getCollection('linguaSiteContent', $c);
-            if ($unusedContents) {
-                foreach ($unusedContents as $item) {
-                    $item->remove();
-                }
-            }
-            foreach ($languages as $language) {
-                $this->modx->lingua->setContentTranslation($objectArray['id'], $language['lang_code'], $objectArray, false);
-            }
-            $tvs = $object->getTemplateVars();
-            $translatedTvs = $this->modx->getCollection('linguaSiteTmplvars');
-            if ($translatedTvs && $tvs) {
-                $translatedTvsArray = array();
-                foreach ($translatedTvs as $translatedTv) {
-                    $translatedTvsArray[] = $translatedTv->get('tmplvarid');
-                }
-                foreach ($tvs as $tv) {
-                    if (!in_array($tv->get('id'), $translatedTvsArray)) {
-                        continue;
-                    }
-                    $this->modx->lingua->setTVTranslation($objectArray['id'], $language['lang_code'], $tv->get('id'), $tv->get('value'), false);
-                }
-            }
-        }
-
-        return $objectArray;
+        $this->modx->lingua->synchronize($object);
+        return $object->toArray();
     }
 
     /**

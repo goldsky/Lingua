@@ -136,5 +136,13 @@ $xpdo_meta_map['linguaSiteTmplvarContentvalues']= array (
       'cardinality' => 'one',
       'owner' => 'foreign',
     ),
+    'Lang' => 
+    array (
+      'class' => 'linguaLangs',
+      'local' => 'lang_id',
+      'foreign' => 'id',
+      'cardinality' => 'one',
+      'owner' => 'foreign',
+    ),
   ),
 );

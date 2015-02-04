@@ -437,27 +437,27 @@ class Lingua {
      * @see xPDO::getCount()
      * @link http://forums.modx.com/thread/88619/getcount-fails-if-the-query-has-aggregate-leaving-having-039-s-field-undefined The discussion for this
      */
-    public function getQueryCount($className, $criteria= null) {
-        $count= 0;
-        if ($query= $this->modx->newQuery($className, $criteria)) {
-            $expr= '*';
-            if ($pk= $this->modx->getPK($className)) {
+    public function getQueryCount($className, $criteria = null) {
+        $count = 0;
+        if ($query = $this->modx->newQuery($className, $criteria)) {
+            $expr = '*';
+            if ($pk = $this->modx->getPK($className)) {
                 if (!is_array($pk)) {
-                    $pk= array ($pk);
+                    $pk = array($pk);
                 }
-                $expr= $this->modx->getSelectColumns($className, 'alias', '', $pk);
+                $expr = $this->modx->getSelectColumns($className, 'alias', '', $pk);
             }
             $query->prepare();
             $sql = $query->toSQL();
-            $stmt= $this->modx->query("SELECT COUNT($expr) FROM ($sql) alias");
+            $stmt = $this->modx->query("SELECT COUNT($expr) FROM ($sql) alias");
             if ($stmt) {
                 $tstart = microtime(true);
                 if ($stmt->execute()) {
                     $this->modx->queryTime += microtime(true) - $tstart;
                     $this->modx->executedQueries++;
-                    if ($results= $stmt->fetchAll(PDO::FETCH_COLUMN)) {
-                        $count= reset($results);
-                        $count= intval($count);
+                    if ($results = $stmt->fetchAll(PDO::FETCH_COLUMN)) {
+                        $count = reset($results);
+                        $count = intval($count);
                     }
                 } else {
                     $this->modx->queryTime += microtime(true) - $tstart;
@@ -847,4 +847,68 @@ class Lingua {
         $linguaSiteTmplvarContentvalues->set('value', $val);
         return $linguaSiteTmplvarContentvalues->save();
     }
+
+    /**
+     * Synchronize Resource and its TVs to the translations of the defined languages
+     * @param modResource $resource
+     * @return boolean
+     */
+    public function synchronize(modResource $resource) {
+        $resourceArray = $resource->toArray();
+        $this->modx->resource = $resource;
+        $languages = $this->getLanguages(true, true, false);
+        if ($languages) {
+            $langCodes = array();
+            foreach ($languages as $language) {
+                $langCodes[] = $language['lang_code'];
+            }
+            // first, delete unused translation
+            $c = $this->modx->newQuery('linguaSiteContent');
+            $c->innerJoin('linguaLangs', 'Lang');
+            $c->where(array(
+                'linguaSiteContent.resource_id:=' => $resourceArray['id'],
+                'Lang.lang_code:NOT IN' => $langCodes,
+            ));
+            $unusedContents = $this->modx->getCollection('linguaSiteContent', $c);
+            if ($unusedContents) {
+                foreach ($unusedContents as $item) {
+                    $item->remove();
+                }
+            }
+            foreach ($languages as $language) {
+                $this->setContentTranslation($resourceArray['id'], $language['lang_code'], $resourceArray, false);
+            }
+            $tvs = $resource->getTemplateVars();
+            $translatedTvs = $this->modx->getCollection('linguaSiteTmplvars');
+            if ($translatedTvs && $tvs) {
+                $translatedTvsArray = array();
+                foreach ($translatedTvs as $translatedTv) {
+                    $translatedTvsArray[] = $translatedTv->get('tmplvarid');
+                }
+                foreach ($tvs as $tv) {
+                    // first, delete unused translation
+                    $c = $this->modx->newQuery('linguaSiteTmplvarContentvalues');
+                    $c->innerJoin('linguaLangs', 'Lang');
+                    $c->where(array(
+                        'linguaSiteTmplvarContentvalues.contentid:=' => $resourceArray['id'],
+                        'linguaSiteTmplvarContentvalues.tmplvarid:=' => $tv->get('id'),
+                        'Lang.lang_code:NOT IN' => $langCodes,
+                    ));
+                    $unusedContents = $this->modx->getCollection('linguaSiteTmplvarContentvalues', $c);
+                    if ($unusedContents) {
+                        foreach ($unusedContents as $item) {
+                            $item->remove();
+                        }
+                    }
+                    if (!in_array($tv->get('id'), $translatedTvsArray)) {
+                        continue;
+                    }
+                    $this->setTVTranslation($resourceArray['id'], $language['lang_code'], $tv->get('id'), $tv->get('value'), false);
+                }
+            }
+        }
+
+        return true;
+    }
+
 }

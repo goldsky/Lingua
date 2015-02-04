@@ -14,9 +14,10 @@
 		<index alias="lang_code" name="lang_code" primary="false" unique="false" type="BTREE" >
 			<column key="lang_code" length="" collation="A" null="false" />
 		</index>
-        
+
         <composite alias="SiteContent" class="linguaSiteContent" local="id" foreign="lang_id" cardinality="many" owner="local" />
-        
+        <composite alias="TmplvarContentvalues" class="linguaSiteTmplvarContentvalues" local="id" foreign="lang_id" cardinality="many" owner="local" />
+
 	</object>
 	<object class="linguaResourceScopes" table="resource_scopes" extends="xPDOSimpleObject">
 		<field key="resource_id" dbtype="int" precision="10" attributes="unsigned" phptype="integer" null="false" />
@@ -97,9 +98,10 @@
 		<index alias="lang_id" name="lang_id" primary="false" unique="false" type="BTREE" >
 			<column key="lang_id" length="" collation="A" null="false" />
 		</index>
-        
+
         <aggregate alias="Tmplvars" class="linguaSiteTmplvars" local="tmplvarid" foreign="tmplvarid" cardinality="one" owner="foreign" />
-        
+        <aggregate alias="Lang" class="linguaLangs" local="lang_id" foreign="id" cardinality="one" owner="foreign" />
+
 	</object>
 	<object class="linguaSiteTmplvars" table="site_tmplvars" extends="xPDOSimpleObject">
 		<field key="tmplvarid" dbtype="int" precision="10" attributes="unsigned" phptype="integer" null="false" default="0" index="index" />
@@ -107,9 +109,9 @@
 		<index alias="tmplvarid" name="tmplvarid" primary="false" unique="false" type="BTREE" >
 			<column key="tmplvarid" length="" collation="A" null="false" />
 		</index>
-        
+
         <composite alias="TmplvarContentvalues" class="linguaSiteTmplvarContentvalues" local="tmplvarid" foreign="tmplvarid" cardinality="many" owner="local" />
-        
+
 	</object>
 	<object class="linguaSiteTmplvarsPatterns" table="site_tmplvars_patterns" extends="xPDOSimpleObject">
 		<field key="type" dbtype="varchar" precision="255" phptype="string" null="true" />

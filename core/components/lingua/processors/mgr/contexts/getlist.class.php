@@ -53,6 +53,22 @@ class ContextsGetListProcessor extends modObjectGetListProcessor {
         return $c;
     }
 
+    /**
+     * Return arrays of objects (with count) converted to JSON.
+     *
+     * The JSON result includes two main elements, total and results. This format is used for list
+     * results.
+     *
+     * @access public
+     * @param array $array An array of data objects.
+     * @param mixed $count The total number of objects. Used for pagination.
+     * @return string The JSON output.
+     */
+    public function outputArray(array $array,$count = false) {
+        if ($count === false) { $count = count($array); }
+        return '{"success":true,"message":"","total":"'.$count.'","results":'.$this->modx->toJSON($array).'}';
+    }
+
 }
 
 return 'ContextsGetListProcessor';
