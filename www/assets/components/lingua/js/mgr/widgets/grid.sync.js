@@ -23,7 +23,7 @@ Lingua.grid.Sync = function (config) {
                 scope: this,
                 handler: this.autoSync
             }],
-        bbar: [{
+        bbar: ['->', {
                 text: _('add'),
                 scope: this,
                 handler: this.addManualResource
@@ -38,6 +38,19 @@ Lingua.grid.Sync = function (config) {
 };
 
 Ext.extend(Lingua.grid.Sync, MODx.grid.LocalGrid, {
+    getMenu: function() {
+        var menu = [
+            {
+                text: _('delete'),
+                handler: this.removeResource
+            }
+        ];
+        return menu;
+    },
+    removeResource: function() {
+        this.getStore().remove(this.getSelectionModel().getSelections()[0]);
+        this.getView().refresh();
+    },
     autoSync: function() {
         var _this = this;
         _this._loadMask();
@@ -86,6 +99,7 @@ Ext.extend(Lingua.grid.Sync, MODx.grid.LocalGrid, {
                                 _this.autoSyncLoop(20, response.object.nextStart);
                             } else {
                                 _this._hideMask();
+                                MODx.msg.alert(_('success'), response.message || '', Ext.emptyFn);
                             }
                         }
                     }
@@ -196,6 +210,7 @@ Ext.extend(Lingua.grid.Sync, MODx.grid.LocalGrid, {
                                 _this._hideMask();
                                 _this.getStore().loadData([]);
                                 _this.getView().refresh();
+                                MODx.msg.alert(_('success'), response.message || '', Ext.emptyFn);
                             }
                         }
                     }

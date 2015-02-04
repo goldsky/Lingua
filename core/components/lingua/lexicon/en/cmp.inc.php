@@ -55,3 +55,4 @@ $_lang['lingua.auto_sync_confirm'] = 'Are you sure you want to run Auto Synchron
 $_lang['lingua.manual_sync'] = 'Manual Synchronize';
 $_lang['lingua.please_wait'] = 'Please wait...';
 $_lang['lingua.manual_sync_err_ns'] = 'Please add resource(s) to be synchronized!';
+$_lang['lingua.sync_suc'] = 'Synchronization was successful';

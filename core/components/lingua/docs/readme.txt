@@ -1,17 +1,11 @@
 -----------------------
 Package: Lingua
 -----------------------
-goldsky
-Concept, System Architecture and Design, Author
-goldsky@virtudraft.com
-http://www.virtudraft.com
-http://twitter.com/_goldsky
+author:
+goldsky <goldsky@virtudraft.com>
 
-Adam Wintle/Monogon Company Limited
-Concept and Strategic Development
-adam@monogon.co
-http://www.monogon.co
-https://twitter.com/adamwintle
+collaborators:
+Adam Wintle <adam@monogon.co>
 
 Lingua is a multi-lingual plugin system for MODX Revolution.
 

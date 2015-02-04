@@ -137,7 +137,7 @@ class ToolManualSyncProcessor extends modObjectGetListProcessor {
             'lingua/resource' => array(),
         ));
         $this->modx->error->total = $count;
-        return $this->success('', array(
+        return $this->success($this->modx->lexicon('lingua.sync_suc'), array(
                     'total' => $count,
                     'results' => $array,
                     'totalUpdated' => $count,
