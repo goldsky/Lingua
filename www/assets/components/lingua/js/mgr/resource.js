@@ -106,7 +106,8 @@ Lingua.prototype.flagDefaultFields = function () {
                 class: 'icon-lingua-insert-flag'
             });
         } else {
-            content.setTitle(_('resource_content') + '&nbsp;<img src="../' + this.config.langs[this.config.defaultLang]['flag'] + '">');
+            this.contentTitle = content.title;
+            content.setTitle(this.contentTitle + '&nbsp;<img src="../' + this.config.langs[this.config.defaultLang]['flag'] + '">');
         }
     }
 
@@ -538,6 +539,11 @@ Lingua.prototype.switchMainFields = function (selectedLang) {
     this.switchMainField('modx-resource-longtitle', 'longtitle', selectedLang);
     this.switchMainField('modx-resource-description', 'description', selectedLang);
     this.switchMainField('modx-resource-introtext', 'introtext', selectedLang);
+
+    var content = Ext.getCmp('modx-resource-content');
+    if (typeof (content) !== "undefined") {
+        content.setTitle(this.contentTitle + '&nbsp;<img src="../' + this.config.langs[selectedLang]['flag'] + '">');
+    }
 
     // textarea content
     var ta = Ext.getCmp('ta');

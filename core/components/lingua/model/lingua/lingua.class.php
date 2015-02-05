@@ -496,6 +496,7 @@ class Lingua {
      * Get list of the languages. Default cultureKey comes first.
      * @param   boolean $activeOnly only return active languages (default: true)
      * @param   boolean $assoc      returned as associative array
+     * @param   boolean $persist    keep the output in placeholder or not?
      * @return  array   languages
      */
     public function getLanguages($activeOnly = true, $assoc = true, $persist = true) {
