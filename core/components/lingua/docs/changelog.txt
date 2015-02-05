@@ -1,4 +1,4 @@
-Lingua 2.1.0-dev
+Lingua 2.1.0-beta2 (February 5, 2015)
 =================================
 - fix flag of the title of the main Content's field
 
