@@ -363,13 +363,8 @@ class LinguaRequest extends modRequest {
 
     public function findResource($uri, $context = '') {
         $resourceId = $this->modx->findResource($uri, $context);
-        if (is_numeric($resourceId)) {
-            // reset the culture key
-            $modCultureKey = $this->modx->getObject('modSystemSetting', array('key' => 'cultureKey'));
-            $cultureKey = $modCultureKey->get('value');
-            $this->lingua->setCultureKey($cultureKey);
-        } else {
-            $resourceId = (int) $this->findCloneResource($uri, $context);
+        if (!is_numeric($resourceId)) {
+            $resourceId = $this->findCloneResource($uri, $context);
         }
         return $resourceId;
     }
