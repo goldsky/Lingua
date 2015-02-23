@@ -201,13 +201,17 @@ foreach ($languages as $language) {
         } elseif ($cloneSite) {
             $itemUri = $cloneSite->get('uri');
         }
-
         if (!empty($itemUri)) {
-            $pageURL = preg_replace('/^' . preg_quote($parseUrl['scheme'] . '://' . $parseUrl['host'] . '/' . $requestUri, '/') . '/i'
-                    , $parseUrl['scheme'] . '://' . $parseUrl['host'] . '/' . $baseUrl . $itemUri
-                    , $originPageUrl);
+            if ((int)$modx->getOption('site_start') === $modx->resource->get('id')) {
+                $pageURL = $parseUrl['scheme'] . '://' . $parseUrl['host'] . '/' . $parseUrl['path'] . $itemUri;
+            } else {
+                $pageURL = preg_replace('/^' . preg_quote($parseUrl['scheme'] . '://' . $parseUrl['host'] . '/' . $requestUri, '/') . '/i'
+                        , $parseUrl['scheme'] . '://' . $parseUrl['host'] . '/' . $baseUrl . $itemUri
+                        , $originPageUrl);
+            }
         }
     }
+
     $language['url'] = $pageURL . (!empty($hasQuery) ? '&' : '?') . $langKey . '=' . $language[$codeField];
     $phs = $lingua->setPlaceholders($language, $phsPrefix, false);
 
