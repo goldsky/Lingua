@@ -56,3 +56,5 @@ $_lang['lingua.manual_sync'] = 'Manual Synchronize';
 $_lang['lingua.please_wait'] = 'Please wait...';
 $_lang['lingua.manual_sync_err_ns'] = 'Please add resource(s) to be synchronized!';
 $_lang['lingua.sync_suc'] = 'Synchronization was successful';
+$_lang['lingua....or'] = '... or';
+$_lang['lingua.pagetitle_of_target'] = 'Pagetitle of target';

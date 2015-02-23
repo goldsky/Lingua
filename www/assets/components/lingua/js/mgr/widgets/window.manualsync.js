@@ -1,5 +1,6 @@
 Lingua.window.ManualSync = function (config) {
     config = config || {};
+    var win = this;
     Ext.applyIf(config, {
         closeAction: 'close',
         fields: [
@@ -10,6 +11,43 @@ Lingua.window.ManualSync = function (config) {
                 xtype: 'lingua-combo-resource',
                 name: 'pagetitle',
                 formpanel: this.getId()
+            }, {
+                xtype: 'modx-combo',
+                fieldLabel: _('lingua....or') + ' ' + _('lingua.pagetitle_of_target'),
+                name: 'page_id',
+                anchor: '100%',
+                url: Lingua.config.connectorUrl,
+                baseParams: {
+                    action: 'mgr/resource/getlist',
+                    combo: true
+                },
+                displayField: 'pagetitle',
+                valueField: 'id',
+                fields: ['id','pagetitle'],
+                editable: true,
+                typeAhead: true,
+                forceSelection: false,
+                listeners: {
+                    select: {
+                        fn: function(combo, record, index) {
+                            if (combo.getValue() === "" || combo.getValue() === 0 || combo.getValue() === "&nbsp;") {
+                                combo.setValue(null);
+                            } else {
+                                win.fp.getForm().findField('resource_id').setValue(record.id);
+                            }
+                            win.fp.getForm().findField('pagetitle').reset();
+                        },
+                        scope: this
+                    },
+                    blur: {
+                        fn: function(combo) {
+                            if (combo.getValue() === "" || combo.getValue() === 0 || combo.getValue() === "&nbsp;") {
+                                combo.setValue(null);
+                            }
+                        },
+                        scope: this
+                    }
+                }
             }
         ],
         buttons: [{
@@ -39,7 +77,7 @@ Ext.extend(Lingua.window.ManualSync, MODx.Window, {
                 record.data.pagetitle
             ]);
         });
-        newData.push([values.resource_id, values.pagetitle]);
+        newData.push([values.resource_id, values.pagetitle || values.page_id]);
         this.grid.getStore().loadData(newData);
         this.grid.getView().refresh();
     }

@@ -17,6 +17,7 @@ Ext.extend(Lingua.combo.Resource, MODx.ChangeParentField, {
         t.on('click', t._handleClick, t);
         t.disableHref = false;
         Ext.getCmp(this.config.formpanel).fp.getForm().findField('resource_id').setValue(p.v);
+        Ext.getCmp(this.config.formpanel).fp.getForm().findField('page_id').setValue(null);
         this.setValue(p.d);
         this.oldValue = false;
     },
