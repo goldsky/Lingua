@@ -1,3 +1,7 @@
+Lingua 2.1.0-beta4 (February 23, 2015)
+======================================
+- [#38] fix table resolver on creating "linguaResourceScopes"
+
 Lingua 2.1.0-beta3 (February 11, 2015)
 ======================================
 - revert language reset on LinguaRequest::findResource()

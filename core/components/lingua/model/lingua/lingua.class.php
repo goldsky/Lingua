@@ -25,7 +25,7 @@
 class Lingua {
 
     const VERSION = '2.1.0';
-    const RELEASE = 'beta3';
+    const RELEASE = 'beta4';
 
     /**
      * modX object

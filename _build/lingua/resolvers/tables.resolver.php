@@ -66,14 +66,12 @@ if ($modx = & $object->xpdo) {
             $manager->createObjectContainer('linguaSiteContent');
             $manager->createObjectContainer('linguaSiteTmplvarContentvalues');
             $manager->createObjectContainer('linguaSiteTmplvars');
+            $manager->createObjectContainer('linguaResourceScopes');
             if ($oldPackage && $oldPackage->compareVersion('2.0.0-rc1', '>')) {
                 $manager->addField('linguaSiteContent', 'parent', array('after' => 'link_attributes'));
                 $manager->addField('linguaSiteContent', 'isfolder', array('after' => 'parent'));
                 $manager->addField('linguaSiteContent', 'context_key', array('after' => 'menutitle'));
                 $manager->addField('linguaSiteContent', 'content_type', array('after' => 'context_key'));
-            }
-            if ($oldPackage && $oldPackage->compareVersion('2.0.2-pl')) {
-                $manager->createObjectContainer('linguaResourceScopes');
             }
             if ($manager->createObjectContainer('linguaSiteTmplvarsPatterns')) {
                 $defaults = include $modx->getOption('core_path') . 'components/lingua/defaults/default.patterns.php';
