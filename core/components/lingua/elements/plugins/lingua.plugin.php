@@ -344,14 +344,17 @@ Ext.onReady(function() {
                     'lang_id' => $language['id']
                 ));
                 // Start to manipulate the ID to parse hidden TVs
-                $content = '';
+                $value = '';
                 if ($linguaTVContent) {
-                    $content = $linguaTVContent->get('value');
+                    $value = $linguaTVContent->get('value');
                 }
-                // Hack TV's value because renderInput ignores empty value
-                $tv->set('value', $content);
+                // Hack TV's value because $tv->renderInput() processes empty value:
+                //     $tv->renderInput()
+                //     $tv->getValue()
+                $tv->set('resourceId', $resourceId);
+                $tv->set('value', $value);
                 $inputForm = $tv->renderInput($resource, array(
-                    'value' => $content
+                    'value' => $value
                 ));
                 if (empty($inputForm)) {
                     continue;

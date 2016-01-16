@@ -1,3 +1,7 @@
+Lingua 2.1.0-dev
+======================================
+- [#48] TV saving problem: saving empty value
+
 Lingua 2.1.0-beta4 (February 23, 2015)
 ======================================
 - [#36] replace "Select Node" on linking resource with pagetitle type ahead
