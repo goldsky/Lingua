@@ -753,8 +753,10 @@ class Lingua {
             'resource_id' => $id,
             'lang_id' => $linguaLangs->get('id'),
         );
+        $force_alias = false;
         $linguaSiteContent = $this->modx->getObject('linguaSiteContent', $params);
         if (!$linguaSiteContent) {
+            $force_alias = true;
             $linguaSiteContent = $this->modx->newObject('linguaSiteContent');
             $linguaSiteContent->fromArray($params);
             $linguaSiteContent->save();
@@ -779,11 +781,17 @@ class Lingua {
         if (isset($values['introtext'])) {
             $linguaSiteContent->set('introtext', $values['introtext']);
         }
-        if (empty($values['alias'])) {
+        
+        if (empty($values['alias']) && $force_alias === false ) {
+            // do nothing
+        } elseif (empty($values['alias']) && $force_alias) {
             $values['alias'] = $values['pagetitle'];
             $linguaSiteContent->setDirty('alias');
+            $linguaSiteContent->set('alias', $values['alias']);
+        } else {
+            $linguaSiteContent->set('alias', $values['alias']);
         }
-        $linguaSiteContent->set('alias', $values['alias']);
+        
         if (isset($values['menutitle'])) {
             $linguaSiteContent->set('menutitle', $values['menutitle']);
         }
