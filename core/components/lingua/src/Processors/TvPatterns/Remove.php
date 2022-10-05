@@ -19,28 +19,19 @@
  * Lingua; if not, write to the Free Software Foundation, Inc., 59 Temple Place,
  * Suite 330, Boston, MA 02111-1307 USA
  *
- * Filling up db tables
- *
  * @package lingua
- * @subpackage build
+ * @subpackage lingua_processor
  */
-$collection = array();
-$patterns = include dirname(__FILE__) . '/modx_lingua_site_tmplvars_patterns.php';
-foreach ($patterns as $pattern) {
-    $oldPattern = $modx->getObject('Lingua\\Model\\LinguaSiteTmplvarsPatterns', array(
-		'type' => $pattern['type'],
-		'search' => $pattern['search'],
-		'replacement' => $pattern['replacement'],
-    ));
-    if ($oldPattern) {
-        continue;
-    }
-	$newPattern = $modx->newObject('Lingua\\Model\\LinguaSiteTmplvarsPatterns');
-	$newPattern->fromArray(array(
-		'type' => $pattern['type'],
-		'search' => $pattern['search'],
-		'replacement' => $pattern['replacement'],
-			), '', true, true);
-	$collection[] = $newPattern;
+
+namespace Lingua\Processors\TvPatterns;
+
+use Lingua\Model\LinguaSiteTmplvarsPatterns;
+use MODX\Revolution\Processors\Model\RemoveProcessor;
+
+class Remove extends RemoveProcessor {
+
+    public $classKey = LinguaSiteTmplvarsPatterns::class;
+    public $languageTopics = array('lingua:cmp');
+    public $objectType = 'lingua.LinguaRemove';
+
 }
-return $collection;

@@ -1,3 +1,7 @@
+Lingua 3.0.0-dev
+======================================
+- Add compatibility with MODX 3
+
 Lingua 2.1.0-dev
 ======================================
 - [#48] TV saving problem: saving empty value

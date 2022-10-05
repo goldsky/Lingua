@@ -19,28 +19,27 @@
  * Lingua; if not, write to the Free Software Foundation, Inc., 59 Temple Place,
  * Suite 330, Boston, MA 02111-1307 USA
  *
- * Filling up db tables
- *
  * @package lingua
- * @subpackage build
+ * @subpackage lingua_processor
  */
-$collection = array();
-$patterns = include dirname(__FILE__) . '/modx_lingua_site_tmplvars_patterns.php';
-foreach ($patterns as $pattern) {
-    $oldPattern = $modx->getObject('Lingua\\Model\\LinguaSiteTmplvarsPatterns', array(
-		'type' => $pattern['type'],
-		'search' => $pattern['search'],
-		'replacement' => $pattern['replacement'],
-    ));
-    if ($oldPattern) {
-        continue;
+
+namespace Lingua\Processors\ResourceScopes;
+
+use Lingua\Processors\ResourceScopes\Update;
+
+class UpdateFromGrid extends Update {
+
+    public function initialize() {
+        $data = $this->getProperty('data');
+        if (empty($data))
+            return $this->modx->lexicon('invalid_data');
+        $data = $this->modx->fromJSON($data);
+        if (empty($data))
+            return $this->modx->lexicon('invalid_data');
+        $this->setProperties($data);
+        $this->unsetProperty('data');
+
+        return parent::initialize();
     }
-	$newPattern = $modx->newObject('Lingua\\Model\\LinguaSiteTmplvarsPatterns');
-	$newPattern->fromArray(array(
-		'type' => $pattern['type'],
-		'search' => $pattern['search'],
-		'replacement' => $pattern['replacement'],
-			), '', true, true);
-	$collection[] = $newPattern;
+
 }
-return $collection;

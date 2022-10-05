@@ -27,7 +27,7 @@
 $collection = array();
 $langs = include dirname(__FILE__) . '/modx_lingua_langs.php';
 foreach ($langs as $lang) {
-    $oldLang = $modx->getObject('linguaLangs', array(
+    $oldLang = $modx->getObject('Lingua\\Model\\LinguaLangs', array(
 		'lang_code' => $lang['lang_code'],
 		'lcid_string' => $lang['lcid_string'],
 		'lcid_dec' => $lang['lcid_dec'],
@@ -35,7 +35,7 @@ foreach ($langs as $lang) {
     if ($oldLang) {
         continue;
     }
-	$newLang = $modx->newObject('linguaLangs');
+	$newLang = $modx->newObject('Lingua\\Model\\LinguaLangs');
 	$newLang->fromArray(array(
 		'active' => $lang['lang_code'] === 'en' ? 1 : 0,
 		'local_name' => $lang['local_name'],
