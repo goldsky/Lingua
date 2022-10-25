@@ -1,5 +1,12 @@
 <?php
 
+namespace Lingua\Model;
+
+use MODX\Revolution\modResource;
+use MODX\Revolution\modTemplate;
+use MODX\Revolution\modTemplateVar;
+use MODX\Revolution\modSystemSetting;
+
 header('Content-Type: text/html; charset=utf-8');
 /**
  * Lingua
@@ -72,10 +79,10 @@ switch ($event) {
                 }
                 arsort($sortedLangs);
                 $langs = array_keys($sortedLangs);
-                $linguaLangs = $modx->getCollection('linguaLangs', array(
+                $linguaLangs = $modx->getCollection(LinguaLangs::class, array(
                     'active' => 1
                 ));
-                $c = $modx->newQuery('linguaLangs');
+                $c = $modx->newQuery(LinguaLangs::class);
                 $c->where('active=1');
                 $contextLangs = $modx->context->config['lingua.langs'];
                 if (!empty($contextLangs)) {
@@ -84,7 +91,7 @@ switch ($event) {
                         'lang_code:IN' => $contextLangs
                     ));
                 }
-                $linguaLangs = $modx->getCollection('linguaLangs', $c);
+                $linguaLangs = $modx->getCollection(LinguaLangs::class, $c);
                 $existingLangs = array();
                 if ($linguaLangs) {
                     foreach ($linguaLangs as $linguaLang) {
@@ -162,7 +169,7 @@ switch ($event) {
         $modx->regClientCSS(MODX_BASE_URL . 'assets/components/lingua/css/mgr.css');
         $modx->controller->addLastJavascript(MODX_BASE_URL . 'assets/components/lingua/js/mgr/resource.js');
         // $modx->getOption('cultureKey') doesn't work!
-        $modCultureKey = $modx->getObject('modSystemSetting', array('key' => 'cultureKey'));
+        $modCultureKey = $modx->getObject(modSystemSetting::class, array('key' => 'cultureKey'));
         $cultureKey = $modCultureKey->get('value');
         $storeData = array();
         $storeDefaultData = array();
@@ -189,7 +196,7 @@ switch ($event) {
                 $language['flag'],
             );
             if ($mode === modSystemEvent::MODE_UPD) {
-                $linguaSiteContent = $modx->getObject('linguaSiteContent', array(
+                $linguaSiteContent = $modx->getObject(LinguaSiteContent::class, array(
                     'resource_id' => $resource->get('id'),
                     'lang_id' => $language['id']
                 ));
@@ -231,7 +238,7 @@ Ext.onReady(function() {
     case 'OnResourceTVFormRender':
         if (!is_object($resource) && is_numeric($resource)) {
             $resourceId = $resource;
-            $resource = $modx->getObject('modResource', $resource);
+            $resource = $modx->getObject(modResource::class, $resource);
         }
         $contexts = $modx->getOption('lingua.contexts', $scriptProperties, 'web');
         if (!empty($contexts)) {
@@ -285,7 +292,7 @@ Ext.onReady(function() {
             $tvs = $resource->getTemplateVars();
         } else {
             $templateId = $template;
-            $template = $modx->getObject('modTemplate', $templateId);
+            $template = $modx->getObject(modTemplate::class, $templateId);
             $tvs = $template->getTemplateVars();
         }
         if (!$tvs) {
@@ -297,11 +304,11 @@ Ext.onReady(function() {
         foreach ($tvs as $tv) {
             $tvIds[] = $tv->get('id');
         }
-        $c = $modx->newQuery('linguaSiteTmplvars');
+        $c = $modx->newQuery(linguaSiteTmplvars::class);
         $c->where(array(
             'tmplvarid:IN' => $tvIds
         ));
-        $linguaSiteTmplvars = $modx->getCollection('linguaSiteTmplvars', $c);
+        $linguaSiteTmplvars = $modx->getCollection(LinguaSiteTmplvars::class, $c);
         if (!$linguaSiteTmplvars) {
             return;
         }
@@ -321,7 +328,7 @@ Ext.onReady(function() {
         $cloneTVFields = array();
         $count = 0;
         // $modx->getOption('cultureKey') doesn't work!
-        $modCultureKey = $modx->getObject('modSystemSetting', array('key' => 'cultureKey'));
+        $modCultureKey = $modx->getObject(modSystemSetting::class, array('key' => 'cultureKey'));
         $cultureKey = $modCultureKey->get('value');
         foreach ($linguaSiteTmplvars as $linguaTv) {
             $tvId = $linguaTv->get('tmplvarid');
@@ -338,7 +345,7 @@ Ext.onReady(function() {
                 if ($language['lang_code'] === $cultureKey) {
                     continue;
                 }
-                $linguaTVContent = $modx->getObject('linguaSiteTmplvarContentvalues', array(
+                $linguaTVContent = $modx->getObject(LinguaSiteTmplvarContentvalues::class, array(
                     'tmplvarid' => $tvId,
                     'contentid' => $resourceId,
                     'lang_id' => $language['id']
@@ -365,7 +372,7 @@ Ext.onReady(function() {
                 $cloneInputForm = preg_replace('/("|\'){1}tv' . $tvId . '("|\'){1}/', '${1}tv' . $tvCloneId . '${2}', $cloneInputForm);
                 $cloneInputForm = preg_replace('/("|\'){1}tv' . $tvId . '\[\]("|\'){1}/', '${1}tv' . $tvCloneId . '[]${2}', $cloneInputForm);
                 // advanced replacements
-                $linguaSiteTmplvarsPatterns = $modx->getCollection('linguaSiteTmplvarsPatterns', array(
+                $linguaSiteTmplvarsPatterns = $modx->getCollection(LinguaSiteTmplvarsPatterns::class, array(
                     'type' => $tv->get('type')
                 ));
                 if ($linguaSiteTmplvarsPatterns) {
@@ -438,7 +445,7 @@ Ext.onReady(function() {
         $reverting = array();
         $clearKeys = array();
         // $modx->getOption('cultureKey') doesn't work!
-        $modCultureKey = $modx->getObject('modSystemSetting', array('key' => 'cultureKey'));
+        $modCultureKey = $modx->getObject(modSystemSetting::class, array('key' => 'cultureKey'));
         $cultureKey = $modCultureKey->get('value');
         foreach ($resource->_fields as $k => $v) {
             if (!preg_match('/_lingua$/', $k)) {
@@ -475,7 +482,7 @@ Ext.onReady(function() {
             if ($lang === $cultureKey) {
                 continue;
             }
-            $tv = $modx->getObject('modTemplateVar', $tvId);
+            $tv = $modx->getObject(modTemplateVar::class, $tvId);
             $tvKey = $tvKeys[0];
             /* validation for different types */
             switch ($tv->get('type')) {
@@ -574,7 +581,7 @@ Ext.onReady(function() {
             }
         }
 
-        $linguaSiteContents = $modx->getCollection('linguaSiteContent', array(
+        $linguaSiteContents = $modx->getCollection(LinguaSiteContent::class, array(
             'resource_id' => $oldResource->get('id')
         ));
         if ($linguaSiteContents) {
@@ -582,7 +589,7 @@ Ext.onReady(function() {
                 $params = $linguaSiteContent->toArray();
                 unset($params['id']);
                 $params['resource_id'] = $newResource->get('id');
-                $newLinguaSiteContent = $modx->newObject('linguaSiteContent');
+                $newLinguaSiteContent = $modx->newObject(LinguaSiteContent::class);
                 $newLinguaSiteContent->fromArray($params);
                 $newLinguaSiteContent->save();
             }
@@ -591,7 +598,7 @@ Ext.onReady(function() {
 
     case 'OnEmptyTrash':
         if (!empty($ids) && is_array($ids)) {
-            $collection = $modx->getCollection('linguaSiteContent', array(
+            $collection = $modx->getCollection(LinguaSiteContent::class, array(
                 'resource_id:IN' => $ids
             ));
             if ($collection) {

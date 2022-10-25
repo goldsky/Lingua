@@ -1,5 +1,10 @@
 <?php
 
+namespace Lingua\Model;
+
+use MODX\Revolution\modResource;
+use MODX\Revolution\modTemplateVar;
+
 /**
  * Lingua
  *
@@ -31,7 +36,6 @@ if (empty($field)) {
 $id = $modx->getOption('id', $scriptProperties, $modx->resource->get('id'));
 $emptyReturnsDefault = $modx->getOption('emptyReturnsDefault', $scriptProperties, $modx->getOption('lingua.empty_returns_default', null, false));
 
-$defaultLinguaCorePath = $modx->getOption('core_path') . 'components/lingua/';
 $lingua = $modx->getService('lingua', 'Lingua', null, $scriptProperties);
 $debug = $modx->getOption('lingua.debug');
 if (!($lingua instanceof Lingua)) {
@@ -39,7 +43,7 @@ if (!($lingua instanceof Lingua)) {
     return;
 }
 
-$langObj = $modx->getObject('linguaLangs', array(
+$langObj = $modx->getObject(LinguaLangs::class, array(
     'lang_code' => $modx->cultureKey
 ));
 if (!$langObj) {
@@ -48,13 +52,13 @@ if (!$langObj) {
     }
     return;
 }
-$c = $modx->newQuery('linguaSiteContent');
+$c = $modx->newQuery(LinguaSiteContent::class);
 $c->where(array(
     'resource_id' => $id,
     'lang_id' => $langObj->get('id'),
 ));
-$linguaSiteContent = $modx->getObject('linguaSiteContent', $c);
-$resource = $modx->getObject('modResource', $id);
+$linguaSiteContent = $modx->getObject(LinguaSiteContent::class, $c);
+$resource = $modx->getObject(modResource::class, $id);
 if (!$resource) {
     if ($debug) {
         $modx->log(modX::LOG_LEVEL_ERROR, '[lingua.getValue]: Missing resource for ' . $field . ' in ' . $modx->cultureKey);
@@ -80,11 +84,11 @@ if (in_array($field, $tableFields)) {
 }
 // try TV
 else {
-    $tv = $modx->getObject('modTemplateVar', array(
+    $tv = $modx->getObject(modTemplateVar::class, array(
         'name' => $field,
     ));
     if ($tv) {
-        $linguaSiteTmplvarContentvalues = $modx->getObject('linguaSiteTmplvarContentvalues', array(
+        $linguaSiteTmplvarContentvalues = $modx->getObject(LinguaSiteTmplvarContentvalues::class, array(
             'lang_id' => $langObj->get('id'),
             'tmplvarid' => $tv->get('id'),
             'contentid' => $id,

@@ -1,8 +1,18 @@
 <?php
 namespace Lingua\Model;
 
-use MODX\Revolution\modRequest;
 use MODX\Revolution\modX;
+use MODX\Revolution\modRequest;
+use MODX\Revolution\modDocument;
+use MODX\Revolution\modResource;
+use MODX\Revolution\modContentType;
+use MODX\Revolution\modContextResource;
+use MODX\Revolution\modResourceGroupResource;
+use MODX\Revolution\Error\modError;
+use MODX\Revolution\Registry\modRegistry;
+use MODX\Revolution\Registry\modFileRegister;
+use xPDO\Cache\xPDOCacheManager;
+use xPDO\xPDO;
 
 /**
  * Lingua
@@ -233,10 +243,10 @@ class LinguaRequest extends modRequest
                     }
 
                     // hack the resource's content in here -------------------->
-                    $linguaLangs = $this->modx->getObject('linguaLangs', array('lang_code' => $cultureKey));
+                    $linguaLangs = $this->modx->getObject(LinguaLangs::class, array('lang_code' => $cultureKey));
                     $emptyReturnsDefault = $this->modx->getOption('lingua.empty_returns_default', null, false);
                     if (($this->lingua instanceof Lingua) && $linguaLangs) {
-                        $linguaSiteContent = $this->modx->getObject('linguaSiteContent', array(
+                        $linguaSiteContent = $this->modx->getObject(LinguaSiteContent::class, array(
                             'resource_id' => $resource->get('id'),
                             'lang_id' => $linguaLangs->get('id'),
                         ));
@@ -266,7 +276,7 @@ class LinguaRequest extends modRequest
                             $value = $tv->getValue($resource->get('id'));
                             // hack the tv's content in here ------------------>
                             if (($this->lingua instanceof Lingua) && $linguaLangs) {
-                                $linguaTVContent = $this->modx->getObject('linguaSiteTmplvarContentvalues', array(
+                                $linguaTVContent = $this->modx->getObject(LinguaSiteTmplvarContentvalues::class, array(
                                     'tmplvarid' => $tv->get('id'),
                                     'contentid' => $resourceId,
                                     'lang_id' => $linguaLangs->get('id')
@@ -407,14 +417,14 @@ class LinguaRequest extends modRequest
         $resourceId = false;
         if (empty($context) && isset($this->modx->context)) $context = $this->modx->context->get('key');
         if (!empty($context) && (!empty($uri) || $uri === '0')) {
-            $query = $this->modx->newQuery('linguaSiteContent');
-            $query->leftJoin('modResource', 'Resource', 'Resource.id = linguaSiteContent.resource_id');
+            $query = $this->modx->newQuery(LinguaSiteContent::class);
+            $query->leftJoin('modResource', 'Resource', 'Resource.id = LinguaSiteContent.resource_id');
             $query->where(array(
                 'context_key' => $context,
                 'uri' => $uri,
                 'Resource.deleted' => false
             ));
-            $linguaContent = $this->modx->getObject('linguaSiteContent', $query);
+            $linguaContent = $this->modx->getObject(LinguaSiteContent::class, $query);
             if ($linguaContent) {
                 $resourceId = $linguaContent->get('resource_id');
                 // reset the culture key

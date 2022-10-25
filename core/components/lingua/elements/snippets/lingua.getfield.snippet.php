@@ -1,5 +1,7 @@
 <?php
 
+namespace Lingua\Model;
+
 /**
  * Lingua
  *
@@ -29,14 +31,13 @@ if (empty($field)) {
 }
 
 $langCodeField = $modx->getOption('codeField', $scriptProperties, $modx->getOption('lingua.code_field', null, 'lang_code'));
-$defaultLinguaCorePath = $modx->getOption('core_path') . 'components/lingua/';
 $lingua = $modx->getService('lingua', 'Lingua', null, $scriptProperties);
 
 if (!($lingua instanceof Lingua)) {
     return;
 }
 
-$langObj = $modx->getObject('linguaLangs', array(
+$langObj = $modx->getObject(LinguaLangs::class, array(
     $langCodeField => $modx->cultureKey
 ));
 if (!$langObj) {
