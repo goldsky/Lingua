@@ -1,6 +1,7 @@
 <?php
 namespace Lingua\Model;
 
+use Lingua\Lingua;
 use MODX\Revolution\modResource;
 use MODX\Revolution\modTemplate;
 use MODX\Revolution\modTemplateVar;
@@ -40,7 +41,7 @@ switch ($event) {
             return;
         }
         $lingua = $modx->getService('Lingua');
-        if (!($lingua instanceof \Lingua)) {
+        if (!($lingua instanceof Lingua)) {
             return;
         }
         $modx->lexicon->load('lingua:default');
@@ -157,7 +158,7 @@ switch ($event) {
         }
 
         $lingua = $modx->getService('Lingua');
-        if (!($lingua instanceof \Lingua)) {
+        if (!($lingua instanceof Lingua)) {
             return;
         }
 
@@ -276,7 +277,7 @@ Ext.onReady(function() {
         }
 
         $lingua = $modx->getService('Lingua');
-        if (!($lingua instanceof \Lingua)) {
+        if (!($lingua instanceof Lingua)) {
             return;
         }
         $languages = $lingua->getLanguages(true, false);
@@ -443,7 +444,7 @@ Ext.onReady(function() {
         }
 
         $lingua = $modx->getService('Lingua');
-        if (!($lingua instanceof \Lingua)) {
+        if (!($lingua instanceof Lingua)) {
             return;
         }
 
