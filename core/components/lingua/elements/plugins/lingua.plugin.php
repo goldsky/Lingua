@@ -32,7 +32,7 @@ switch ($event) {
         if ($modx->context->key === 'mgr') {
             return;
         }
-        $lingua = $modx->getService('lingua', 'Lingua', MODX_CORE_PATH . 'components/lingua/model/lingua/');
+        $lingua = $modx->getService('lingua', 'Lingua');
         if (!($lingua instanceof Lingua)) {
             return;
         }
@@ -149,7 +149,7 @@ switch ($event) {
             }
         }
 
-        $lingua = $modx->getService('lingua', 'Lingua', MODX_CORE_PATH . 'components/lingua/model/lingua/');
+        $lingua = $modx->getService('lingua', 'Lingua');
         if (!($lingua instanceof Lingua)) {
             return;
         }
@@ -268,7 +268,7 @@ Ext.onReady(function() {
             }
         }
 
-        $lingua = $modx->getService('lingua', 'Lingua', MODX_CORE_PATH . 'components/lingua/model/lingua/');
+        $lingua = $modx->getService('lingua', 'Lingua');
         if (!($lingua instanceof Lingua)) {
             return;
         }
@@ -429,7 +429,7 @@ Ext.onReady(function() {
             }
         }
 
-        $lingua = $modx->getService('lingua', 'Lingua', MODX_CORE_PATH . 'components/lingua/model/lingua/');
+        $lingua = $modx->getService('lingua', 'Lingua');
         if (!($lingua instanceof Lingua)) {
             return;
         }

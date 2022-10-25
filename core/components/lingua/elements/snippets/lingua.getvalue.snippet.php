@@ -32,8 +32,7 @@ $id = $modx->getOption('id', $scriptProperties, $modx->resource->get('id'));
 $emptyReturnsDefault = $modx->getOption('emptyReturnsDefault', $scriptProperties, $modx->getOption('lingua.empty_returns_default', null, false));
 
 $defaultLinguaCorePath = $modx->getOption('core_path') . 'components/lingua/';
-$linguaCorePath = $modx->getOption('lingua.core_path', null, $defaultLinguaCorePath);
-$lingua = $modx->getService('lingua', 'Lingua', $linguaCorePath . 'model/lingua/', $scriptProperties);
+$lingua = $modx->getService('lingua', 'Lingua', null, $scriptProperties);
 $debug = $modx->getOption('lingua.debug');
 if (!($lingua instanceof Lingua)) {
     $modx->log(modX::LOG_LEVEL_ERROR, '[lingua.getValue]: !($lingua instanceof Lingua)');

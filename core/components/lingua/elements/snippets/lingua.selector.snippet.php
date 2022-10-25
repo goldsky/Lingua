@@ -32,8 +32,7 @@ $phsPrefix = $modx->getOption('phsPrefix', $scriptProperties, 'lingua.');
 $codeField = $modx->getOption('codeField', $scriptProperties, 'lang_code');
 
 $defaultLinguaCorePath = $modx->getOption('core_path') . 'components/lingua/';
-$linguaCorePath = $modx->getOption('lingua.core_path', null, $defaultLinguaCorePath);
-$lingua = $modx->getService('lingua', 'Lingua', $linguaCorePath . 'model/lingua/', $scriptProperties);
+$lingua = $modx->getService('lingua', 'Lingua', null, $scriptProperties);
 
 if (!($lingua instanceof Lingua)) {
     return;
