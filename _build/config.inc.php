@@ -12,7 +12,7 @@ return [
     'name' => 'Lingua',
     'name_lower' => 'lingua',
     'version' => '3.0.0',
-    'release' => 'pl',
+    'release' => 'beta',
     // Install package to site right after build
     'install' => true,
     // Which elements should be updated on package upgrade

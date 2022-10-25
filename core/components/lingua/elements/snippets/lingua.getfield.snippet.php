@@ -2,6 +2,8 @@
 
 namespace Lingua\Model;
 
+use Lingua\Lingua;
+
 /**
  * Lingua
  *

@@ -1,6 +1,7 @@
 <?php
 namespace Lingua\Model;
 
+use Lingua\Lingua;
 use MODX\Revolution\modX;
 use MODX\Revolution\modRequest;
 use MODX\Revolution\modDocument;

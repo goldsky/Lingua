@@ -1,6 +1,5 @@
 
 <!-- lingua's clone TV started with id: "[[+tv.id]]" -->
-[[+tv.type:isnot=`hidden`:then=`
 <div class="x-form-item x-tab-item modx-tv" id="tv[[+tv.id]]-tr">
     <label for="tv[[+tv.id]]" class="x-form-item-label modx-tv-label" style="width: auto;">
         <div class="modx-tv-label-title">
@@ -27,8 +26,4 @@
         });
     });
 </script>
-`:else=`
-<input type="hidden" id="tvdef[[+tv.id]]" value="[[+tv.default_text:escape]]" />
-[[+tv.formElement]]
-`]]
 <!-- lingua's clone TV ended with id: "[[+tv.id]]" -->

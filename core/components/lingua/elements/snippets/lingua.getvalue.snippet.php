@@ -2,6 +2,8 @@
 
 namespace Lingua\Model;
 
+use Lingua\Lingua;
+use MODX\Revolution\modX;
 use MODX\Revolution\modResource;
 use MODX\Revolution\modTemplateVar;
 

@@ -2,8 +2,20 @@
 
 namespace Lingua;
 
+use Lingua\Model\LinguaLangs;
+use Lingua\Model\LinguaResourceScopes;
+use Lingua\Model\LinguaSiteContent;
+use Lingua\Model\LinguaSiteTmplvarContentvalues;
+use Lingua\Model\LinguaSiteTmplvars;
+use Lingua\Model\LinguaSiteTmplvarsPatterns;
 use MODX\Revolution\modX;
 use MODX\Revolution\modResource;
+use MODX\Revolution\modChunk;
+use MODX\Revolution\modSystemSetting;
+use MODX\Revolution\modContext;
+use MODX\Revolution\modContextSetting;
+use MODX\Revolution\modUserSetting;
+use xPDO\xPDOQuery;
 
 /**
  * Lingua
@@ -303,7 +315,7 @@ class Lingua
             $tplChunk = ltrim($tpl, ':');
             $tplChunk = trim($tpl);
 
-            $chunk = $this->modx->getObject('modChunk', ['name' => $tplChunk], true);
+            $chunk = $this->modx->getObject(modChunk::class, ['name' => $tplChunk], true);
             if (empty($chunk)) {
                 // try to use @splittingred's fallback
                 $f = $this->config['chunksPath'] . strtolower($tplChunk) . '.chunk.tpl';
@@ -336,7 +348,7 @@ class Lingua
      * @return  string  parsed output
      */
     public function parseTplCode($code, array $phs = []) {
-        $chunk = $this->modx->newObject('modChunk');
+        $chunk = $this->modx->newObject(modChunk::class);
         $chunk->setContent($code);
         $chunk->setCacheable(false);
         $phs = $this->replacePropPhs($phs);
@@ -357,7 +369,7 @@ class Lingua
         }
         $o = file_get_contents($file);
         $this->_chunks[$file] = $o;
-        $chunk = $this->modx->newObject('modChunk');
+        $chunk = $this->modx->newObject(modChunk::class);
 
         // just to create a name for the modChunk object.
         $name = strtolower(basename($file));
@@ -521,9 +533,9 @@ class Lingua
         $this->_placeholders['languages_assoc_array'] = [];
         $this->_placeholders['languages_array'] = [];
         // $modx->getOption('cultureKey') doesn't work!
-        $modCultureKey = $this->modx->getObject('modSystemSetting', ['key' => 'cultureKey']);
+        $modCultureKey = $this->modx->getObject(modSystemSetting::class, ['key' => 'cultureKey']);
         $cultureKey = $modCultureKey->get('value');
-        $defaultLang = $this->modx->getObject('LinguaLangs', [
+        $defaultLang = $this->modx->getObject(LinguaLangs::class, [
             'lang_code' => $cultureKey
         ]);
         if ($defaultLang) {
@@ -533,7 +545,7 @@ class Lingua
                 $this->_placeholders['languages_array'][] = $defaultLang->toArray();
             }
         }
-        $c = $this->modx->newQuery('LinguaLangs');
+        $c = $this->modx->newQuery(LinguaLangs::class);
 
         $definedLanguages = $this->getOption('lingua.langs');
         if (!empty($definedLanguages)) {
@@ -554,7 +566,7 @@ class Lingua
                 'id:!=' => $defaultLang->get('id')
             ]);
         }
-        $collection = $this->modx->getCollection('LinguaLangs', $c);
+        $collection = $this->modx->getCollection(LinguaLangs::class, $c);
         if ($collection) {
             foreach ($collection as $item) {
                 if ($assoc) {
@@ -590,7 +602,7 @@ class Lingua
                 } else {
                     $ctxKey = $this->modx->resource->get('context_key');
                 }
-                $contextSettings = $this->modx->getCollection('modContextSetting', [
+                $contextSettings = $this->modx->getCollection(modContextSetting::class, [
                     'context_key' => $ctxKey,
                 ]);
                 if ($contextSettings) {
@@ -606,7 +618,7 @@ class Lingua
             // check resource's ancestors scope
             $ancestors = $this->getAncestors($this->modx->resource->get('id'));
             if (!empty($ancestors)) {
-                $countResourceAncestorsScopes = $this->modx->getCount('LinguaResourceScopes', [
+                $countResourceAncestorsScopes = $this->modx->getCount(LinguaResourceScopes::class, [
                     'resource_id:IN' => $ancestors,
                     'as_ancestor' => 1,
                 ]);
@@ -617,7 +629,7 @@ class Lingua
                      * from the closest ancestor
                      */
                     foreach ($ancestors as $ancestor) {
-                        $scope = $this->modx->getObject('LinguaResourceScopes', [
+                        $scope = $this->modx->getObject(LinguaResourceScopes::class, [
                             'resource_id' => $ancestor,
                             'as_ancestor' => 1,
                         ]);
@@ -635,7 +647,7 @@ class Lingua
             // check resource's parent scope
             $parentId = $this->modx->resource->get('parent');
             if ($parentId > 0) {
-                $linguaResourceParentScope = $this->modx->getObject('LinguaResourceScopes', [
+                $linguaResourceParentScope = $this->modx->getObject(LinguaResourceScopes::class, [
                     'resource_id' => $parentId,
                     'as_parent' => 1,
                 ]);
@@ -648,7 +660,7 @@ class Lingua
                 }
             }
             // check resource's scope
-            $linguaResourceScope = $this->modx->getObject('LinguaResourceScopes', ['resource_id' => $this->modx->resource->get('id')]);
+            $linguaResourceScope = $this->modx->getObject(LinguaResourceScopes::class, ['resource_id' => $this->modx->resource->get('id')]);
             if ($linguaResourceScope) {
                 $props = $linguaResourceScope->get('properties');
                 $props = json_decode($props, true);
@@ -664,7 +676,7 @@ class Lingua
         // user's defined properties
         if ($this->modx->context->get('key') !== 'mgr') {
             if ($this->modx->user->get('id') !== 0) {
-                $userSettings = $this->modx->getCollection('modUserSetting', [
+                $userSettings = $this->modx->getCollection(modUserSetting::class, [
                     'user' => $this->modx->user->get('id'),
                 ]);
                 if ($userSettings) {
@@ -686,7 +698,7 @@ class Lingua
      * @return array list of ancestors
      */
     public function getAncestors($id) {
-        $self = $this->modx->getObject('modResource', $id);
+        $self = $this->modx->getObject(modResource::class, $id);
         if ($self) {
             $parent = $self->get('parent');
             if ($parent > 0) {
@@ -743,16 +755,16 @@ class Lingua
      * @return boolean
      */
     public function setContentTranslation($id, $langCode, array $values = [], $update = true) {
-        $resource = $this->modx->getObject('modResource', $id);
+        $resource = $this->modx->getObject(modResource::class, $id);
         if (!$resource) {
             return false;
         }
-        $this->modx->context = $this->modx->getObject('modContext', ['key' => $resource->get('context_key')]);
+        $this->modx->context = $this->modx->getObject(modContext::class, ['key' => $resource->get('context_key')]);
         $defaultCultureKey = $this->modx->context->getOption('cultureKey');
         if ($langCode === $defaultCultureKey) {
             return false;
         }
-        $linguaLangs = $this->modx->getObject('LinguaLangs', ['lang_code' => $langCode]);
+        $linguaLangs = $this->modx->getObject(LinguaLangs::class, ['lang_code' => $langCode]);
         if (!$linguaLangs) {
             return false;
         }
@@ -760,9 +772,9 @@ class Lingua
             'resource_id' => $id,
             'lang_id' => $linguaLangs->get('id'),
         ];
-        $linguaSiteContent = $this->modx->getObject('LinguaSiteContent', $params);
+        $linguaSiteContent = $this->modx->getObject(LinguaSiteContent::class, $params);
         if (!$linguaSiteContent) {
-            $linguaSiteContent = $this->modx->newObject('LinguaSiteContent');
+            $linguaSiteContent = $this->modx->newObject(LinguaSiteContent::class);
             $linguaSiteContent->fromArray($params);
             $linguaSiteContent->save();
         } else {
@@ -823,16 +835,16 @@ class Lingua
      * @return boolean
      */
     public function setTVTranslation($resourceId, $langCode, $tvId, $val = '', $update = true) {
-        $resource = $this->modx->getObject('modResource', $resourceId);
+        $resource = $this->modx->getObject(modResource::class, $resourceId);
         if (!$resource) {
             return false;
         }
-        $this->modx->context = $this->modx->getObject('modContext', ['key' => $resource->get('context_key')]);
+        $this->modx->context = $this->modx->getObject(modContext::class, ['key' => $resource->get('context_key')]);
         $defaultCultureKey = $this->modx->context->getOption('cultureKey');
         if ($langCode === $defaultCultureKey) {
             return false;
         }
-        $linguaLangs = $this->modx->getObject('LinguaLangs', ['lang_code' => $langCode]);
+        $linguaLangs = $this->modx->getObject(LinguaLangs::class, ['lang_code' => $langCode]);
         if (!$linguaLangs) {
             return false;
         }
@@ -841,9 +853,9 @@ class Lingua
             'tmplvarid' => $tvId,
             'contentid' => $resourceId,
         ];
-        $linguaSiteTmplvarContentvalues = $this->modx->getObject('LinguaSiteTmplvarContentvalues', $params);
+        $linguaSiteTmplvarContentvalues = $this->modx->getObject(LinguaSiteTmplvarContentvalues::class, $params);
         if (!$linguaSiteTmplvarContentvalues) {
-            $linguaSiteTmplvarContentvalues = $this->modx->newObject('LinguaSiteTmplvarContentvalues');
+            $linguaSiteTmplvarContentvalues = $this->modx->newObject(LinguaSiteTmplvarContentvalues::class);
             $linguaSiteTmplvarContentvalues->set('lang_id', $linguaLangs->get('id'));
             $linguaSiteTmplvarContentvalues->set('tmplvarid', $tvId);
             $linguaSiteTmplvarContentvalues->set('contentid', $resourceId);
@@ -871,13 +883,13 @@ class Lingua
                 $langCodes[] = $language['lang_code'];
             }
             // first, delete unused translation
-            $c = $this->modx->newQuery('LinguaSiteContent');
-            $c->innerJoin('LinguaLangs', 'Lang');
+            $c = $this->modx->newQuery(LinguaSiteContent::class);
+            $c->innerJoin(LinguaLangs::class, 'Lang');
             $c->where([
                 'LinguaSiteContent.resource_id:=' => $resourceArray['id'],
                 'Lang.lang_code:NOT IN' => $langCodes,
             ]);
-            $unusedContents = $this->modx->getCollection('LinguaSiteContent', $c);
+            $unusedContents = $this->modx->getCollection(LinguaSiteContent::class, $c);
             if ($unusedContents) {
                 foreach ($unusedContents as $item) {
                     $item->remove();
@@ -887,7 +899,7 @@ class Lingua
                 $this->setContentTranslation($resourceArray['id'], $language['lang_code'], $resourceArray, false);
             }
             $tvs = $resource->getTemplateVars();
-            $translatedTvs = $this->modx->getCollection('LinguaSiteTmplvars');
+            $translatedTvs = $this->modx->getCollection(LinguaSiteTmplvars::class);
             if ($translatedTvs && $tvs) {
                 $translatedTvsArray = [];
                 foreach ($translatedTvs as $translatedTv) {
@@ -895,14 +907,14 @@ class Lingua
                 }
                 foreach ($tvs as $tv) {
                     // first, delete unused translation
-                    $c = $this->modx->newQuery('LinguaSiteTmplvarContentvalues');
-                    $c->innerJoin('LinguaLangs', 'Lang');
+                    $c = $this->modx->newQuery(LinguaSiteTmplvarContentvalues::class);
+                    $c->innerJoin(LinguaLangs::class, 'Lang');
                     $c->where([
                         'LinguaSiteTmplvarContentvalues.contentid:=' => $resourceArray['id'],
                         'LinguaSiteTmplvarContentvalues.tmplvarid:=' => $tv->get('id'),
                         'Lang.lang_code:NOT IN' => $langCodes,
                     ]);
-                    $unusedContents = $this->modx->getCollection('LinguaSiteTmplvarContentvalues', $c);
+                    $unusedContents = $this->modx->getCollection(LinguaSiteTmplvarContentvalues::class, $c);
                     if ($unusedContents) {
                         foreach ($unusedContents as $item) {
                             $item->remove();

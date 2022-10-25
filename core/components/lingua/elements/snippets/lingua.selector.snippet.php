@@ -2,6 +2,7 @@
 
 namespace Lingua\Model;
 
+use Lingua\Lingua;
 use MODX\Revolution\modResource;
 use MODX\Revolution\modSystemSetting;
 

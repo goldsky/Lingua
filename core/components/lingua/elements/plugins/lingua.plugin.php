@@ -1,11 +1,12 @@
 <?php
-
 namespace Lingua\Model;
 
+use Lingua\Lingua;
 use MODX\Revolution\modResource;
 use MODX\Revolution\modTemplate;
 use MODX\Revolution\modTemplateVar;
 use MODX\Revolution\modSystemSetting;
+use MODX\Revolution\modSystemEvent;
 
 header('Content-Type: text/html; charset=utf-8');
 /**
@@ -39,7 +40,7 @@ switch ($event) {
         if ($modx->context->key === 'mgr') {
             return;
         }
-        $lingua = $modx->getService('lingua', 'Lingua');
+        $lingua = $modx->getService('Lingua');
         if (!($lingua instanceof Lingua)) {
             return;
         }
@@ -156,7 +157,7 @@ switch ($event) {
             }
         }
 
-        $lingua = $modx->getService('lingua', 'Lingua');
+        $lingua = $modx->getService('Lingua');
         if (!($lingua instanceof Lingua)) {
             return;
         }
@@ -275,7 +276,7 @@ Ext.onReady(function() {
             }
         }
 
-        $lingua = $modx->getService('lingua', 'Lingua');
+        $lingua = $modx->getService('Lingua');
         if (!($lingua instanceof Lingua)) {
             return;
         }
@@ -304,7 +305,7 @@ Ext.onReady(function() {
         foreach ($tvs as $tv) {
             $tvIds[] = $tv->get('id');
         }
-        $c = $modx->newQuery(linguaSiteTmplvars::class);
+        $c = $modx->newQuery(LinguaSiteTmplvars::class);
         $c->where(array(
             'tmplvarid:IN' => $tvIds
         ));
@@ -389,7 +390,13 @@ Ext.onReady(function() {
                 $phs['tv.id'] = $tvCloneId;
                 $phs['tv.formElement'] = $cloneInputForm;
                 $phs['tv.showCheckbox'] = $showCheckbox;
-                $cloneTVFields[] = $lingua->processElementTags($lingua->parseTpl('lingua.resourcetv.row', $phs));
+                
+                
+                $tpl = 'lingua.resourcetv.row';
+                if ($tv->type == 'hidden') {
+                    $tpl = 'lingua.resourcetv.hidden.row';
+                }
+                $cloneTVFields[] = $lingua->processElementTags($lingua->parseTpl($tpl, $phs));
             }
         }
 
@@ -436,7 +443,7 @@ Ext.onReady(function() {
             }
         }
 
-        $lingua = $modx->getService('lingua', 'Lingua');
+        $lingua = $modx->getService('Lingua');
         if (!($lingua instanceof Lingua)) {
             return;
         }
