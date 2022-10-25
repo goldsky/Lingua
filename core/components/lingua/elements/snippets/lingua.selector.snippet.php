@@ -2,7 +2,6 @@
 
 namespace Lingua\Model;
 
-use Lingua\Lingua;
 use MODX\Revolution\modResource;
 use MODX\Revolution\modSystemSetting;
 
@@ -40,7 +39,7 @@ $codeField = $modx->getOption('codeField', $scriptProperties, 'lang_code');
 $defaultLinguaCorePath = $modx->getOption('core_path') . 'components/lingua/';
 $lingua = $modx->getService('lingua', 'Lingua', null, $scriptProperties);
 
-if (!($lingua instanceof Lingua)) {
+if (!($lingua instanceof \Lingua)) {
     return;
 }
 

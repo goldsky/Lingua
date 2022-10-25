@@ -1,7 +1,6 @@
 <?php
 namespace Lingua\Model;
 
-use Lingua\Lingua;
 use MODX\Revolution\modX;
 use MODX\Revolution\modRequest;
 use MODX\Revolution\modDocument;
@@ -246,7 +245,7 @@ class LinguaRequest extends modRequest
                     // hack the resource's content in here -------------------->
                     $linguaLangs = $this->modx->getObject(LinguaLangs::class, array('lang_code' => $cultureKey));
                     $emptyReturnsDefault = $this->modx->getOption('lingua.empty_returns_default', null, false);
-                    if (($this->lingua instanceof Lingua) && $linguaLangs) {
+                    if (($this->lingua instanceof \Lingua) && $linguaLangs) {
                         $linguaSiteContent = $this->modx->getObject(LinguaSiteContent::class, array(
                             'resource_id' => $resource->get('id'),
                             'lang_id' => $linguaLangs->get('id'),
@@ -276,7 +275,7 @@ class LinguaRequest extends modRequest
                         foreach ($tvs as $tv) {
                             $value = $tv->getValue($resource->get('id'));
                             // hack the tv's content in here ------------------>
-                            if (($this->lingua instanceof Lingua) && $linguaLangs) {
+                            if (($this->lingua instanceof \Lingua) && $linguaLangs) {
                                 $linguaTVContent = $this->modx->getObject(LinguaSiteTmplvarContentvalues::class, array(
                                     'tmplvarid' => $tv->get('id'),
                                     'contentid' => $resourceId,

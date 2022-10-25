@@ -2,7 +2,6 @@
 
 namespace Lingua\Model;
 
-use Lingua\Lingua;
 use MODX\Revolution\modX;
 use MODX\Revolution\modResource;
 use MODX\Revolution\modTemplateVar;
@@ -40,7 +39,7 @@ $emptyReturnsDefault = $modx->getOption('emptyReturnsDefault', $scriptProperties
 
 $lingua = $modx->getService('lingua', 'Lingua', null, $scriptProperties);
 $debug = $modx->getOption('lingua.debug');
-if (!($lingua instanceof Lingua)) {
+if (!($lingua instanceof \Lingua)) {
     $modx->log(modX::LOG_LEVEL_ERROR, '[lingua.getValue]: !($lingua instanceof Lingua)');
     return;
 }
