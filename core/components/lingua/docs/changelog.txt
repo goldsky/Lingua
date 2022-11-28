@@ -1,3 +1,7 @@
+Lingua 3.0.1-dev
+======================================
+- Fix modRequest.class settings
+
 Lingua 3.0.0-dev
 ======================================
 - Add compatibility with MODX 3

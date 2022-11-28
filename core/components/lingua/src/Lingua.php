@@ -42,8 +42,8 @@ use xPDO\xPDOQuery;
 
 class Lingua
 {
-    const VERSION = '3.0.0';
-    const RELEASE = 'beta4';
+    const VERSION = '3.0.1';
+    const RELEASE = 'beta';
 
     /**
      * modX object
