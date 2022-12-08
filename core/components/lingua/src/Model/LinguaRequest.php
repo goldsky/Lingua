@@ -362,7 +362,7 @@ class LinguaRequest extends modRequest
                     $found = $this->findResource($identifier);
                 } else {
                     $identifier = "{$identifier}{$containerSuffix}";
-                    $found = $this->findResource($identifier);
+                    $found = $this->findResource("{$identifier}{$containerSuffix}");
                 }
                 if ($found) {
                     $parameters = $this->getParameters();

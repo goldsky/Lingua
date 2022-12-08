@@ -1,3 +1,7 @@
+Lingua 3.0.2-dev
+======================================
+- Fix findResource parameter in _cleanResourceIdentifier method
+
 Lingua 3.0.1-dev
 ======================================
 - Fix modRequest.class settings
