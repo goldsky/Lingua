@@ -56,5 +56,6 @@ return array(
   array('id' => '49','type' => 'superboxselect','search' => '/("|\')superboxselect-tv-{{tvId}}/','replacement' => '${1}superboxselect-tv-{{tvCloneId}}'),
   array('id' => '50','type' => 'superboxselect','search' => '/("|\'){1}tvdef{{tvId}}("|\'){1}/','replacement' => '${1}tvdef{{tvCloneId}}${2}'),
   array('id' => '51','type' => 'superboxselect','search' => '/tvid: ("|\'){1}{{tvId}}("|\'){1}/','replacement' => 'tvid: ${1}{{tvCloneId}}${2}'),
-  array('id' => '52','type' => 'superboxselect','search' => '/tv{{tvId}}store/','replacement' => 'tv{{tvCloneId}}store')
+  array('id' => '52','type' => 'superboxselect','search' => '/tv{{tvId}}store/','replacement' => 'tv{{tvCloneId}}store'),
+  array('id' => '53','type' => 'superboxselect','search' => '/"tvid": "{{tvId}}"/','replacement' => '"tvid": "{{tvCloneId}}"')
 );
