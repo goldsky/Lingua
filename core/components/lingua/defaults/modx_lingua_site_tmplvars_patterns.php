@@ -49,5 +49,12 @@ return array(
   array('id' => '42','type' => 'migx','search' => '/("|\'){1}migx_iframewin_json_{{tvId}}("|\'){1}/','replacement' => '${1}migx_iframewin_json_{{tvCloneId}}${2}'),
   array('id' => '43','type' => 'migx','search' => '/("|\'){1}migx_iframewin_co_id_{{tvId}}("|\'){1}/','replacement' => '${1}migx_iframewin_co_id_{{tvCloneId}}${2}'),
   array('id' => '44','type' => 'migx','search' => '/("|\'){1}migx_iframewin_store_params_{{tvId}}("|\'){1}/','replacement' => '${1}migx_iframewin_store_params_{{tvCloneId}}${2}'),
-  array('id' => '45','type' => 'migx','search' => '/tv_id:(\\s)*("|\'){1}{{tvId}}("|\'){1}/','replacement' => 'tv_id:${1}${2}{{tvCloneId}}${3}')
+  array('id' => '45','type' => 'migx','search' => '/tv_id:(\\s)*("|\'){1}{{tvId}}("|\'){1}/','replacement' => 'tv_id:${1}${2}{{tvCloneId}}${3}'),
+  array('id' => '46','type' => 'calltoactiontv','search' => '/("|\')modx-calltoactiontv-tv{{tvId}}/','replacement' => '${1}modx-calltoactiontv-tv{{tvCloneId}}'),
+  array('id' => '47','type' => 'calltoactiontv','search' => '/("|\'){1}tv{{tvId}}("|\'){1}/','replacement' => '${1}tv{{tvCloneId}}${2}'),
+  array('id' => '48','type' => 'calltoactiontv','search' => '/tvId: \'{{tvId}}\'/','replacement' => 'tvId: \'{{tvCloneId}}\''),
+  array('id' => '49','type' => 'superboxselect','search' => '/("|\')superboxselect-tv-{{tvId}}/','replacement' => '${1}superboxselect-tv-{{tvCloneId}}'),
+  array('id' => '50','type' => 'superboxselect','search' => '/("|\'){1}tvdef{{tvId}}("|\'){1}/','replacement' => '${1}tvdef{{tvCloneId}}${2}'),
+  array('id' => '51','type' => 'superboxselect','search' => '/tvid: ("|\'){1}{{tvId}}("|\'){1}/','replacement' => 'tvid: ${1}{{tvCloneId}}${2}'),
+  array('id' => '52','type' => 'superboxselect','search' => '/tv{{tvId}}store/','replacement' => 'tv{{tvCloneId}}store')
 );
