@@ -1,7 +1,7 @@
 <?php
 
 if (!defined('MODX_CORE_PATH')) {
-    $path = dirname(__FILE__);
+    $path = __DIR__;
     while (!file_exists($path . '/core/config/config.inc.php') && (strlen($path) > 1)) {
         $path = dirname($path);
     }
@@ -11,7 +11,7 @@ if (!defined('MODX_CORE_PATH')) {
 return [
     'name' => 'Lingua',
     'name_lower' => 'lingua',
-    'version' => '3.0.2',
+    'version' => '3.0.3',
     'release' => 'beta',
     // Install package to site right after build
     'install' => true,
@@ -37,7 +37,7 @@ return [
     ],
     // Log settings
     'log_level' => !empty($_REQUEST['download']) ? 0 : 3,
-    'log_target' => php_sapi_name() == 'cli' ? 'ECHO' : 'HTML',
+    'log_target' => PHP_SAPI === 'cli' ? 'ECHO' : 'HTML',
     // Download transport.zip after build
     'download' => !empty($_REQUEST['download']),
 ];
