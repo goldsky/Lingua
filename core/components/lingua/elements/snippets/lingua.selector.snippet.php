@@ -1,5 +1,10 @@
 <?php
 
+namespace Lingua\Model;
+
+use MODX\Revolution\modResource;
+use MODX\Revolution\modSystemSetting;
+
 /**
  * Lingua
  *
@@ -32,10 +37,9 @@ $phsPrefix = $modx->getOption('phsPrefix', $scriptProperties, 'lingua.');
 $codeField = $modx->getOption('codeField', $scriptProperties, 'lang_code');
 
 $defaultLinguaCorePath = $modx->getOption('core_path') . 'components/lingua/';
-$linguaCorePath = $modx->getOption('lingua.core_path', null, $defaultLinguaCorePath);
-$lingua = $modx->getService('lingua', 'Lingua', $linguaCorePath . 'model/lingua/', $scriptProperties);
+$lingua = $modx->getService('lingua', 'Lingua', null, $scriptProperties);
 
-if (!($lingua instanceof Lingua)) {
+if (!($lingua instanceof \Lingua)) {
     return;
 }
 
@@ -176,12 +180,12 @@ $originPageUrl = $pageURL;
 $requestUri = preg_replace('/^'. preg_quote(MODX_BASE_URL, '/') . '/i', '', $parseUrl['path']);
 
 // $modx->getOption('cultureKey') is overriden by plugin!
-$modCultureKey = $modx->getObject('modSystemSetting', array('key' => 'cultureKey'));
+$modCultureKey = $modx->getObject(modSystemSetting::class, array('key' => 'cultureKey'));
 $cultureKey = $modCultureKey->get('value');
 
 $baseUrl = $modx->getOption('base_url', $scriptProperties);
 $baseUrl = preg_replace('/^'. preg_quote(MODX_BASE_URL, '/') . '/i', '', $baseUrl);
-$originResource = $modx->getObject('modResource', $modx->resource->get('id'));
+$originResource = $modx->getObject(modResource::class, $modx->resource->get('id'));
 
 $languages = $lingua->getLanguages($activeOnly);
 $selections = array();
@@ -190,7 +194,7 @@ foreach ($languages as $language) {
         continue;
     }
 
-    $cloneSite = $modx->getObject('linguaSiteContent', array(
+    $cloneSite = $modx->getObject(LinguaSiteContent::class, array(
         'resource_id' => $modx->resource->get('id'),
         'lang_id' => $language['id'],
     ));

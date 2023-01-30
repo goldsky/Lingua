@@ -27,7 +27,7 @@
 $collection = array();
 $patterns = include dirname(__FILE__) . '/modx_lingua_site_tmplvars_patterns.php';
 foreach ($patterns as $pattern) {
-    $oldPattern = $modx->getObject('linguaSiteTmplvarsPatterns', array(
+    $oldPattern = $modx->getObject('Lingua\\Model\\LinguaSiteTmplvarsPatterns', array(
 		'type' => $pattern['type'],
 		'search' => $pattern['search'],
 		'replacement' => $pattern['replacement'],
@@ -35,7 +35,7 @@ foreach ($patterns as $pattern) {
     if ($oldPattern) {
         continue;
     }
-	$newPattern = $modx->newObject('linguaSiteTmplvarsPatterns');
+	$newPattern = $modx->newObject('Lingua\\Model\\LinguaSiteTmplvarsPatterns');
 	$newPattern->fromArray(array(
 		'type' => $pattern['type'],
 		'search' => $pattern['search'],

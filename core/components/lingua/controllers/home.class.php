@@ -1,5 +1,7 @@
 <?php
 
+use MODX\Revolution\modExtraManagerController;
+
 /**
  * Lingua
  *
@@ -23,37 +25,87 @@
  * @subpackage lingua_controller
  */
 
-class LinguaHomeManagerController extends LinguaManagerController {
+class LinguaHomeManagerController extends modExtraManagerController
+{
+    /** @var Lingua\Lingua $Lingua */
+    public $Lingua;
 
-	public function process(array $scriptProperties = array()) {
 
-	}
+    /**
+     *
+     */
+    public function initialize()
+    {
+        $this->Lingua = $this->modx->services->get('Lingua');
 
-	public function getPageTitle() {
-		return $this->modx->lexicon('lingua');
-	}
+        $this->addCss($this->Lingua->config['cssUrl'] . 'mgr.css');
+        $this->addJavascript($this->Lingua->config['jsUrl'] . 'mgr/lingua.js');
+        $this->addHtml('<script type="text/javascript">
+        Ext.onReady(function() {
+            Lingua.config = ' . $this->modx->toJSON($this->Lingua->config) . ';
+        });
+        </script>');
 
-	public function loadCustomCssJs() {
-		$this->addJavascript($this->lingua->config['jsUrl'] . 'mgr/widgets/window.autosync.js');
-		$this->addJavascript($this->lingua->config['jsUrl'] . 'mgr/widgets/window.manualsync.js');
-		$this->addJavascript($this->lingua->config['jsUrl'] . 'mgr/widgets/grid.sync.js');
-		$this->addJavascript($this->lingua->config['jsUrl'] . 'mgr/widgets/combo.resource.js');
-		$this->addJavascript($this->lingua->config['jsUrl'] . 'mgr/widgets/window.resourcescope.js');
-		$this->addJavascript($this->lingua->config['jsUrl'] . 'mgr/widgets/grid.resourcescopes.js');
-		$this->addJavascript($this->lingua->config['jsUrl'] . 'ux/CheckColumn.js');
-		$this->addJavascript($this->lingua->config['jsUrl'] . 'mgr/widgets/window.tvpattern.js');
-		$this->addJavascript($this->lingua->config['jsUrl'] . 'mgr/widgets/grid.tvspatterns.js');
-		$this->addJavascript($this->lingua->config['jsUrl'] . 'mgr/widgets/combo.tv.js');
-		$this->addJavascript($this->lingua->config['jsUrl'] . 'mgr/widgets/window.tv.js');
-		$this->addJavascript($this->lingua->config['jsUrl'] . 'mgr/widgets/grid.tvs.js');
-		$this->addJavascript($this->lingua->config['jsUrl'] . 'mgr/widgets/window.lang.js');
-		$this->addJavascript($this->lingua->config['jsUrl'] . 'mgr/widgets/grid.langs.js');
-		$this->addJavascript($this->lingua->config['jsUrl'] . 'mgr/widgets/panel.home.js');
-		$this->addLastJavascript($this->lingua->config['jsUrl'] . 'mgr/sections/index.js');
-	}
+        parent::initialize();
+    }
 
-	public function getTemplateFile() {
-		return $this->lingua->config['templatesPath'] . 'home.tpl';
-	}
 
+    /**
+     * @return array
+     */
+    public function getLanguageTopics()
+    {
+        return ['lingua:default', 'lingua:cmp'];
+    }
+
+
+    /**
+     * @return bool
+     */
+    public function checkPermissions()
+    {
+        return true;
+    }
+
+
+    /**
+     * @return null|string
+     */
+    public function getPageTitle()
+    {
+        return $this->modx->lexicon('lingua');
+    }
+
+
+    /**
+     * @return void
+     */
+    public function loadCustomCssJs()
+    {
+		$this->addJavascript($this->Lingua->config['jsUrl'] . 'mgr/widgets/window.autosync.js');
+		$this->addJavascript($this->Lingua->config['jsUrl'] . 'mgr/widgets/window.manualsync.js');
+		$this->addJavascript($this->Lingua->config['jsUrl'] . 'mgr/widgets/grid.sync.js');
+		$this->addJavascript($this->Lingua->config['jsUrl'] . 'mgr/widgets/combo.resource.js');
+		$this->addJavascript($this->Lingua->config['jsUrl'] . 'mgr/widgets/window.resourcescope.js');
+		$this->addJavascript($this->Lingua->config['jsUrl'] . 'mgr/widgets/grid.resourcescopes.js');
+		$this->addJavascript($this->Lingua->config['jsUrl'] . 'ux/CheckColumn.js');
+		$this->addJavascript($this->Lingua->config['jsUrl'] . 'mgr/widgets/window.tvpattern.js');
+		$this->addJavascript($this->Lingua->config['jsUrl'] . 'mgr/widgets/grid.tvspatterns.js');
+		$this->addJavascript($this->Lingua->config['jsUrl'] . 'mgr/widgets/combo.tv.js');
+		$this->addJavascript($this->Lingua->config['jsUrl'] . 'mgr/widgets/window.tv.js');
+		$this->addJavascript($this->Lingua->config['jsUrl'] . 'mgr/widgets/grid.tvs.js');
+		$this->addJavascript($this->Lingua->config['jsUrl'] . 'mgr/widgets/window.lang.js');
+		$this->addJavascript($this->Lingua->config['jsUrl'] . 'mgr/widgets/grid.langs.js');
+		$this->addJavascript($this->Lingua->config['jsUrl'] . 'mgr/widgets/panel.home.js');
+		$this->addLastJavascript($this->Lingua->config['jsUrl'] . 'mgr/sections/index.js');
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getTemplateFile()
+    {
+        return $this->Lingua->config['templatesPath'] . 'home.tpl';
+    }
 }
